@@ -3,27 +3,531 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cheat Sheet Αποδείξεων — Μαθηματικά Πληροφορικής</title>
+  <meta name="description"
+        content="Cheatsheet Τεχνικών Απόδειξης — Άμεση, Άτοπο, Επαγωγή, Πιθανοτική, Διαγωνοποίηση και άλλες.">
+  <title>Cheatsheet Αποδείξεων | Μαθ. Πληροφορικής ΕΚΠΑ</title>
   <link rel="stylesheet" href="../css/style.css">
   <script>
-    window.MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };
+    window.MathJax = {
+      tex: {
+        inlineMath:  [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        macros: { N: '\\mathbb{N}', R: '\\mathbb{R}', Q: '\\mathbb{Q}' }
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+    };
+    (function () {
+      const t = localStorage.getItem('math-plir-theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
   <script src="../js/main.js" defer></script>
+  <style>
+    .tech-card {
+      border-radius: 10px;
+      border: 1px solid var(--color-border, #d0d8f0);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.25rem;
+      background: var(--color-surface, #fff);
+    }
+    .tech-card__header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .tech-card__icon {
+      font-size: 1.5rem;
+      width: 2.2rem;
+      text-align: center;
+    }
+    .tech-card__title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--color-primary, #3b6fd4);
+      margin: 0;
+    }
+    .tech-card__grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem 1.25rem;
+      font-size: 0.92rem;
+    }
+    .tech-card__grid dt { font-weight: 600; color: var(--color-text-secondary, #555); }
+    .tech-card__grid dd { margin: 0 0 0.25rem 0; }
+    .tag-when {
+      display: inline-block;
+      background: #e8f0fe;
+      color: #1a56db;
+      border-radius: 4px;
+      padding: 0.1rem 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    [data-theme="dark"] .tag-when { background: #1e3a8a; color: #93c5fd; }
+    .trap-list { list-style: none; padding: 0; }
+    .trap-list li::before { content: "⚠️ "; }
+    .quick-ref-table td, .quick-ref-table th { font-size: 0.88rem; }
+    [data-theme="dark"] .tech-card { background: var(--color-surface, #1a1f2e); }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Cheat Sheet Αποδείξεων</h1>
-    <a href="../index.html">← Αρχική</a>
-  </header>
 
-  <main>
-    <p><em>Placeholder — περιεχόμενο θα συμπληρωθεί.</em></p>
+<header class="site-header" role="banner">
+  <div class="site-header__inner">
+    <a href="../index.html" class="site-header__title">&#8469; Μαθηματικά Πληροφορικής</a>
+    <nav class="site-nav" aria-label="Κύρια πλοήγηση">
+      <a href="../index.html">Αρχική</a>
+      <a href="../lectures/lecture1.html">Διαλέξεις</a>
+      <a href="induction.html" aria-current="page">Θέματα</a>
+      <a href="../exercises/solved.html">Ασκήσεις</a>
+      <a href="../exam-prep/formulas.html">Εξεταστική</a>
+    </nav>
+    <button id="theme-toggle" class="btn-theme-toggle"
+            aria-label="Εναλλαγή σκοτεινής λειτουργίας">&#127769; Σκοτεινό</button>
+  </div>
+</header>
+
+<div class="page-wrapper">
+
+  <aside class="sidebar-toc" aria-label="Περιεχόμενα σελίδας">
+    <button class="toc-toggle" aria-expanded="true">&#128203; Περιεχόμενα &#9662;</button>
+    <div class="sidebar-toc__title">Τεχνικές</div>
+    <ol class="sidebar-toc__list">
+      <li><a href="#quick-ref">Γρήγορη Αναφορά</a></li>
+      <li><a href="#t-direct">1. Άμεση Απόδειξη</a></li>
+      <li><a href="#t-contra">2. Αντιθετοαντίστροφη</a></li>
+      <li><a href="#t-absurd">3. Απαγωγή σε Άτοπο</a></li>
+      <li><a href="#t-induction">4. Επαγωγή</a></li>
+      <li><a href="#t-construction">5. Κατασκευαστική Ύπαρξη</a></li>
+      <li><a href="#t-counter">6. Αντιπαράδειγμα</a></li>
+      <li><a href="#t-pigeonhole">7. Αρχή Περιστερεώνα</a></li>
+      <li><a href="#t-probabilistic">8. Πιθανοτική Μέθοδος</a></li>
+      <li><a href="#t-diagonal">9. Διαγωνοποίηση</a></li>
+    </ol>
+  </aside>
+
+  <main class="main-content" id="main-content">
+
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <div class="breadcrumbs__item"><a href="../index.html">Αρχική</a></div>
+      <div class="breadcrumbs__item"><span class="breadcrumbs__current">Cheatsheet Αποδείξεων</span></div>
+    </nav>
+
+    <h1 class="lecture-title">Cheatsheet Τεχνικών Απόδειξης</h1>
+    <p class="lecture-subtitle">
+      Quick reference για όλες τις τεχνικές που χρησιμοποιούνται στο μάθημα.
+      Πότε, πώς, παράδειγμα, παγίδες.
+    </p>
+
+    <!-- Γρήγορη Αναφορά -->
+    <section id="quick-ref">
+      <h2>Γρήγορη Αναφορά</h2>
+      <table class="math-table quick-ref-table">
+        <thead>
+          <tr>
+            <th>Τεχνική</th>
+            <th>Κλειδί Αναγνώρισης</th>
+            <th>Φόρμα</th>
+            <th>Διάλεξη</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Άμεση</td>
+            <td>Σαφείς υποθέσεις → συμπέρασμα</td>
+            <td>\(P \Rightarrow Q\) απευθείας</td>
+            <td><a href="../lectures/lecture1.html">Δ1</a></td>
+          </tr>
+          <tr>
+            <td>Αντιθετοαντίστροφη</td>
+            <td>«Αν \(\neg Q\) τότε \(\neg P\)» ευκολότερο</td>
+            <td>\(\neg Q \Rightarrow \neg P\)</td>
+            <td><a href="../lectures/lecture1.html">Δ1</a></td>
+          </tr>
+          <tr>
+            <td>Άτοπο</td>
+            <td>Αδύνατο να κατασκευάσω αντίθετο</td>
+            <td>Υποθέτω \(\neg P\), φτάνω σε \(A \land \neg A\)</td>
+            <td><a href="../lectures/lecture1.html">Δ1</a></td>
+          </tr>
+          <tr>
+            <td>Μαθ. Επαγωγή</td>
+            <td>Ιδιότητα για \(n \in \N\)</td>
+            <td>Βάση + Βήμα \(n\to n+1\)</td>
+            <td><a href="../lectures/lecture2.html">Δ2</a></td>
+          </tr>
+          <tr>
+            <td>Ισχυρή Επαγωγή</td>
+            <td>Βήμα χρειάζεται \(k < n\)</td>
+            <td>Ε.Υ.: κάθε \(m < n\)</td>
+            <td><a href="../lectures/lecture2.html">Δ2</a></td>
+          </tr>
+          <tr>
+            <td>Δομική Επαγωγή</td>
+            <td>Αντικείμενο ορισμένο επαγωγικά</td>
+            <td>Βάση δομής + κανόνας</td>
+            <td><a href="../lectures/lecture3.html">Δ3</a></td>
+          </tr>
+          <tr>
+            <td>Κατασκευαστική</td>
+            <td>«Υπάρχει» — φτιάξε το ρητά</td>
+            <td>Αλγόριθμος / κατασκευή</td>
+            <td><a href="../lectures/lecture4.html">Δ4</a></td>
+          </tr>
+          <tr>
+            <td>Αντιπαράδειγμα</td>
+            <td>Διάψευση ∀-ισχυρισμού</td>
+            <td>Ένα \(x\) με \(\neg P(x)\)</td>
+            <td><a href="../lectures/lecture1.html">Δ1</a></td>
+          </tr>
+          <tr>
+            <td>Περιστερεώνας</td>
+            <td>\(n+1\) αντικ. σε \(n\) κλάσεις</td>
+            <td>Pigeonhole principle</td>
+            <td><a href="../lectures/lecture4.html">Δ4</a></td>
+          </tr>
+          <tr>
+            <td>Πιθανοτική</td>
+            <td>Ύπαρξη με \(\Pr > 0\)</td>
+            <td>Τυχαία δομή, union bound</td>
+            <td><a href="../lectures/lecture4.html">Δ4</a></td>
+          </tr>
+          <tr>
+            <td>Διαγωνοποίηση</td>
+            <td>Μη-απαριθμησιμότητα / Halting</td>
+            <td>Diagonal construction</td>
+            <td><a href="../lectures/lecture5.html">Δ5</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 1. Άμεση -->
+    <section id="t-direct">
+      <h2>1. Άμεση Απόδειξη</h2>
+      <div class="tech-card">
+        <div class="tech-card__header">
+          <div class="tech-card__icon">➡️</div>
+          <h3 class="tech-card__title">Άμεση Απόδειξη</h3>
+        </div>
+        <div class="tag-when">Πότε</div>
+        <p>Όταν οι υποθέσεις μεταφράζονται απευθείας στο συμπέρασμα μέσω γνωστών θεωρημάτων, ορισμών ή αλγεβρικών μετασχηματισμών.</p>
+        <dl class="tech-card__grid">
+          <dt>Φόρμα</dt>
+          <dd>Υποθέτω \(P\). Με βάση [ορισμό/θεώρημα]: ... Άρα \(Q\). \(\square\)</dd>
+          <dt>Παράδειγμα</dt>
+          <dd>«Αν \(n\) ζυγός, τότε \(n^2\) ζυγός.»
+            Βάζω \(n = 2k\), τότε \(n^2 = 4k^2 = 2(2k^2)\).</dd>
+        </dl>
+        <ul class="trap-list">
+          <li>Μην παρουσιάζετε ως «άμεση» μια απόδειξη που κρύβει κυκλικό συλλογισμό.</li>
+          <li>Φροντίστε να χρησιμοποιείτε ρητά τις υποθέσεις — μην τις αγνοείτε.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 2. Αντιθετοαντίστροφη -->
+    <section id="t-contra">
+      <h2>2. Αντιθετοαντίστροφη (Contrapositive)</h2>
+      <div class="tech-card">
+        <div class="tech-card__header">
+          <div class="tech-card__icon">↩️</div>
+          <h3 class="tech-card__title">Αντιθετοαντίστροφη</h3>
+        </div>
+        <div class="tag-when">Πότε</div>
+        <p>Όταν το «αν \(\neg Q\) τότε \(\neg P\)» είναι φυσικότερο να αποδείξετε.
+          Ισοδύναμο λογικά με \(P \Rightarrow Q\).</p>
+        <dl class="tech-card__grid">
+          <dt>Φόρμα</dt>
+          <dd>Αποδεικνύω \(\neg Q \Rightarrow \neg P\):<br>
+              Υποθέτω \(\neg Q\). ... Άρα \(\neg P\). \(\square\)</dd>
+          <dt>Παράδειγμα</dt>
+          <dd>«Αν \(n^2\) ζυγός τότε \(n\) ζυγός.»
+            Αντιστρόφως: αν \(n\) μονός (\(n=2k+1\)) τότε \(n^2=4k^2+4k+1\) μονός.</dd>
+        </dl>
+        <ul class="trap-list">
+          <li>Μη μπερδεύετε με «αντίστροφο» (\(Q \Rightarrow P\)) — είναι διαφορετική πρόταση.</li>
+          <li>Πρέπει να αποδείξετε \(\neg Q \Rightarrow \neg P\), όχι \(\neg P \Rightarrow \neg Q\).</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 3. Άτοπο -->
+    <section id="t-absurd">
+      <h2>3. Απαγωγή σε Άτοπο (Contradiction)</h2>
+      <div class="tech-card">
+        <div class="tech-card__header">
+          <div class="tech-card__icon">💥</div>
+          <h3 class="tech-card__title">Απαγωγή σε Άτοπο</h3>
+        </div>
+        <div class="tag-when">Πότε</div>
+        <p>Όταν δεν μπορείτε να κατασκευάσετε αντικείμενο με τις ιδιότητες \(\neg P\),
+          ή όταν \(\neg P\) οδηγεί αναπόφευκτα σε αντίφαση.</p>
+        <dl class="tech-card__grid">
+          <dt>Φόρμα</dt>
+          <dd>Υποθέτω \(\neg P\). Τότε ... [αλυσίδα συλλογισμών] ... Άρα \(A \land \neg A\). Άτοπο.
+            Άρα \(P\). \(\square\)</dd>
+          <dt>Παράδειγμα</dt>
+          <dd>«\(\sqrt{2}\) άρρητος.» Υποθέτω \(\sqrt{2} = p/q\) πλήρως απλοποιημένο.
+            Τότε \(2q^2 = p^2\) → \(p\) ζυγός → \(p=2k\) → \(q^2=2k^2\) → \(q\) ζυγός. Αντίφαση.</dd>
+        </dl>
+        <ul class="trap-list">
+          <li>Η αντίφαση πρέπει να πηγάζει από \(\neg P\) — μην χρησιμοποιείτε ήδη αποδεδειγμένα γεγονότα ως «άτοπο».</li>
+          <li>Προτιμήστε αντιθετοαντίστροφη όταν είναι δυνατό (πιο διαφανής).</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 4. Επαγωγή -->
+    <section id="t-induction">
+      <h2>4. Επαγωγή (Μαθηματική / Ισχυρή / Δομική)</h2>
+      <div class="tech-card">
+        <div class="tech-card__header">
+          <div class="tech-card__icon">🔁</div>
+          <h3 class="tech-card__title">Επαγωγή</h3>
+        </div>
+        <div class="tag-when">Πότε</div>
+        <p>Ιδιότητες για φυσικούς αριθμούς ή επαγωγικά ορισμένες δομές.
+          Βλ. αναλυτικά <a href="induction.html">Οδηγό Επαγωγής</a>.</p>
+        <dl class="tech-card__grid">
+          <dt>Απλή</dt>
+          <dd>Βήμα \(n \to n+1\), Ε.Υ. για \(n\)</dd>
+          <dt>Ισχυρή</dt>
+          <dd>Ε.Υ. για κάθε \(m &lt; n\)</dd>
+          <dt>Δομική</dt>
+          <dd>Ε.Υ. για «μικρότερα» υπο-αντικείμενα</dd>
+          <dt>Παράδειγμα</dt>
+          <dd>Φόρμουλες αθροισμάτων (απλή), Fibonacci (ισχυρή), \(\ell(x\circ y)\) (δομική)</dd>
+        </dl>
+        <ul class="trap-list">
+          <li>Λάθος βάση → όλη η απόδειξη καταρρέει.</li>
+          <li>Κυκλική Ε.Υ. (χρήση \(n+1\) για \(n+1\)) — μη-αποδεκτό.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 5. Κατασκευαστική -->
+    <section id="t-construction">
+      <h2>5. Κατασκευαστική Απόδειξη Ύπαρξης</h2>
+      <div class="tech-card">
+        <div class="tech-card__header">
+          <div class="tech-card__icon">🔨</div>
+          <h3 class="tech-card__title">Κατασκευαστική Ύπαρξη</h3>
+        </div>
+        <div class="tag-when">Πότε</div>
+        <p>Όταν η εκφώνηση λέει «υπάρχει» και μπορείτε να κατασκευάσετε ρητά αυτό που ζητείται.</p>
+        <dl class="tech-card__grid">
+          <dt>Φόρμα</dt>
+          <dd>«Ορίζουμε \(x = \ldots\). Αποδεικνύουμε ότι \(x\) έχει τις ζητούμενες ιδιότητες.»</dd>
+          <dt>Παράδειγμα</dt>
+          <dd>«Υπάρχουν \(x, y \in \Z\) με \(ax + by = \gcd(a,b)\).»
+            Κατασκευή: ExtGCD αλγόριθμος (Δ4).</dd>
+        </dl>
+        <ul class="trap-list">
+          <li>Δεν φτάνει να «πείτε» ότι υπάρχει — πρέπει να κατασκευάσετε ρητά ή να αποδείξετε ύπαρξη με άλλη μέθοδο.</li>
+          <li>Βεβαιωθείτε ότι η κατασκευή σας ικανοποιεί όλους τους απαιτούμενους περιορισμούς.</li>
+        </ul>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Μη-Κατασκευαστική Ύπαρξη — \(\sqrt{2}^{\sqrt{2}}\)</div>
+        <p>
+          Ορίζουμε \(a = \sqrt{2}^{\sqrt{2}}\).
+          Αν \(a\) άρρητος: τότε \(a^{\sqrt{2}} = \sqrt{2}^2 = 2\) ρητός — άρα \(x=a, y=\sqrt{2}\) δίνει \(x^y\) ρητό.
+          Αν \(a\) ρητός: τότε \(x = y = \sqrt{2}\) δίνει \(x^y = a\) ρητό.
+          Σε κάθε περίπτωση ο ισχυρισμός ισχύει, χωρίς να γνωρίζουμε ποια περίπτωση ισχύει!
+          (Πηγή: <a href="../lectures/lecture4.html#sec-nonconstructive">Δ4 §1</a>.)
+        </p>
+      </div>
+    </section>
+
+    <!-- 6. Αντιπαράδειγμα -->
+    <section id="t-counter">
+      <h2>6. Αντιπαράδειγμα</h2>
+      <div class="tech-card">
+        <div class="tech-card__header">
+          <div class="tech-card__icon">❌</div>
+          <h3 class="tech-card__title">Αντιπαράδειγμα</h3>
+        </div>
+        <div class="tag-when">Πότε</div>
+        <p>Για να αποδείξετε ότι ένας ∀-ισχυρισμός είναι <em>ψευδής</em>:
+          αρκεί ένα μόνο αντιπαράδειγμα.</p>
+        <dl class="tech-card__grid">
+          <dt>Φόρμα</dt>
+          <dd>«Ο ισχυρισμός είναι ψευδής. Αντιπαράδειγμα: \(x = \ldots\).
+            Τότε [επαληθεύστε ότι \(\neg P(x)\)].»</dd>
+          <dt>Παράδειγμα</dt>
+          <dd>«Κάθε πρώτος είναι μονός.» Αντιπαράδειγμα: \(2\) είναι πρώτος και ζυγός.</dd>
+        </dl>
+        <ul class="trap-list">
+          <li>Ένα αντιπαράδειγμα αρκεί — δεν χρειάζεστε απαρίθμηση.</li>
+          <li>Μην δίνετε «ψευδο-αντιπαράδειγμα» — ελέγξτε ότι πράγματι ικανοποιεί τις υποθέσεις αλλά όχι το συμπέρασμα.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 7. Περιστερεώνας -->
+    <section id="t-pigeonhole">
+      <h2>7. Αρχή Περιστερεώνα (Pigeonhole)</h2>
+      <div class="tech-card">
+        <div class="tech-card__header">
+          <div class="tech-card__icon">🐦</div>
+          <h3 class="tech-card__title">Αρχή Περιστερεώνα</h3>
+        </div>
+        <div class="tag-when">Πότε</div>
+        <p>Όταν έχετε \(n+1\) αντικείμενα και \(n\) κατηγορίες — κάποια κατηγορία έχει \(\ge 2\).
+          Γενίκευση: αν \(m\) αντικείμενα σε \(n\) κλάσεις, τότε κάποια έχει \(\ge \lceil m/n \rceil\).</p>
+        <dl class="tech-card__grid">
+          <dt>Φόρμα</dt>
+          <dd>«Ορίζουμε \(n\) "συρτάρια" ως [...].<br>
+              Αφού \(m > n\), κάποιο συρτάρι περιέχει \(\ge 2\) αντικείμενα.»</dd>
+          <dt>Παράδειγμα</dt>
+          <dd>Σε 13 ανθρώπους υπάρχουν δύο με ίδιο μήνα γέννησης. (13 άνθρωποι, 12 μήνες.)</dd>
+        </dl>
+        <ul class="trap-list">
+          <li>Οι κλάσεις πρέπει να καλύπτουν ΟΛα τα αντικείμενα.</li>
+          <li>Μην κάνετε την ανάθεση κυκλική — πρέπει να είναι σαφής.</li>
+        </ul>
+      </div>
+
+      <h3>Εφαρμογές στο Μάθημα</h3>
+      <table class="math-table">
+        <thead><tr><th>Εφαρμογή</th><th>Αντικείμενα</th><th>Συρτάρια</th><th>Πηγή</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Dirichlet Approximation</td>
+            <td>\(m+1\) κλασματικά μέρη \(\{k\theta\}\)</td>
+            <td>\(m\) διαστήματα \([i/m,(i+1)/m)\)</td>
+            <td><a href="../lectures/lecture4.html#sec-dirichlet">Δ4 §6</a></td>
+          </tr>
+          <tr>
+            <td>Erdős–Szekeres</td>
+            <td>\(n^2+1\) αριθμοί, \(d_i\) αύξουσες υπακολουθίες</td>
+            <td>\(n\) τιμές \(1,\ldots,n\)</td>
+            <td><a href="../lectures/lecture4.html#sec-es">Δ4 §5</a></td>
+          </tr>
+          <tr>
+            <td>Βαθμός γράφου</td>
+            <td>\(n\) κόμβοι με βαθμούς \(0,\ldots,n-1\)</td>
+            <td>Δεν μπορεί ταυτόχρονα 0 και \(n-1\)</td>
+            <td><a href="../lectures/lecture6.html">Δ6</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 8. Πιθανοτική -->
+    <section id="t-probabilistic">
+      <h2>8. Πιθανοτική Μέθοδος</h2>
+      <div class="tech-card">
+        <div class="tech-card__header">
+          <div class="tech-card__icon">🎲</div>
+          <h3 class="tech-card__title">Πιθανοτική Μέθοδος</h3>
+        </div>
+        <div class="tag-when">Πότε</div>
+        <p>Για να αποδείξετε ύπαρξη αντικειμένου με κάποια ιδιότητα, χωρίς να το κατασκευάσετε ρητά.
+          Αν σε τυχαία επιλογή \(\Pr[\text{ιδιότητα}] > 0\), τότε το αντικείμενο υπάρχει.</p>
+        <dl class="tech-card__grid">
+          <dt>Φόρμα (Union Bound)</dt>
+          <dd>Αν \(\Pr[\exists \text{ "κακό" } A] \le \sum \Pr[A_i] < 1\),
+            τότε με θετική πιθανότητα κανένα κακό δεν συμβαίνει.</dd>
+          <dt>Παράδειγμα</dt>
+          <dd>Erdős (1947): \(R(k,k) > 2^{k/2}\).
+            Τυχαίος 2-χρωματισμός \(K_N\): \(\Pr[\text{υπάρχει mono } K_k] < 1\) για \(N = 2^{k/2}\).</dd>
+        </dl>
+        <ul class="trap-list">
+          <li>Μη-κατασκευαστική: δεν λέμε <em>ποιο</em> αντικείμενο — μόνο ότι <em>υπάρχει</em>.</li>
+          <li>Προσέξτε ότι το σύμπαν πιθανότητας είναι καλά ορισμένο.</li>
+          <li>Union bound: \(\Pr[\bigcup A_i] \le \sum \Pr[A_i]\) — ισχύει αλλά μπορεί να είναι χαλαρό.</li>
+        </ul>
+      </div>
+
+      <h3>Εφαρμογές στο Μάθημα</h3>
+      <table class="math-table">
+        <thead><tr><th>Εφαρμογή</th><th>Τυχαία Επιλογή</th><th>Αποτέλεσμα</th><th>Πηγή</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>\(m(n) \ge 2^{n-1}\)</td>
+            <td>Τυχαία 2-χρώμ. \(K_n\)</td>
+            <td>Λίγες μονόχρωμες \(K_3\)</td>
+            <td><a href="../lectures/lecture4.html#sec-probabilistic">Δ4 §3</a></td>
+          </tr>
+          <tr>
+            <td>\(R(k,k) > 2^{k/2}\)</td>
+            <td>Τυχαίος 2-χρωμ. \(K_N\)</td>
+            <td>Δεν υπάρχει mono \(K_k\) με πιθανότητα \(> 0\)</td>
+            <td><a href="../lectures/lecture4.html#sec-ramsey-lower">Δ4 §4</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 9. Διαγωνοποίηση -->
+    <section id="t-diagonal">
+      <h2>9. Διαγωνοποίηση</h2>
+      <div class="tech-card">
+        <div class="tech-card__header">
+          <div class="tech-card__icon">📐</div>
+          <h3 class="tech-card__title">Διαγωνοποίηση (Cantor)</h3>
+        </div>
+        <div class="tag-when">Πότε</div>
+        <p>Για να αποδείξετε μη-απαριθμησιμότητα ή μη-αποφασιστότητα.
+          Κατασκευάστε αντικείμενο που <em>διαφέρει από το \(i\)-οστό στην \(i\)-οστή συντεταγμένη</em>.</p>
+        <dl class="tech-card__grid">
+          <dt>Φόρμα</dt>
+          <dd>Υποθέτω απαρίθμηση \(x_1, x_2, \ldots\).<br>
+              Κατασκευώ \(y\) με \(y_i \ne (x_i)_i\).<br>
+              Τότε \(y \ne x_i\) για κάθε \(i\) — άτοπο.</dd>
+          <dt>Παράδειγμα 1</dt>
+          <dd>\(\R\) μη-απαριθμήσιμο (Cantor 1874).
+            Δεκαδικό \(y_i = \begin{cases}5 & \text{αν } (x_i)_i \ne 5 \\ 6 & \text{αν } (x_i)_i = 5\end{cases}\).</dd>
+          <dt>Παράδειγμα 2</dt>
+          <dd>Halting Problem: Πρόγραμμα \(D\) που «εκτελείται σε εαυτό και αντιστρέφει».</dd>
+        </dl>
+        <ul class="trap-list">
+          <li>Η επιλογή \(y_i\) πρέπει να είναι ρητά ορισμένη και να αποφεύγει <em>συγκεκριμένες τιμές</em> (π.χ. αποφύγετε 0 και 9 για να μην υπάρξει 0.999... = 1.000... πρόβλημα).</li>
+          <li>Για Halting: ο \(D\) πρέπει να είναι έγκυρο πρόγραμμα — επαληθεύστε ότι η κατασκευή είναι συνεπής.</li>
+        </ul>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Διαγράμμα Διαγωνοποίησης (Halting Problem)</div>
+        <p>Πίνακας \(G[i][j] = 1\) αν πρόγραμμα \(P_i\) τερματίζει με είσοδο \(\langle P_j \rangle\):</p>
+        <pre style="overflow-x:auto; font-size:0.85rem; padding:0.75rem; background:var(--color-surface-alt,#f8f9ff); border-radius:6px">
+      P₁  P₂  P₃  P₄  ···
+P₁ [  1    0    1    1  ···]
+P₂ [  0    1    0    0  ···]
+P₃ [  1    1    0    1  ···]  ← διαγώνιος: G[1,1],G[2,2],G[3,3],...
+P₄ [  0    0    1    1  ···]
+ D [  0    1    1    0  ···]  ← D: αντίθετο της διαγωνίου
+        </pre>
+        <p>
+          Πρόγραμμα \(D\): «αν \(G[i,i]=1\) τότε μη-τερμάτισε, αλλιώς τερμάτισε».
+          Για \(i = D\): \(G[D,D] = 1 \iff D\) τερματίζει \(\iff G[D,D]=0\). Αντίφαση. \(\square\)
+        </p>
+        <p>Πηγή: <a href="../lectures/lecture5.html#sec-halting">Δ5 §5</a></p>
+      </div>
+    </section>
+
+    <nav class="lecture-nav" aria-label="Πλοήγηση θεμάτων">
+      <a href="graphs.html" class="lecture-nav__btn">← Οδηγός Γραφημάτων</a>
+      <span class="lecture-nav__current">Cheatsheet Αποδείξεων</span>
+      <a href="../exercises/solved.html" class="lecture-nav__btn">Λυμένες Ασκήσεις →</a>
+    </nav>
+
   </main>
+</div>
 
-  <footer>
-    <p>Σημειώσεις Μαθηματικών Πληροφορικής — ΕΚΠΑ</p>
-  </footer>
+<footer class="site-footer">
+  <p>Μαθηματικά Πληροφορικής · ΕΚΠΑ · Τμήμα Πληροφορικής &amp; Τηλεπικοινωνιών</p>
+  <p>
+    <a href="../index.html">Αρχική</a> ·
+    <a href="induction.html">Οδηγός Επαγωγής</a> ·
+    <a href="graphs.html">Οδηγός Γραφημάτων</a>
+  </p>
+</footer>
 </body>
 </html>

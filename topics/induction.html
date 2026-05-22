@@ -3,27 +3,668 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Επαγωγή — Μαθηματικά Πληροφορικής</title>
+  <meta name="description"
+        content="Πλήρης Οδηγός Επαγωγής — Μαθηματική, Ισχυρή, Δομική. Templates, λάθη, ασκήσεις.">
+  <title>Οδηγός Επαγωγής | Μαθ. Πληροφορικής ΕΚΠΑ</title>
   <link rel="stylesheet" href="../css/style.css">
   <script>
-    window.MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };
+    window.MathJax = {
+      tex: {
+        inlineMath:  [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        tags: 'ams',
+        macros: {
+          N:  '\\mathbb{N}',
+          Z:  '\\mathbb{Z}',
+          R:  '\\mathbb{R}'
+        }
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+    };
+    (function () {
+      const t = localStorage.getItem('math-plir-theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <script src="../js/main.js" defer></script>
+  <style>
+    .template-box {
+      background: var(--color-surface-alt, #f0f4ff);
+      border: 2px dashed var(--color-primary, #3b6fd4);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      font-family: var(--font-mono, monospace);
+      font-size: 0.92rem;
+      line-height: 1.7;
+    }
+    .template-box .blank {
+      display: inline-block;
+      min-width: 120px;
+      border-bottom: 2px solid var(--color-primary, #3b6fd4);
+      color: var(--color-primary, #3b6fd4);
+      font-style: italic;
+    }
+    .proof-table td { vertical-align: top; padding: 0.5rem 0.75rem; }
+    .proof-table th { background: var(--color-primary, #3b6fd4); color: #fff; padding: 0.5rem 0.75rem; }
+    .induction-card {
+      border-left: 4px solid var(--color-primary, #3b6fd4);
+      background: var(--color-surface-alt, #f8f9ff);
+      border-radius: 0 8px 8px 0;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .induction-card h4 { margin: 0 0 0.4rem; color: var(--color-primary, #3b6fd4); }
+    .mistake-item {
+      border-left: 4px solid #e53935;
+      background: #fff5f5;
+      border-radius: 0 6px 6px 0;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+    [data-theme="dark"] .mistake-item { background: #3a1212; }
+    [data-theme="dark"] .template-box { background: #1a2040; }
+    [data-theme="dark"] .induction-card { background: #1a2040; }
+    .ex-difficulty { display: inline-block; font-size: 0.85rem; margin-left: 0.5rem; }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Επαγωγή</h1>
-    <a href="../index.html">← Αρχική</a>
-  </header>
 
-  <main>
-    <p><em>Placeholder — περιεχόμενο θα συμπληρωθεί.</em></p>
+<header class="site-header" role="banner">
+  <div class="site-header__inner">
+    <a href="../index.html" class="site-header__title">&#8469; Μαθηματικά Πληροφορικής</a>
+    <nav class="site-nav" aria-label="Κύρια πλοήγηση">
+      <a href="../index.html">Αρχική</a>
+      <a href="../lectures/lecture1.html">Διαλέξεις</a>
+      <a href="induction.html" aria-current="page">Θέματα</a>
+      <a href="../exercises/solved.html">Ασκήσεις</a>
+      <a href="../exam-prep/formulas.html">Εξεταστική</a>
+    </nav>
+    <button id="theme-toggle" class="btn-theme-toggle"
+            aria-label="Εναλλαγή σκοτεινής λειτουργίας">&#127769; Σκοτεινό</button>
+  </div>
+</header>
+
+<div class="page-wrapper">
+
+  <aside class="sidebar-toc" aria-label="Περιεχόμενα σελίδας">
+    <button class="toc-toggle" aria-expanded="true">&#128203; Περιεχόμενα &#9662;</button>
+    <div class="sidebar-toc__title">Περιεχόμενα</div>
+    <ol class="sidebar-toc__list">
+      <li class="toc-h2"><a href="#sec-when">1. Πότε Χρησιμοποιώ τι;</a></li>
+      <li class="toc-h2"><a href="#sec-templates">2. Templates Απόδειξης</a>
+        <ol>
+          <li class="toc-h3"><a href="#tpl-simple">Απλή Επαγωγή</a></li>
+          <li class="toc-h3"><a href="#tpl-strong">Ισχυρή Επαγωγή</a></li>
+          <li class="toc-h3"><a href="#tpl-structural">Δομική Επαγωγή</a></li>
+        </ol>
+      </li>
+      <li class="toc-h2"><a href="#sec-mistakes">3. Συχνά Λάθη</a></li>
+      <li class="toc-h2"><a href="#sec-catalog">4. Κατάλογος Αποδείξεων</a></li>
+      <li class="toc-h2"><a href="#sec-strengthen">5. Ισχυροποίηση Πρότασης</a></li>
+      <li class="toc-h2"><a href="#sec-exercises">6. Ασκήσεις (10)</a></li>
+    </ol>
+  </aside>
+
+  <main class="main-content" id="main-content">
+
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <div class="breadcrumbs__item"><a href="../index.html">Αρχική</a></div>
+      <div class="breadcrumbs__item"><span class="breadcrumbs__current">Οδηγός Επαγωγής</span></div>
+    </nav>
+
+    <h1 class="lecture-title">Πλήρης Οδηγός Επαγωγής</h1>
+    <p class="lecture-subtitle">
+      Συγκεντρωτικός οδηγός από τις Διαλέξεις 2 &amp; 3 —
+      μαθηματική, ισχυρή και δομική επαγωγή με templates, λάθη και ασκήσεις.
+    </p>
+
+    <!-- §1 Πότε -->
+    <section id="sec-when">
+      <h2>1. Πότε Χρησιμοποιώ Ποια Επαγωγή;</h2>
+
+      <div class="callout callout-tldr">
+        <div class="callout-title">&#9889; Γρήγορος Οδηγός Επιλογής</div>
+        <div class="mermaid">
+flowchart TD
+  Q1{"Αποδεικνύω ιδιότητα\nγια φυσικούς αριθμούς;"}
+  Q2{"Το βήμα n+1 εξαρτάται\nμόνο από το n;"}
+  Q3{"Ορίζεται το αντικείμενο\nεπαγωγικά (δέντρο, γλώσσα,…)?"}
+  A1["Απλή Επαγωγή\n(Δ2 §4)"]
+  A2["Ισχυρή Επαγωγή\n(Δ2 §4)"]
+  A3["Δομική Επαγωγή\n(Δ3 §1)"]
+  A4["Άλλη τεχνική\n(βλ. Proofs Cheatsheet)"]
+  Q1 -->|Ναι| Q2
+  Q1 -->|Όχι| Q3
+  Q2 -->|Ναι| A1
+  Q2 -->|Όχι — χρειάζομαι\nπολλαπλές υποθέσεις| A2
+  Q3 -->|Ναι| A3
+  Q3 -->|Όχι| A4
+        </div>
+      </div>
+
+      <h3>Σύγκριση Ειδών Επαγωγής</h3>
+      <table class="math-table">
+        <thead>
+          <tr>
+            <th>Είδος</th>
+            <th>Βάση</th>
+            <th>Επαγωγική Υπόθεση (Ε.Υ.)</th>
+            <th>Κλασικές Χρήσεις</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Απλή</strong></td>
+            <td>\(P(0)\) ή \(P(1)\)</td>
+            <td>\(P(n)\) αληθής</td>
+            <td>Φόρμουλες αθροισμάτων, ανισότητες, διαιρετότητα</td>
+          </tr>
+          <tr>
+            <td><strong>Ισχυρή</strong></td>
+            <td>\(P(0),\ldots,P(k)\)</td>
+            <td>\(P(0) \land \cdots \land P(n)\) αληθή</td>
+            <td>Fibonacci, πρώτοι, δέντρα, σπάσιμο σε μικρότερα μέρη</td>
+          </tr>
+          <tr>
+            <td><strong>Δομική</strong></td>
+            <td>Βασικές δομές (π.χ. ε, φύλλα)</td>
+            <td>Η ιδιότητα ισχύει για τα «μικρότερα» μέρη</td>
+            <td>Ιδιότητες γλωσσών (\(\Sigma^*\)), δέντρων, γραμματικών</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="induction-card">
+        <h4>Πότε Ισχυρή vs Απλή;</h4>
+        <p>
+          Χρησιμοποιείτε ισχυρή επαγωγή όταν στο βήμα \(n+1\) χρειάζεστε
+          την υπόθεση για <em>πολλαπλές</em> τιμές (π.χ. \(P(n)\) και \(P(n-1)\)),
+          ή όταν το πρόβλημα σπάει σε δύο ανεξάρτητα υποπροβλήματα αγνώστου μεγέθους.
+        </p>
+        <p>
+          Παραδείγματα από Δ2: Fibonacci (\(F_n = F_{n-1}+F_{n-2}\)),
+          αριθμοθεωρία (κάθε \(n\ge 2\) έχει πρώτο διαιρέτη).
+        </p>
+      </div>
+
+      <div class="induction-card">
+        <h4>Πότε Δομική;</h4>
+        <p>
+          Όταν το σύνολο \(S\) ορίζεται επαγωγικά (με «κανόνες»), χρησιμοποιείτε
+          δομική επαγωγή <em>πάνω στη δομή του αντικειμένου</em>, όχι πάνω στον αριθμό.
+        </p>
+        <p>
+          Παράδειγμα από Δ3: \(\ell(x \circ y) = \ell(x) + \ell(y)\) αποδεικνύεται με
+          δομική επαγωγή στο \(y \in \Sigma^*\), όχι με επαγωγή στο \(\ell(y)\).
+        </p>
+      </div>
+    </section>
+
+    <!-- §2 Templates -->
+    <section id="sec-templates">
+      <h2>2. Templates Απόδειξης</h2>
+
+      <section id="tpl-simple">
+        <h3>2.1 Template Απλής Μαθηματικής Επαγωγής</h3>
+        <div class="template-box">
+          <strong>Πρόταση:</strong> Για κάθε \(n \ge\) <span class="blank">βάση</span>,
+          ισχύει \(P(n)\): «<span class="blank">ορισμός της ιδιότητας</span>».<br><br>
+          <strong>Απόδειξη με μαθηματική επαγωγή στο \(n\).</strong><br><br>
+          <strong>Βάση (\(n =\) <span class="blank">βάση</span>):</strong><br>
+          &nbsp;&nbsp;[Δείξτε ότι \(P(\text{βάση})\) ισχύει απευθείας.]<br>
+          &nbsp;&nbsp;<span class="blank">Υπολογισμός / παρατήρηση</span>. ✓<br><br>
+          <strong>Επαγωγικό Βήμα:</strong><br>
+          &nbsp;&nbsp;Έστω \(n \ge\) <span class="blank">βάση</span> αυθαίρετο.<br>
+          &nbsp;&nbsp;<strong>Ε.Υ.:</strong> Υποθέτουμε ότι \(P(n)\) ισχύει,
+          δηλ. «<span class="blank">η πρόταση για n</span>».<br>
+          &nbsp;&nbsp;<strong>Δείχνουμε:</strong> \(P(n+1)\), δηλ. «<span class="blank">η πρόταση για n+1</span>».<br><br>
+          &nbsp;&nbsp;[Απόδειξη:<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="blank">Χρησιμοποιήστε Ε.Υ. εδώ</span><br>
+          &nbsp;&nbsp;] ✓<br><br>
+          Από την αρχή της μαθηματικής επαγωγής, \(P(n)\) ισχύει για κάθε \(n \ge\) <span class="blank">βάση</span>. \(\square\)
+        </div>
+      </section>
+
+      <section id="tpl-strong">
+        <h3>2.2 Template Ισχυρής Επαγωγής</h3>
+        <div class="template-box">
+          <strong>Πρόταση:</strong> Για κάθε \(n \ge\) <span class="blank">βάση</span>, ισχύει \(P(n)\).<br><br>
+          <strong>Απόδειξη με ισχυρή επαγωγή στο \(n\).</strong><br><br>
+          <strong>Βάση:</strong> [Δείξτε \(P(\text{βάση}), P(\text{βάση}+1), \ldots, P(k)\) αν χρειάζεται.]<br><br>
+          <strong>Επαγωγικό Βήμα:</strong><br>
+          &nbsp;&nbsp;Έστω \(n >\) <span class="blank">τελευταία βάση</span> αυθαίρετο.<br>
+          &nbsp;&nbsp;<strong>Ε.Υ.:</strong> Υποθέτουμε ότι \(P(m)\) ισχύει για κάθε
+          <span class="blank">βάση</span> \(\le m < n\).<br>
+          &nbsp;&nbsp;<strong>Δείχνουμε:</strong> \(P(n)\).<br><br>
+          &nbsp;&nbsp;[<span class="blank">Σπάστε το n σε μικρότερα μέρη και εφαρμόστε Ε.Υ.</span>]<br><br>
+          Άρα \(P(n)\) ισχύει για κάθε \(n \ge\) <span class="blank">βάση</span>. \(\square\)
+        </div>
+        <div class="callout callout-warning" style="margin-top:1rem">
+          <div class="callout-title">&#9888; Κλειδί για Ισχυρή Επαγωγή</div>
+          <p>
+            Στην ισχυρή επαγωγή η Ε.Υ. λέει «για κάθε \(m &lt; n\)», οπότε μπορείτε να
+            εφαρμόσετε σε <em>οποιοδήποτε</em> μικρότερο. Μην ξεχνάτε να ελέγξετε ότι
+            οι τιμές που εφαρμόζετε την Ε.Υ. είναι πράγματι \(\ge\) βάση.
+          </p>
+        </div>
+      </section>
+
+      <section id="tpl-structural">
+        <h3>2.3 Template Δομικής Επαγωγής</h3>
+        <div class="template-box">
+          <strong>Πρόταση:</strong> Για κάθε \(x \in S\), ισχύει \(P(x)\).<br>
+          (Το \(S\) ορίζεται από: βασικά στοιχεία + κανόνες δόμησης.)<br><br>
+          <strong>Απόδειξη με δομική επαγωγή.</strong><br><br>
+          <strong>Βάση (βασικά στοιχεία):</strong><br>
+          &nbsp;&nbsp;Για κάθε βασικό στοιχείο \(b\): [δείξτε \(P(b)\) άμεσα.] ✓<br><br>
+          <strong>Επαγωγικό Βήμα (κανόνας: αν \(x_1, x_2 \in S\) τότε \(f(x_1,x_2) \in S\)):</strong><br>
+          &nbsp;&nbsp;Έστω \(x_1, x_2 \in S\) αυθαίρετα.<br>
+          &nbsp;&nbsp;<strong>Ε.Υ.:</strong> \(P(x_1)\) και \(P(x_2)\) αληθή.<br>
+          &nbsp;&nbsp;<strong>Δείχνουμε:</strong> \(P(f(x_1, x_2))\).<br><br>
+          &nbsp;&nbsp;[<span class="blank">Χρησιμοποιείτε Ε.Υ. για τα x₁, x₂</span>] ✓<br><br>
+          Άρα \(P(x)\) ισχύει για κάθε \(x \in S\). \(\square\)
+        </div>
+        <div class="callout callout-example" style="margin-top:1rem">
+          <div class="callout-title">Παράδειγμα Δομής — \(\Sigma^*\)</div>
+          <p>
+            Βασικό: \(\varepsilon \in \Sigma^*\). &nbsp; Κανόνας: αν \(w \in \Sigma^*\) και \(a \in \Sigma\),
+            τότε \(wa \in \Sigma^*\).
+            Άρα στη δομική επαγωγή: βάση είναι \(w = \varepsilon\),
+            επαγωγικό βήμα: αν ισχύει για \(w\), δείξτε για \(wa\).
+          </p>
+        </div>
+      </section>
+    </section>
+
+    <!-- §3 Λάθη -->
+    <section id="sec-mistakes">
+      <h2>3. Συχνά Λάθη στην Επαγωγή</h2>
+
+      <div class="mistake-item">
+        <strong>&#10060; Λάθος 1: Ελλιπής / λανθασμένη Βάση</strong>
+        <p>
+          Π.χ. υποθέτουν ότι η βάση είναι προφανής χωρίς να την ελέγξουν.
+          Ή παραλείπουν πολλαπλές βάσεις (π.χ. ισχυρή επαγωγή με \(F_n = F_{n-1}+F_{n-2}\)
+          χρειάζεται βάσεις για \(n=0\) <em>και</em> \(n=1\)).
+        </p>
+        <p>
+          <strong>&#10003; Διόρθωση:</strong> Πάντα γράψτε τη βάση ρητά και επαληθεύστε αριθμητικά.
+        </p>
+      </div>
+
+      <div class="mistake-item">
+        <strong>&#10060; Λάθος 2: Λανθασμένη Χρήση Ε.Υ. (Κυκλική Συλλογιστική)</strong>
+        <p>
+          Χρησιμοποιούν αυτό που θέλουν να αποδείξουν για να το αποδείξουν.
+          Π.χ. «Έχω \(P(n+1)\) γιατί ισχύει \(P(n+1)\)» — αυτό δεν είναι Ε.Υ.
+        </p>
+        <p>
+          <strong>&#10003; Διόρθωση:</strong> Η Ε.Υ. πάντα αναφέρεται σε <em>μικρότερες</em>
+          τιμές. Πριν τη γράψετε, πείτε ρητά «υποθέτουμε για \(n\), δείχνουμε για \(n+1\)».
+        </p>
+      </div>
+
+      <div class="mistake-item">
+        <strong>&#10060; Λάθος 3: Παράλειψη Ποσοδεικτών</strong>
+        <p>
+          Λένε «η Ε.Υ. μας λέει ότι \(P\)» χωρίς να διευκρινίσουν <em>για ποιο \(n\)</em>.
+          Συγκεχυμένοι συμβολισμοί όπου το \(n\) χρησιμοποιείται με πολλαπλές σημασίες.
+        </p>
+        <p>
+          <strong>&#10003; Διόρθωση:</strong> Γράψτε ρητά «Ε.Υ.: υποθέτουμε ότι \(P(n)\) ισχύει
+          για συγκεκριμένο \(n \ge n_0\)».
+        </p>
+      </div>
+
+      <div class="mistake-item">
+        <strong>&#10060; Λάθος 4: Λανθασμένο Βήμα Επαγωγής</strong>
+        <p>
+          Εφαρμόζουν Ε.Υ. σε τιμή που δεν έχει αποδειχθεί — π.χ. ισχυρή επαγωγή
+          όπου ο υπολογισμός παράγει τιμή \(&lt;\) βάσης.
+        </p>
+        <p>
+          <strong>&#10003; Διόρθωση:</strong> Ελέγξτε ότι οι τιμές στις οποίες εφαρμόζεται
+          η Ε.Υ. ανήκουν στο εύρος \([n_0, n-1]\).
+        </p>
+      </div>
+
+      <div class="mistake-item">
+        <strong>&#10060; Λάθος 5: Μη Γενικός Βηματισμός στη Δομική Επαγωγή</strong>
+        <p>
+          Αποδεικνύουν μόνο έναν κανόνα δόμησης ή αγνοούν ότι η δομή έχει πολλαπλούς κανόνες.
+        </p>
+        <p>
+          <strong>&#10003; Διόρθωση:</strong> Για κάθε κανόνα δόμησης χωριστά, εφαρμόστε
+          το επαγωγικό βήμα.
+        </p>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Κλασικό Κατεψυγμένο Λάθος — «Όλα τα άλογα έχουν ίδιο χρώμα»</div>
+        <p>
+          <em>Ψευδής «απόδειξη»:</em> Με επαγωγή στο \(n\) (μέγεθος ομάδας). Βάση: 1 άλογο, προφανές.
+          Βήμα: ομάδα \(n+1\) — αφαιρούμε το πρώτο (τα \(n\) υπόλοιπα έχουν ίδιο χρώμα από Ε.Υ.),
+          αφαιρούμε το τελευταίο (τα \(n\) υπόλοιπα έχουν ίδιο χρώμα) — άρα όλα ίδιο.
+        </p>
+        <p>
+          <strong>Το λάθος:</strong> Για \(n=1\) στο βήμα \(n+1=2\), τα δύο «υπόλοιπα»
+          δεν επικαλύπτονται (η μία ομάδα είναι \(\{2\}\) και η άλλη \(\{1\}\)). Η επικάλυψη
+          υποτίθεται ότι υπάρχει αλλά δεν ισχύει για \(n=1\). &#8658; <strong>Λανθασμένη μεταβάσεις βάσης.</strong>
+        </p>
+      </div>
+    </section>
+
+    <!-- §4 Κατάλογος -->
+    <section id="sec-catalog">
+      <h2>4. Κατάλογος Αποδείξεων με Επαγωγή στο Μάθημα</h2>
+
+      <table class="math-table">
+        <thead>
+          <tr>
+            <th>Πρόταση</th>
+            <th>Είδος</th>
+            <th>Τεχνική</th>
+            <th>Πηγή</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>\(\displaystyle\sum_{i=1}^n i = \frac{n(n+1)}{2}\)</td>
+            <td>Απλή</td>
+            <td>Αλγεβρικός μετασχηματισμός</td>
+            <td><a href="../lectures/lecture2.html#sec-induction">Δ2 §4</a></td>
+          </tr>
+          <tr>
+            <td>\(H_n = \sum_{i=1}^n \frac{1}{i} \ge \frac{\ln(n+1)}{2}\)</td>
+            <td>Απλή</td>
+            <td>Ανισότητα με \(\ln\)</td>
+            <td><a href="../lectures/lecture2.html#sec-induction">Δ2 §4</a></td>
+          </tr>
+          <tr>
+            <td>Fibonacci Doubling: \(F_{2n}, F_{2n+1}\)</td>
+            <td>Ισχυρή</td>
+            <td>Χρήση \(F_{n-1}\) και \(F_n\)</td>
+            <td><a href="../lectures/lecture2.html#sec-fibonacci">Δ2 §5</a></td>
+          </tr>
+          <tr>
+            <td>Κάθε \(n \ge 2\) έχει πρώτο διαιρέτη</td>
+            <td>Ισχυρή</td>
+            <td>Αν σύνθετος, σπάει σε μικρότερο</td>
+            <td><a href="../lectures/lecture2.html#sec-nt">Δ2 §6</a></td>
+          </tr>
+          <tr>
+            <td>Ισχυροποίηση: \(\sum i^2\) με καλύτερο \(Q(n)\)</td>
+            <td>Απλή</td>
+            <td>Ισχυροποίηση πρότασης</td>
+            <td><a href="../lectures/lecture2.html#sec-strengthen">Δ2 §7</a></td>
+          </tr>
+          <tr>
+            <td>\(S = \{n \in \N : 3 \mid n\}\): δομή</td>
+            <td>Δομική</td>
+            <td>Διπλή περιέχεση \(A \subseteq S\) και \(S \subseteq A\)</td>
+            <td><a href="../lectures/lecture3.html#sec-induction-S">Δ3 §1</a></td>
+          </tr>
+          <tr>
+            <td>\(\ell(x \circ y) = \ell(x) + \ell(y)\)</td>
+            <td>Δομική στο \(y\)</td>
+            <td>Βάση \(y=\varepsilon\), βήμα \(y=wa\)</td>
+            <td><a href="../lectures/lecture3.html#sec-concat">Δ3 §2</a></td>
+          </tr>
+          <tr>
+            <td>Γλώσσα \(L\) = ίσα 0 και 1: \(L = B\)</td>
+            <td>Δομική + Ισχυρή</td>
+            <td>\(L \subseteq B\) δομική, \(B \subseteq L\) ισχυρή</td>
+            <td><a href="../lectures/lecture3.html#sec-language">Δ3 §3</a></td>
+          </tr>
+          <tr>
+            <td>ΚΔΔ: \(n(T) \le 2^{h(T)+1}-1\)</td>
+            <td>Δομική στο \(T\)</td>
+            <td>Βάση φύλλο, βήμα \(T=v(T_L, T_R)\)</td>
+            <td><a href="../lectures/lecture3.html#sec-bst">Δ3 §4</a></td>
+          </tr>
+          <tr>
+            <td>Δέντρα: \(n-1\) ακμές, leaf lemma</td>
+            <td>Ισχυρή</td>
+            <td>Αφαίρεση φύλλου, εφαρμογή Ε.Υ.</td>
+            <td><a href="../lectures/lecture6.html#sec-trees">Δ6 §Β</a></td>
+          </tr>
+          <tr>
+            <td>Euler formula \(n-m+f=2\)</td>
+            <td>Ισχυρή στο \(m\)</td>
+            <td>Αφαίρεση ακμής (γέφυρα vs μη-γέφυρα)</td>
+            <td><a href="../lectures/lecture6.html#sec-planar">Δ6 §Δ</a></td>
+          </tr>
+          <tr>
+            <td>Hall's Theorem (ικανή κατεύθυνση)</td>
+            <td>Ισχυρή στο \(|L|\)</td>
+            <td>Δύο περιπτώσεις: loose/tight Hall</td>
+            <td><a href="../lectures/lecture7.html#sec-hall">Δ7 §4</a></td>
+          </tr>
+          <tr>
+            <td>Dilworth: κλάσεις Mirsky</td>
+            <td>Δομική/Ισχυρή</td>
+            <td>Αφαιρούμε μεγιστικά επαγωγικά</td>
+            <td><a href="../lectures/lecture8.html#sec-mirsky">Δ8 §8</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- §5 Ισχυροποίηση -->
+    <section id="sec-strengthen">
+      <h2>5. Πότε Χρειάζεται Ισχυροποίηση Πρότασης;</h2>
+
+      <div class="callout callout-theorem">
+        <div class="callout-title">Αρχή Ισχυροποίησης</div>
+        <p>
+          Αν η πρόταση \(P(n)\) είναι «αδύνατη» να αποδειχθεί — δηλ. η Ε.Υ. δεν δίνει αρκετές
+          πληροφορίες — αντικαταστήστε με ισχυρότερη πρόταση \(Q(n)\) που «συνεπάγεται»
+          τη \(P(n)\) αλλά η Ε.Υ. της \(Q\) είναι χρήσιμη.
+        </p>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Παράδειγμα από Δ2 — Άθροισμα Τετραγώνων</div>
+        <p>
+          <strong>Αδύναμη πρόταση:</strong> \(\sum_{i=1}^n i^2 \le n^3\).
+          Στο βήμα παίρνουμε \(\sum_{i=1}^{n+1} i^2 \le n^3 + (n+1)^2\) και δεν μπορούμε
+          να δείξουμε \(\le (n+1)^3\) εύκολα από αυτό μόνο.
+        </p>
+        <p>
+          <strong>Ισχυροποίηση:</strong> \(Q(n)\): \(\sum_{i=1}^n i^2 \le \frac{n^3}{3} + \frac{n^2}{2} + \frac{n}{6}\).
+          Τώρα η Ε.Υ. είναι αρκετά ισχυρή. (Βλ. Δ2 §7 για πλήρη απόδειξη.)
+        </p>
+      </div>
+
+      <h3>Σήματα που χρειάζεστε ισχυροποίηση</h3>
+      <ul>
+        <li>Η Ε.Υ. δίνει φράγμα \(f(n)\) αλλά χρειάζεστε \(f(n+1)\) και η διαφορά δεν κλείνει.</li>
+        <li>Αποδεικνύετε φράγμα για ένα σύνολο αλλά δεν ξέρετε τίποτα για τη <em>δομή</em> του.</li>
+        <li>Σε δομική επαγωγή, η ιδιότητα εξαρτάται από πολλαπλά χαρακτηριστικά — μαζέψτε τα σε ένα ισχυρό \(Q\).</li>
+      </ul>
+    </section>
+
+    <!-- §6 Ασκήσεις -->
+    <section id="sec-exercises">
+      <h2>6. Ασκήσεις</h2>
+
+      <ol class="exercise-list">
+
+        <li>
+          <strong>Φόρμουλα αθροίσματος</strong>
+          <span class="ex-difficulty">●○○</span>
+          <p>Αποδείξτε με μαθηματική επαγωγή: \(\displaystyle\sum_{i=1}^{n} i^2 = \frac{n(n+1)(2n+1)}{6}\).</p>
+          <details><summary>Υπόδειξη &amp; Λύση</summary>
+            <p><strong>Βάση \(n=1\):</strong> \(1 = \frac{1\cdot2\cdot3}{6} = 1\). ✓</p>
+            <p><strong>Βήμα:</strong> Ε.Υ.: \(\sum_{i=1}^n i^2 = \frac{n(n+1)(2n+1)}{6}\).
+              \[\sum_{i=1}^{n+1} i^2 = \frac{n(n+1)(2n+1)}{6} + (n+1)^2
+              = (n+1)\left(\frac{n(2n+1)}{6} + n+1\right)
+              = (n+1)\frac{2n^2+7n+6}{6}
+              = \frac{(n+1)(n+2)(2n+3)}{6}.\]
+              Αυτό είναι ακριβώς ο τύπος για \(n+1\). \(\square\)
+            </p>
+          </details>
+        </li>
+
+        <li>
+          <strong>Ανισότητα</strong>
+          <span class="ex-difficulty">●○○</span>
+          <p>Αποδείξτε: \(2^n > n^2\) για κάθε \(n \ge 5\).</p>
+          <details><summary>Υπόδειξη &amp; Λύση</summary>
+            <p><strong>Βάση \(n=5\):</strong> \(32 > 25\). ✓</p>
+            <p><strong>Βήμα:</strong> Ε.Υ.: \(2^n > n^2\). Θέλουμε \(2^{n+1} > (n+1)^2\).
+              \[2^{n+1} = 2 \cdot 2^n > 2n^2.\]
+              Αρκεί \(2n^2 \ge (n+1)^2 = n^2 + 2n + 1\), δηλ. \(n^2 - 2n - 1 \ge 0\),
+              δηλ. \((n-1)^2 \ge 2\), που ισχύει για \(n \ge 3\). \(\square\)
+            </p>
+          </details>
+        </li>
+
+        <li>
+          <strong>Διαιρετότητα</strong>
+          <span class="ex-difficulty">●○○</span>
+          <p>Αποδείξτε: \(6 \mid n(n+1)(n+2)\) για κάθε \(n \ge 1\).</p>
+          <details><summary>Υπόδειξη &amp; Λύση</summary>
+            <p>Με επαγωγή: βάση \(n=1\): \(1\cdot2\cdot3=6\). ✓
+              Βήμα: \((n+1)(n+2)(n+3) = n(n+1)(n+2) + 3(n+1)(n+2)\).
+              Το πρώτο διαιρείται από 6 (Ε.Υ.). Το δεύτερο: \(3(n+1)(n+2)\) — το
+              \((n+1)(n+2)\) είναι γινόμενο δύο διαδοχικών, άρα διαιρείται από 2,
+              οπότε \(3(n+1)(n+2)\) διαιρείται από 6. \(\square\)
+            </p>
+          </details>
+        </li>
+
+        <li>
+          <strong>Fibonacci — Ισχυρή Επαγωγή</strong>
+          <span class="ex-difficulty">●●○</span>
+          <p>Αποδείξτε: \(F_n \le \left(\frac{5}{3}\right)^n\) για κάθε \(n \ge 1\), όπου \(F_1=F_2=1\).</p>
+          <details><summary>Υπόδειξη &amp; Λύση</summary>
+            <p>Ισχυρή επαγωγή. Βάσεις: \(F_1=1 \le 5/3\) ✓, \(F_2=1 \le 25/9\) ✓.
+              Βήμα: \(F_n = F_{n-1}+F_{n-2} \le (5/3)^{n-1}+(5/3)^{n-2} = (5/3)^{n-2}(5/3+1)=(5/3)^{n-2}\cdot\frac{8}{3}\).
+              Αρκεί \(\frac{8}{3} \le (5/3)^2 = 25/9\), δηλ. \(24 \le 25\). ✓ \(\square\)
+            </p>
+          </details>
+        </li>
+
+        <li>
+          <strong>Δέντρα — Ισχυρή Επαγωγή</strong>
+          <span class="ex-difficulty">●●○</span>
+          <p>Αποδείξτε: κάθε δέντρο με \(n\) κόμβους έχει \(n-1\) ακμές.</p>
+          <details><summary>Υπόδειξη &amp; Λύση</summary>
+            <p>Ισχυρή επαγωγή στο \(n\). Βάση \(n=1\): 0 ακμές. ✓
+              Βήμα: κάθε δέντρο έχει φύλλο \(v\) (κόμβο βαθμού 1 — αποδεικνύεται χωριστά).
+              Αφαιρούμε \(v\) και τη μοναδική ακμή του: προκύπτει δέντρο με \(n-1\) κόμβους,
+              το οποίο από Ε.Υ. έχει \(n-2\) ακμές. Αρα το αρχικό: \(n-2+1=n-1\). \(\square\)
+            </p>
+          </details>
+        </li>
+
+        <li>
+          <strong>Δομική Επαγωγή — Γλώσσα Palindromes</strong>
+          <span class="ex-difficulty">●●○</span>
+          <p>Ορίστε \(\text{Pal} \subseteq \{0,1\}^*\) δομικά:
+            (i) \(\varepsilon, 0, 1 \in \text{Pal}\);
+            (ii) αν \(w \in \text{Pal}\) τότε \(0w0, 1w1 \in \text{Pal}\).
+            Αποδείξτε ότι κάθε \(w \in \text{Pal}\) ισούται με το αντίστροφό του \(\text{rev}(w)\).
+          </p>
+          <details><summary>Υπόδειξη &amp; Λύση</summary>
+            <p>Δομική επαγωγή. Βάσεις: \(\text{rev}(\varepsilon)=\varepsilon\), \(\text{rev}(0)=0\), \(\text{rev}(1)=1\). ✓
+              Βήμα για \(awa\) (\(a \in \{0,1\}\)): Ε.Υ.: \(\text{rev}(w)=w\).
+              \(\text{rev}(awa) = a \cdot \text{rev}(w) \cdot a = awa\). ✓ \(\square\)
+            </p>
+          </details>
+        </li>
+
+        <li>
+          <strong>Δομική — ΚΔΔ Μέγεθος</strong>
+          <span class="ex-difficulty">●●○</span>
+          <p>Ορίστε ΚΔΔ (Κ.Δ.Δ.) δομικά. Αποδείξτε: αν \(T\) έχει ύψος \(h\),
+            τότε \(n(T) \le 2^{h+1}-1\).</p>
+          <details><summary>Υπόδειξη &amp; Λύση</summary>
+            <p>Δομική επαγωγή. Βάση (φύλλο): \(n=1 \le 2^1-1=1\). ✓
+              Βήμα: \(T = \text{root}(T_L, T_R)\). Ε.Υ.: \(n(T_L) \le 2^{h_L+1}-1\) και
+              \(n(T_R) \le 2^{h_R+1}-1\). Τότε \(h(T)=\max(h_L,h_R)+1\) και
+              \(n(T) = 1+n(T_L)+n(T_R) \le 1+(2^{h_L+1}-1)+(2^{h_R+1}-1)
+              \le 2\cdot 2^{\max(h_L,h_R)+1}-1 = 2^{h(T)+1}-1\). \(\square\)
+            </p>
+          </details>
+        </li>
+
+        <li>
+          <strong>Ισχυροποίηση</strong>
+          <span class="ex-difficulty">●●●</span>
+          <p>Αποδείξτε με επαγωγή: \(\displaystyle\sum_{i=1}^n \frac{1}{i^2} \le 2 - \frac{1}{n}\).</p>
+          <details><summary>Υπόδειξη &amp; Λύση</summary>
+            <p>Βάση \(n=1\): \(1 \le 2-1=1\). ✓
+              Βήμα: Ε.Υ.: \(\sum_{i=1}^n 1/i^2 \le 2-1/n\).
+              \[\sum_{i=1}^{n+1}\frac{1}{i^2} \le 2-\frac{1}{n}+\frac{1}{(n+1)^2}.\]
+              Αρκεί \(2-\frac{1}{n}+\frac{1}{(n+1)^2} \le 2-\frac{1}{n+1}\),
+              δηλ. \(\frac{1}{(n+1)^2} \le \frac{1}{n}-\frac{1}{n+1} = \frac{1}{n(n+1)}\).
+              Αυτό ισχύει γιατί \(n(n+1) \le (n+1)^2\). \(\square\)
+            </p>
+          </details>
+        </li>
+
+        <li>
+          <strong>Χρωματισμός Επίπεδου Γράφου</strong>
+          <span class="ex-difficulty">●●●</span>
+          <p>Αποδείξτε: κάθε επίπεδο γράφημα μπορεί να χρωματιστεί με \(\le 6\) χρώματα.
+            (Υπόδειξη: χρησιμοποιείτε ότι \(m \le 3n-6\) για \(n \ge 3\).)
+          </p>
+          <details><summary>Υπόδειξη &amp; Λύση</summary>
+            <p>Ισχυρή επαγωγή στο \(n\). Βάσεις \(n \le 6\): τετριμμένο.
+              Βήμα: επίπεδος γράφος με \(n > 6\). Από \(2m \le 6n-12\) (άθροισμα βαθμών), μέσος βαθμός
+              \(< 6\), άρα υπάρχει κόμβος \(v\) με \(\deg(v) \le 5\). Αφαιρούμε \(v\):
+              από Ε.Υ. ο \(G-v\) χρωματίζεται με \(\le 6\) χρώματα. Ο \(v\) έχει \(\le 5\)
+              γείτονες, άρα υπάρχει έστω 1 χρώμα από τα 6 για τον \(v\). \(\square\)
+            </p>
+          </details>
+        </li>
+
+        <li>
+          <strong>Παράβαση Επαγωγής</strong>
+          <span class="ex-difficulty">●●●</span>
+          <p>Εντοπίστε το λάθος: «Αποδεικνύουμε ότι σε κάθε σύνολο \(n\) ανθρώπων,
+            όλοι έχουν ίδια ηλικία. Βάση \(n=1\): προφανές. Βήμα: έστω ομάδα \(n+1\).
+            Αφαιρώ τον 1ο: οι \(n\) υπόλοιποι έχουν ίδια ηλικία (Ε.Υ.).
+            Αφαιρώ τον τελευταίο: οι \(n\) υπόλοιποι ίδιας ηλικίας.
+            Άρα και ο 1ος και ο τελευταίος έχουν ίδια ηλικία.»</p>
+          <details><summary>Λύση</summary>
+            <p>Το λάθος εντοπίζεται για \(n=1\): οι δύο ομάδες των \(n=1\) ατόμων είναι
+              \(\{1\}\) και \(\{2\}\) — δεν έχουν κοινό μέλος για να «μεταφέρουν» την ηλικία.
+              Δηλαδή το επαγωγικό βήμα αποτυγχάνει για \(n+1=2\): οι δύο ομάδες μεγέθους 1
+              δεν επικαλύπτονται.
+            </p>
+          </details>
+        </li>
+
+      </ol>
+    </section>
+
+    <nav class="lecture-nav" aria-label="Πλοήγηση θεμάτων">
+      <a href="../lectures/lecture3.html" class="lecture-nav__btn">← Δ3 Δομική Επαγωγή</a>
+      <span class="lecture-nav__current">Οδηγός Επαγωγής</span>
+      <a href="graphs.html" class="lecture-nav__btn">Οδηγός Γραφημάτων →</a>
+    </nav>
+
   </main>
+</div>
 
-  <footer>
-    <p>Σημειώσεις Μαθηματικών Πληροφορικής — ΕΚΠΑ</p>
-  </footer>
+<footer class="site-footer">
+  <p>Μαθηματικά Πληροφορικής · ΕΚΠΑ · Τμήμα Πληροφορικής &amp; Τηλεπικοινωνιών</p>
+  <p>
+    <a href="../index.html">Αρχική</a> ·
+    <a href="graphs.html">Οδηγός Γραφημάτων</a> ·
+    <a href="proofs-cheatsheet.html">Cheatsheet Αποδείξεων</a>
+  </p>
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+  });
+</script>
 </body>
 </html>

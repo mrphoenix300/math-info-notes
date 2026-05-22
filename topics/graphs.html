@@ -3,27 +3,432 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Γραφήματα — Μαθηματικά Πληροφορικής</title>
+  <meta name="description"
+        content="Πλήρης Οδηγός Γραφημάτων — Ορισμοί, θεωρήματα, decision tree, σχέσεις θεωρημάτων.">
+  <title>Οδηγός Γραφημάτων | Μαθ. Πληροφορικής ΕΚΠΑ</title>
   <link rel="stylesheet" href="../css/style.css">
   <script>
-    window.MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };
+    window.MathJax = {
+      tex: {
+        inlineMath:  [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        tags: 'ams',
+        macros: {
+          N: '\\mathbb{N}',
+          Z: '\\mathbb{Z}'
+        }
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+    };
+    (function () {
+      const t = localStorage.getItem('math-plir-theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <script src="../js/main.js" defer></script>
+  <style>
+    .thm-card {
+      border: 1px solid var(--color-border, #d0d8f0);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+      background: var(--color-surface-alt, #f8f9ff);
+    }
+    .thm-card h4 { margin: 0 0 0.4rem; color: var(--color-primary, #3b6fd4); }
+    .thm-card .thm-formula {
+      font-size: 1.05rem;
+      margin: 0.4rem 0;
+    }
+    .thm-card .thm-meta {
+      font-size: 0.85rem;
+      color: var(--color-text-muted, #666);
+      margin-top: 0.4rem;
+    }
+    .decision-box {
+      border: 2px solid var(--color-primary, #3b6fd4);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+    .decision-box .trigger {
+      font-weight: 600;
+      color: var(--color-primary, #3b6fd4);
+    }
+    .decision-box .tool {
+      background: var(--color-primary, #3b6fd4);
+      color: #fff;
+      display: inline-block;
+      padding: 0.15rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      margin-left: 0.5rem;
+    }
+    [data-theme="dark"] .thm-card { background: #1a2040; }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Γραφήματα</h1>
-    <a href="../index.html">← Αρχική</a>
-  </header>
 
-  <main>
-    <p><em>Placeholder — περιεχόμενο θα συμπληρωθεί.</em></p>
+<header class="site-header" role="banner">
+  <div class="site-header__inner">
+    <a href="../index.html" class="site-header__title">&#8469; Μαθηματικά Πληροφορικής</a>
+    <nav class="site-nav" aria-label="Κύρια πλοήγηση">
+      <a href="../index.html">Αρχική</a>
+      <a href="../lectures/lecture1.html">Διαλέξεις</a>
+      <a href="induction.html" aria-current="page">Θέματα</a>
+      <a href="../exercises/solved.html">Ασκήσεις</a>
+      <a href="../exam-prep/formulas.html">Εξεταστική</a>
+    </nav>
+    <button id="theme-toggle" class="btn-theme-toggle"
+            aria-label="Εναλλαγή σκοτεινής λειτουργίας">&#127769; Σκοτεινό</button>
+  </div>
+</header>
+
+<div class="page-wrapper">
+
+  <aside class="sidebar-toc" aria-label="Περιεχόμενα σελίδας">
+    <button class="toc-toggle" aria-expanded="true">&#128203; Περιεχόμενα &#9662;</button>
+    <div class="sidebar-toc__title">Περιεχόμενα</div>
+    <ol class="sidebar-toc__list">
+      <li class="toc-h2"><a href="#sec-defs">1. Cheatsheet Ορισμών</a></li>
+      <li class="toc-h2"><a href="#sec-theorems">2. Κεντρικά Θεωρήματα</a></li>
+      <li class="toc-h2"><a href="#sec-decision">3. Decision Tree Ασκήσεων</a></li>
+      <li class="toc-h2"><a href="#sec-types">4. Συνηθισμένοι Τύποι Ασκήσεων</a></li>
+      <li class="toc-h2"><a href="#sec-relations">5. Σχέσεις Θεωρημάτων</a></li>
+    </ol>
+  </aside>
+
+  <main class="main-content" id="main-content">
+
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <div class="breadcrumbs__item"><a href="../index.html">Αρχική</a></div>
+      <div class="breadcrumbs__item"><span class="breadcrumbs__current">Οδηγός Γραφημάτων</span></div>
+    </nav>
+
+    <h1 class="lecture-title">Πλήρης Οδηγός Γραφημάτων</h1>
+    <p class="lecture-subtitle">
+      Συγκεντρωτικός οδηγός από τις Διαλέξεις 6, 7, 8 —
+      ορισμοί, θεωρήματα, decision tree, τυπικές ασκήσεις.
+    </p>
+
+    <!-- §1 Ορισμοί -->
+    <section id="sec-defs">
+      <h2>1. Cheatsheet Ορισμών</h2>
+
+      <table class="math-table">
+        <thead>
+          <tr><th>Όρος</th><th>Ορισμός</th><th>Σύμβολο / Σημείωση</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Γράφος</strong></td><td>Ζεύγος \((V, E)\) με \(E \subseteq \binom{V}{2}\)</td><td>\(G=(V,E)\)</td></tr>
+          <tr><td><strong>Βαθμός κόμβου</strong></td><td>Πλήθος ακμών που περιέχουν τον κόμβο</td><td>\(\deg(v)\)</td></tr>
+          <tr><td><strong>Μονοπάτι</strong></td><td>Ακολουθία κόμβων χωρίς επαναλήψεις</td><td></td></tr>
+          <tr><td><strong>Κύκλος</strong></td><td>Κλειστό μονοπάτι (ίδια αρχή και τέλος)</td><td></td></tr>
+          <tr><td><strong>Συνεκτικός</strong></td><td>Υπάρχει μονοπάτι μεταξύ κάθε ζεύγους</td><td></td></tr>
+          <tr><td><strong>Δάσος / Δέντρο</strong></td><td>Ακυκλικός γράφος / Συνεκτικό δάσος</td><td></td></tr>
+          <tr><td><strong>Γέφυρα</strong></td><td>Ακμή που αφαίρεσή της αυξάνει συνεκτικές συνιστώσες</td><td></td></tr>
+          <tr><td><strong>Διμερής</strong></td><td>\(V = L \cup R\), \(E \subseteq L \times R\)</td><td>\(K_{m,n}\)</td></tr>
+          <tr><td><strong>Πλήρης</strong></td><td>Κάθε ζεύγος συνδέεται</td><td>\(K_n\)</td></tr>
+          <tr><td><strong>Ανεξάρτητο σύνολο</strong></td><td>Σύνολο κόμβων χωρίς ακμές μεταξύ τους</td><td>\(\alpha(G)\) = μέγεθος μεγίστου</td></tr>
+          <tr><td><strong>Κλίκα</strong></td><td>Πλήρης υπογράφος</td><td>\(\omega(G)\) = μέγεθος μεγίστης</td></tr>
+          <tr><td><strong>Ταίριασμα</strong></td><td>Σύνολο ζεύγη-ζεύγη ξένων ακμών</td><td>\(\nu(G)\) = μέγεθος μεγίστου</td></tr>
+          <tr><td><strong>Χρωματικός αριθμός</strong></td><td>Ελάχιστα χρώματα για εγκυρό χρωματισμό</td><td>\(\chi(G)\)</td></tr>
+          <tr><td><strong>Επίπεδος γράφος</strong></td><td>Μπορεί να σχεδιαστεί χωρίς τομές ακμών</td><td></td></tr>
+          <tr><td><strong>Πρόσωπο (face)</strong></td><td>Περιοχή επιπέδου σε επίπεδη σχεδίαση</td><td>\(f\)</td></tr>
+          <tr><td><strong>Euler γράφος</strong></td><td>Περιέχει Euler κύκλο (όλες οι ακμές)</td><td></td></tr>
+          <tr><td><strong>M-αυξητικό μονοπάτι</strong></td><td>Εναλλάσσεται ακμές εντός/εκτός \(M\), αρχίζει και τελειώνει σε ελεύθερο κόμβο</td><td></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- §2 Θεωρήματα -->
+    <section id="sec-theorems">
+      <h2>2. Κεντρικά Θεωρήματα</h2>
+
+      <div class="thm-card" id="thm-handshake">
+        <h4>Λήμμα Χειραψίας</h4>
+        <div class="thm-formula">\[\sum_{v \in V} \deg(v) = 2|E|\]</div>
+        <p>Ο αριθμός κόμβων περιττού βαθμού είναι ζυγός.</p>
+        <div class="thm-meta">&#128279; <a href="../lectures/lecture6.html#sec-basic">Δ6 §Α</a></div>
+      </div>
+
+      <div class="thm-card" id="thm-ramsey">
+        <h4>Αριθμοί Ramsey</h4>
+        <div class="thm-formula">\[R(k,m) \le R(k-1,m) + R(k,m-1), \quad R(k,k) < 4^k\]</div>
+        <p>Σε οποιοδήποτε \(K_{R(k,m)}\), υπάρχει \(K_k\) μονόχρωμο κόκκινο ή \(K_m\) μπλε.</p>
+        <div class="thm-meta">&#128279; <a href="../lectures/lecture6.html#sec-ramsey">Δ6 §Α</a> · <a href="../lectures/lecture2.html#sec-ramsey">Δ2 §3</a></div>
+      </div>
+
+      <div class="thm-card" id="thm-tree">
+        <h4>Θεώρημα Δέντρων (Ισοδύναμες Συνθήκες)</h4>
+        <p>Για συνεκτικό \(G\) με \(n\) κόμβους, ισοδυναμούν:</p>
+        <ol>
+          <li>\(G\) είναι δέντρο (συνεκτικός ακυκλικός)</li>
+          <li>\(G\) έχει ακριβώς \(n-1\) ακμές</li>
+          <li>Κάθε ζεύγος κόμβων συνδέεται με μοναδικό μονοπάτι</li>
+          <li>Αφαίρεση οποιασδήποτε ακμής αποσυνδέει</li>
+          <li>Προσθήκη οποιασδήποτε ακμής δημιουργεί κύκλο</li>
+        </ol>
+        <div class="thm-meta">&#128279; <a href="../lectures/lecture6.html#sec-trees">Δ6 §Β</a></div>
+      </div>
+
+      <div class="thm-card" id="thm-euler">
+        <h4>Θεώρημα Euler (Euler Κύκλος)</h4>
+        <div class="thm-formula">
+          Συνεκτικός \(G\) έχει Euler κύκλο \(\iff\) κάθε κόμβος έχει <strong>ζυγό βαθμό</strong>.
+        </div>
+        <p>Euler <em>μονοπάτι</em>: ακριβώς δύο κόμβοι περιττού βαθμού.</p>
+        <div class="thm-meta">&#128279; <a href="../lectures/lecture6.html#sec-euler">Δ6 §Γ</a></div>
+      </div>
+
+      <div class="thm-card" id="thm-euler-formula">
+        <h4>Τύπος Euler (Επίπεδα Γραφήματα)</h4>
+        <div class="thm-formula">\[n - m + f = 2\]</div>
+        <p>Για συνεκτικό επίπεδο γράφο: \(n\) κόμβοι, \(m\) ακμές, \(f\) πρόσωπα.</p>
+        <div class="thm-meta">&#128279; <a href="../lectures/lecture6.html#sec-planar">Δ6 §Δ</a></div>
+      </div>
+
+      <div class="thm-card" id="thm-sparse">
+        <h4>Φράγμα Αραιότητας</h4>
+        <div class="thm-formula">
+          Επίπεδος γράφος με \(n \ge 3\): \(m \le 3n-6\). <br>
+          Διμερής επίπεδος: \(m \le 2n-4\).
+        </div>
+        <div class="thm-meta">&#128279; <a href="../lectures/lecture6.html#sec-planar">Δ6 §Δ</a></div>
+      </div>
+
+      <div class="thm-card" id="thm-kuratowski">
+        <h4>Θεώρημα Kuratowski / Wagner</h4>
+        <div class="thm-formula">
+          \(G\) επίπεδος \(\iff\) δεν περιέχει subdivision του \(K_5\) ή \(K_{3,3}\).
+        </div>
+        <div class="thm-meta">&#128279; <a href="../lectures/lecture6.html#sec-planar">Δ6 §Δ</a></div>
+      </div>
+
+      <div class="thm-card" id="thm-hall">
+        <h4>Θεώρημα Hall</h4>
+        <div class="thm-formula">
+          Διμερής \(G=(L\cup R, E)\) έχει τέλειο ταίριασμα του \(L\) \(\iff\)
+          \(\forall S \subseteq L: |N(S)| \ge |S|\).
+        </div>
+        <div class="thm-meta">&#128279; <a href="../lectures/lecture7.html#sec-hall">Δ7 §4</a></div>
+      </div>
+
+      <div class="thm-card" id="thm-dilworth">
+        <h4>Θεώρημα Dilworth</h4>
+        <div class="thm-formula">\[c(P) = \alpha(P)\]</div>
+        <p>Ελάχιστη κάλυψη αλυσίδων = μέγιστη αντιαλυσίδα σε κάθε poset.</p>
+        <div class="thm-meta">&#128279; <a href="../lectures/lecture8.html#sec-dilworth">Δ8 §7</a></div>
+      </div>
+    </section>
+
+    <!-- §3 Decision Tree -->
+    <section id="sec-decision">
+      <h2>3. Decision Tree: Ποιο Θεώρημα Χρησιμοποιώ;</h2>
+
+      <div class="decision-box">
+        <span class="trigger">«Δείξτε ότι σε κάθε γράφο υπάρχουν δύο κόμβοι ίδιου βαθμού»</span>
+        <span class="tool">Αρχή Περιστερεώνα</span>
+        <p>Οι βαθμοί είναι στο \(\{0, 1, \ldots, n-1\}\) — \(n\) τιμές για \(n\) κόμβους,
+          αλλά δεν μπορεί ταυτόχρονα να υπάρχουν βαθμός 0 και βαθμός \(n-1\).
+          Άρα το πολύ \(n-1\) διακριτές τιμές για \(n\) κόμβους.</p>
+      </div>
+
+      <div class="decision-box">
+        <span class="trigger">«Αποδείξτε ότι \(\sum_{v}\deg(v)\) είναι ζυγός / μετρήστε ακμές»</span>
+        <span class="tool">Λήμμα Χειραψίας</span>
+        <p>\(\sum \deg(v) = 2|E|\).</p>
+      </div>
+
+      <div class="decision-box">
+        <span class="trigger">«Υπάρχει ή δεν υπάρχει Euler κύκλος/μονοπάτι;»</span>
+        <span class="tool">Θεώρημα Euler</span>
+        <p>Μετρήστε κόμβους περιττού βαθμού: 0 → Euler κύκλος, 2 → Euler μονοπάτι, άλλο → κανένα.</p>
+      </div>
+
+      <div class="decision-box">
+        <span class="trigger">«Αποδείξτε/ελέγξτε ότι γράφος είναι δέντρο»</span>
+        <span class="tool">Θεώρημα Δέντρων</span>
+        <p>Αρκεί: συνεκτικός + \(n-1\) ακμές. Ή: συνεκτικός + ακυκλικός. Ή: μοναδικά μονοπάτια.</p>
+      </div>
+
+      <div class="decision-box">
+        <span class="trigger">«Αποδείξτε/ελέγξτε επιπεδότητα γράφου»</span>
+        <span class="tool">Τύπος Euler + Φράγμα + Kuratowski</span>
+        <p>
+          Για απόδειξη μη-επιπεδότητας: αν \(m > 3n-6\) ή βρείτε \(K_5\)/\(K_{3,3}\) ως minor/subdivision.
+          Για απόδειξη επιπεδότητας: σχεδιάστε χωρίς τομές.
+        </p>
+      </div>
+
+      <div class="decision-box">
+        <span class="trigger">«Υπάρχει τέλειο ταίριασμα σε διμερή γράφο;»</span>
+        <span class="tool">Θεώρημα Hall</span>
+        <p>Ελέγξτε \(|N(S)| \ge |S|\) για κάθε \(S \subseteq L\).
+          Αν βρείτε \(S\) με \(|N(S)| < |S|\): Hall violation, δεν υπάρχει.</p>
+      </div>
+
+      <div class="decision-box">
+        <span class="trigger">«Ελάχιστη κάλυψη αλυσίδων / μέγιστη αντιαλυσίδα»</span>
+        <span class="tool">Θεώρημα Dilworth</span>
+        <p>Κατασκεύασε διμερή γράφο \(H\), βρες μέγιστο ταίριασμα, κάλυψη = \(n - |M_\max|\).</p>
+      </div>
+
+      <div class="decision-box">
+        <span class="trigger">«Σε κάθε ακολουθία \(n^2+1\) αριθμών, υπάρχει μονότονη υπακολουθία μήκους \(n+1\)»</span>
+        <span class="tool">Erdős–Szekeres (Dilworth)</span>
+        <p>Ορίζουμε poset, εφαρμόζουμε Dilworth ή Mirsky.</p>
+      </div>
+
+      <div class="decision-box">
+        <span class="trigger">«Υπάρχει μονόχρωμο \(K_k\) σε 2-χρωματισμό \(K_N\)»</span>
+        <span class="tool">Αριθμοί Ramsey / Πιθανοτική Μέθοδος</span>
+        <p>Για \(N = R(k,k)\): σίγουρα. Για \(N &lt; 2^{k/2}\): πιθανοτική μέθοδος δείχνει ότι ενδέχεται να μην υπάρχει.</p>
+      </div>
+    </section>
+
+    <!-- §4 Τύποι Ασκήσεων -->
+    <section id="sec-types">
+      <h2>4. Συνηθισμένοι Τύποι Ασκήσεων</h2>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Τύπος Α — Αποδείξτε / Διαψεύστε ιδιότητα γράφου</div>
+        <p><strong>Στρατηγική:</strong></p>
+        <ol>
+          <li>Αν χρειάζεται ύπαρξη: Ramsey, Hall, περιστερεώνας, πιθανοτική.</li>
+          <li>Αν χρειάζεται αναγκαία συνθήκη: χειραψία, Euler, φράγμα.</li>
+          <li>Αν ζητείτε παράδειγμα/αντιπαράδειγμα: δοκιμάστε \(K_n\), \(C_n\), \(K_{m,n}\), \(P_n\).</li>
+        </ol>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Τύπος Β — Υπολογίστε \(\alpha(G)\), \(\omega(G)\), \(\chi(G)\)</div>
+        <p><strong>Τρικ:</strong>
+          <br>— \(\chi(G) \ge \omega(G)\) (κλίκες χρειάζονται διαφορετικά χρώματα).
+          <br>— Για διμερείς: \(\chi(G) \le 2\).
+          <br>— Για επίπεδους: \(\chi(G) \le 4\) (Θεώρημα 4 Χρωμάτων), \(\le 6\) εύκολα.
+          <br>— \(\alpha(G) \cdot \chi(G) \ge n\) (κάθε χρώμα = ανεξάρτητο σύνολο).
+        </p>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Τύπος Γ — Δείξτε ότι γράφος δεν είναι επίπεδος</div>
+        <p><strong>Βήματα:</strong>
+          <br>1. Ελέγξτε \(m \le 3n-6\) (αν παραβιάζεται: μη-επίπεδος).
+          <br>2. Αν διμερής: \(m \le 2n-4\).
+          <br>3. Βρείτε subdivision \(K_5\) ή \(K_{3,3}\) (Kuratowski).
+          <br><em>Παράδειγμα:</em> \(K_5\): \(n=5, m=10 > 3\cdot5-6=9\). Άρα μη-επίπεδος.
+        </p>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Τύπος Δ — Hall / Ταίριασμα σε Εφαρμογή</div>
+        <p><strong>Βήματα:</strong>
+          <br>1. Μοντελοποιήστε ως διμερή γράφο (L = «αντικείμενα», R = «θέσεις»/«ζεύγη»).
+          <br>2. Ελέγξτε Hall condition.
+          <br>3. Αν Hall παραβιάζεται, βρείτε \(S \subseteq L\) με \(|N(S)| &lt; |S|\).
+        </p>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Τύπος Ε — Ramsey Lower/Upper Bound</div>
+        <p><strong>Upper:</strong> \(R(k,m) \le R(k-1,m)+R(k,m-1)\) — επαγωγή στο \(k+m\).
+          <br><strong>Lower:</strong> Πιθανοτική μέθοδος (Erdős 1947) — τυχαίος 2-χρωματισμός \(K_N\)
+          για \(N = 2^{k/2}\) δεν έχει μονόχρωμο \(K_k\) με θετική πιθανότητα.
+        </p>
+      </div>
+    </section>
+
+    <!-- §5 Σχέσεις Θεωρημάτων -->
+    <section id="sec-relations">
+      <h2>5. Σχέσεις Μεταξύ Θεωρημάτων</h2>
+
+      <div class="callout callout-tldr">
+        <div class="callout-title">&#9889; Δίκτυο Θεωρημάτων</div>
+        <div class="mermaid">
+graph TD
+  HS["Λήμμα Χειραψίας\nΣd(v)=2|E|"]
+  TR["Θεώρημα Δέντρων\n(5 ισοδύναμα)"]
+  EU["Θεώρημα Euler\nEuler Κύκλος"]
+  EF["Τύπος Euler\nn-m+f=2"]
+  SP["Αραιότητα\nm≤3n-6"]
+  KU["Kuratowski\nK₅, K₃,₃"]
+  HA["Θεώρημα Hall\nΤέλειο Ταίριασμα"]
+  DI["Θεώρημα Dilworth\nc(P)=α(P)"]
+  MI["Θεώρημα Mirsky\n(Δυϊκό Dilworth)"]
+  KO["Θεώρημα König\nΔιμερής: ν=τ"]
+  ES["Erdős–Szekeres\nΜονότονη υπακολ."]
+  RM["Αριθμοί Ramsey\nR(k,m)"]
+  PM["Πιθανοτική Μέθοδος"]
+  PE["Αρχή Περιστερεώνα"]
+
+  HS --> TR
+  HS --> EU
+  EF --> SP
+  SP --> KU
+  KO --> DI
+  DI --> HA
+  DI --> ES
+  DI --> MI
+  PM --> RM
+  PE --> RM
+  PE --> ES
+        </div>
+      </div>
+
+      <h3>Βασικά Αξιώματα / Αρχές</h3>
+      <table class="math-table">
+        <thead>
+          <tr><th>Αρχή</th><th>Δηλωτικά</th><th>Κύριες Εφαρμογές</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Αρχή Περιστερεώνα</td>
+            <td>\(n+1\) αντικείμενα σε \(n\) συρτάρια \(\Rightarrow\) κάποιο συρτάρι έχει \(\ge 2\)</td>
+            <td>Ramsey bounds, Dirichlet, Erdős–Szekeres</td>
+          </tr>
+          <tr>
+            <td>Πιθανοτική Μέθοδος</td>
+            <td>Δείχνει ύπαρξη με \(\Pr[\text{ιδιότητα}] > 0\)</td>
+            <td>Ramsey lower bounds, \(m(n) \ge 2^{n-1}\)</td>
+          </tr>
+          <tr>
+            <td>König</td>
+            <td>Διμερής: \(\nu(G) = \tau(G)\) (max matching = min vertex cover)</td>
+            <td>Dilworth, βάση για min-max θεωρήματα</td>
+          </tr>
+          <tr>
+            <td>Berge</td>
+            <td>\(M\) μέγιστο \(\iff\) δεν υπάρχει \(M\)-αυξητικό μονοπάτι</td>
+            <td>BFS αλγόριθμος Hall</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <nav class="lecture-nav" aria-label="Πλοήγηση θεμάτων">
+      <a href="induction.html" class="lecture-nav__btn">← Οδηγός Επαγωγής</a>
+      <span class="lecture-nav__current">Οδηγός Γραφημάτων</span>
+      <a href="proofs-cheatsheet.html" class="lecture-nav__btn">Cheatsheet Αποδείξεων →</a>
+    </nav>
+
   </main>
+</div>
 
-  <footer>
-    <p>Σημειώσεις Μαθηματικών Πληροφορικής — ΕΚΠΑ</p>
-  </footer>
+<footer class="site-footer">
+  <p>Μαθηματικά Πληροφορικής · ΕΚΠΑ · Τμήμα Πληροφορικής &amp; Τηλεπικοινωνιών</p>
+  <p>
+    <a href="../index.html">Αρχική</a> ·
+    <a href="induction.html">Οδηγός Επαγωγής</a> ·
+    <a href="proofs-cheatsheet.html">Cheatsheet Αποδείξεων</a>
+  </p>
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+  });
+</script>
 </body>
 </html>

@@ -3,27 +3,810 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Λυμένες Ασκήσεις — Μαθηματικά Πληροφορικής</title>
+  <meta name="description"
+        content="Λυμένες Ασκήσεις — 22 ασκήσεις τύπου εξετάσεων με πλήρεις λύσεις.">
+  <title>Λυμένες Ασκήσεις | Μαθ. Πληροφορικής ΕΚΠΑ</title>
   <link rel="stylesheet" href="../css/style.css">
   <script>
-    window.MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };
+    window.MathJax = {
+      tex: {
+        inlineMath:  [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        tags: 'ams',
+        macros: {
+          floor: ['\\lfloor #1 \\rfloor', 1],
+          ceil:  ['\\lceil  #1 \\rceil',  1],
+          N:  '\\mathbb{N}',
+          Z:  '\\mathbb{Z}',
+          R:  '\\mathbb{R}',
+          Q:  '\\mathbb{Q}'
+        }
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+    };
+    (function () {
+      const t = localStorage.getItem('math-plir-theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <script src="../js/main.js" defer></script>
+  <style>
+    .ex-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .ex-num {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--color-primary, #3b6fd4);
+      white-space: nowrap;
+    }
+    .ex-difficulty {
+      display: inline-flex;
+      gap: 2px;
+      align-items: center;
+      font-size: 0.82rem;
+    }
+    .ex-difficulty .dot { width: 10px; height: 10px; border-radius: 50%; background: #ccc; display: inline-block; }
+    .ex-difficulty .dot.filled { background: var(--color-primary, #3b6fd4); }
+    .ex-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      padding: 0.1rem 0.5rem;
+      border-radius: 12px;
+      background: #e8f0fe;
+      color: #1a56db;
+      font-weight: 600;
+    }
+    [data-theme="dark"] .ex-tag { background: #1e3a8a; color: #93c5fd; }
+    .ex-source { font-size: 0.82rem; color: var(--color-text-muted, #666); }
+    .exercise-block {
+      border: 1px solid var(--color-border, #d0d8f0);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+      background: var(--color-surface, #fff);
+    }
+    .exercise-block:hover { border-color: var(--color-primary, #3b6fd4); }
+    .exercise-block .statement { margin: 0.75rem 0; }
+    .exercise-block details { margin-top: 0.75rem; }
+    .exercise-block details summary {
+      cursor: pointer;
+      color: var(--color-primary, #3b6fd4);
+      font-weight: 600;
+      padding: 0.4rem 0;
+    }
+    .solution-body { padding: 0.75rem 0 0.25rem 1rem; border-left: 3px solid var(--color-primary, #3b6fd4); margin-top: 0.5rem; }
+    .category-header {
+      margin: 2rem 0 1rem;
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      background: var(--color-primary, #3b6fd4);
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+    [data-theme="dark"] .exercise-block { background: #1a1f2e; }
+    .hint { font-style: italic; color: var(--color-text-muted, #666); font-size: 0.9rem; }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Λυμένες Ασκήσεις</h1>
-    <a href="../index.html">← Αρχική</a>
-  </header>
 
-  <main>
-    <p><em>Placeholder — περιεχόμενο θα συμπληρωθεί.</em></p>
+<header class="site-header" role="banner">
+  <div class="site-header__inner">
+    <a href="../index.html" class="site-header__title">&#8469; Μαθηματικά Πληροφορικής</a>
+    <nav class="site-nav" aria-label="Κύρια πλοήγηση">
+      <a href="../index.html">Αρχική</a>
+      <a href="../lectures/lecture1.html">Διαλέξεις</a>
+      <a href="../topics/induction.html">Θέματα</a>
+      <a href="solved.html" aria-current="page">Ασκήσεις</a>
+      <a href="../exam-prep/formulas.html">Εξεταστική</a>
+    </nav>
+    <button id="theme-toggle" class="btn-theme-toggle"
+            aria-label="Εναλλαγή σκοτεινής λειτουργίας">&#127769; Σκοτεινό</button>
+  </div>
+</header>
+
+<div class="page-wrapper">
+
+  <aside class="sidebar-toc" aria-label="Περιεχόμενα σελίδας">
+    <button class="toc-toggle" aria-expanded="true">&#128203; Περιεχόμενα &#9662;</button>
+    <div class="sidebar-toc__title">Κατηγορίες</div>
+    <ol class="sidebar-toc__list">
+      <li><a href="#cat-induction">Α. Επαγωγή (5)</a></li>
+      <li><a href="#cat-structural">Β. Δομική Επαγωγή (3)</a></li>
+      <li><a href="#cat-pigeonhole">Γ. Περιστερεώνας (3)</a></li>
+      <li><a href="#cat-graphs">Δ. Γραφήματα (5)</a></li>
+      <li><a href="#cat-hall">Ε. Hall / Ταιριάσματα (2)</a></li>
+      <li><a href="#cat-dilworth">ΣΤ. Dilworth / Sperner (2)</a></li>
+      <li><a href="#cat-mixed">Ζ. Μικτές (2)</a></li>
+    </ol>
+  </aside>
+
+  <main class="main-content" id="main-content">
+
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <div class="breadcrumbs__item"><a href="../index.html">Αρχική</a></div>
+      <div class="breadcrumbs__item"><span class="breadcrumbs__current">Λυμένες Ασκήσεις</span></div>
+    </nav>
+
+    <h1 class="lecture-title">Λυμένες Ασκήσεις</h1>
+    <p class="lecture-subtitle">
+      22 ασκήσεις τύπου εξετάσεων με πλήρεις βαθμολογημένες λύσεις.
+      Δυσκολία:
+      <span class="ex-difficulty">
+        <span class="dot filled"></span><span class="dot"></span><span class="dot"></span> Εύκολη
+      </span> ·
+      <span class="ex-difficulty">
+        <span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span> Μέτρια
+      </span> ·
+      <span class="ex-difficulty">
+        <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span> Δύσκολη
+      </span>
+    </p>
+
+    <!-- ═══ ΕΠΑΓΩΓΗ ═══ -->
+    <div class="category-header" id="cat-induction">Α. Μαθηματική Επαγωγή</div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">Α1.</span>
+        <span class="ex-tag">Απλή Επαγωγή</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot"></span><span class="dot"></span>
+        </span>
+        <span class="ex-source">Πηγή: <a href="../lectures/lecture2.html">Δ2</a></span>
+      </div>
+      <div class="statement">
+        Αποδείξτε με μαθηματική επαγωγή ότι για κάθε \(n \ge 1\):
+        \[\sum_{i=1}^{n} i = \frac{n(n+1)}{2}.\]
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p><strong>Βάση (\(n=1\)):</strong> \(\sum_{i=1}^{1} i = 1 = \frac{1 \cdot 2}{2} = 1\). ✓</p>
+          <p><strong>Επαγωγικό Βήμα:</strong> Έστω \(n \ge 1\) αυθαίρετο. Ε.Υ.: \(\sum_{i=1}^{n} i = \frac{n(n+1)}{2}\).</p>
+          <p>Θέλουμε: \(\sum_{i=1}^{n+1} i = \frac{(n+1)(n+2)}{2}\).</p>
+          \[\sum_{i=1}^{n+1} i = \underbrace{\sum_{i=1}^{n} i}_{\text{Ε.Υ.} = \frac{n(n+1)}{2}} + (n+1) = \frac{n(n+1)}{2} + \frac{2(n+1)}{2} = \frac{(n+1)(n+2)}{2}. \quad\square\]
+        </div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">Α2.</span>
+        <span class="ex-tag">Απλή Επαγωγή</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot"></span><span class="dot"></span>
+        </span>
+        <span class="ex-source">Κλασική άσκηση</span>
+      </div>
+      <div class="statement">
+        Αποδείξτε: \(3 \mid (n^3 - n)\) για κάθε \(n \ge 0\).
+      </div>
+      <p class="hint">Υπόδειξη: \(n^3 - n = n(n-1)(n+1)\) — τρία διαδοχικά.</p>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p><strong>Μέθοδος Α (αλγεβρική):</strong> \(n^3 - n = n(n^2-1) = n(n-1)(n+1) = (n-1)n(n+1)\).
+            Το γινόμενο τριών διαδοχικών ακεραίων διαιρείται από \(3! = 6\), άρα και από 3. \(\square\)</p>
+          <p><strong>Μέθοδος Β (επαγωγή):</strong></p>
+          <p>Βάση \(n=0\): \(0\). ✓ &nbsp; Ε.Υ.: \(3 \mid (n^3-n)\).</p>
+          \[(n+1)^3 - (n+1) = n^3 + 3n^2 + 3n + 1 - n - 1 = (n^3-n) + 3n^2 + 3n = (n^3-n) + 3n(n+1).\]
+          <p>Το πρώτο διαιρείται από 3 (Ε.Υ.), το δεύτερο προφανώς. \(\square\)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">Α3.</span>
+        <span class="ex-tag">Ανισότητα</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span>
+        </span>
+      </div>
+      <div class="statement">
+        Αποδείξτε: \(n! > 2^n\) για κάθε \(n \ge 4\).
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p><strong>Βάση (\(n=4\)):</strong> \(4! = 24 > 16 = 2^4\). ✓</p>
+          <p><strong>Βήμα:</strong> Ε.Υ.: \(n! > 2^n\) για κάποιο \(n \ge 4\).
+            \[(n+1)! = (n+1) \cdot n! > (n+1) \cdot 2^n \ge 2 \cdot 2^n = 2^{n+1},\]
+            αφού \(n+1 \ge 5 > 2\). \(\square\)
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">Α4.</span>
+        <span class="ex-tag">Ισχυρή Επαγωγή</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span>
+        </span>
+        <span class="ex-source"><a href="../lectures/lecture2.html">Δ2</a></span>
+      </div>
+      <div class="statement">
+        Αποδείξτε ότι κάθε ακέραιος \(n \ge 2\) έχει τουλάχιστον έναν πρώτο παράγοντα.
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p><strong>Ισχυρή επαγωγή στο \(n\).</strong></p>
+          <p><strong>Βάση (\(n=2\)):</strong> \(2\) είναι πρώτος, οπότε ο ίδιος είναι πρώτος παράγοντας. ✓</p>
+          <p><strong>Βήμα:</strong> Ε.Υ.: κάθε ακέραιος \(2 \le m &lt; n\) έχει πρώτο παράγοντα.</p>
+          <ul>
+            <li>Αν \(n\) πρώτος: ο \(n\) είναι πρώτος παράγοντας του εαυτού του. ✓</li>
+            <li>Αν \(n\) σύνθετος: υπάρχει \(n = a \cdot b\) με \(2 \le a, b &lt; n\).
+              Από Ε.Υ., ο \(a\) έχει πρώτο παράγοντα \(p\). Τότε \(p \mid a \mid n\). ✓ \(\square\)
+            </li>
+          </ul>
+        </div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">Α5.</span>
+        <span class="ex-tag">Ισχυρά Επαγωγή</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span>
+        </span>
+      </div>
+      <div class="statement">
+        Αποδείξτε: για κάθε \(n \ge 1\), ο \(n\)-οστός αριθμός Fibonacci ικανοποιεί
+        \(F_n \le \left(\frac{1+\sqrt{5}}{2}\right)^{n-1}\).
+        (Αρκεί να χρησιμοποιήσετε ότι \(\varphi = \frac{1+\sqrt{5}}{2}\) ικανοποιεί \(\varphi^2 = \varphi + 1\).)
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p><strong>Ισχυρή επαγωγή.</strong>
+            <br>Βάσεις: \(F_1 = 1 \le \varphi^0 = 1\) ✓, \(F_2 = 1 \le \varphi^1 = \varphi \approx 1.618\) ✓.
+          </p>
+          <p><strong>Βήμα (\(n \ge 3\)):</strong> Ε.Υ.: \(F_{n-1} \le \varphi^{n-2}\) και \(F_{n-2} \le \varphi^{n-3}\).
+            \[F_n = F_{n-1} + F_{n-2} \le \varphi^{n-2} + \varphi^{n-3} = \varphi^{n-3}(\varphi + 1) = \varphi^{n-3} \cdot \varphi^2 = \varphi^{n-1}. \quad\square\]
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ═══ ΔΟΜΙΚΗ ΕΠΑΓΩΓΗ ═══ -->
+    <div class="category-header" id="cat-structural">Β. Δομική Επαγωγή</div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">Β1.</span>
+        <span class="ex-tag">Δομική Επαγωγή</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span>
+        </span>
+        <span class="ex-source"><a href="../lectures/lecture3.html">Δ3</a></span>
+      </div>
+      <div class="statement">
+        Ορίζουμε \(\Sigma^*\) επαγωγικά: (i) \(\varepsilon \in \Sigma^*\);
+        (ii) αν \(w \in \Sigma^*\) και \(a \in \Sigma\) τότε \(wa \in \Sigma^*\).
+        Αποδείξτε ότι \(\ell(x \circ y) = \ell(x) + \ell(y)\) για κάθε \(x, y \in \Sigma^*\).
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p><strong>Δομική επαγωγή στο \(y\).</strong></p>
+          <p><strong>Βάση (\(y = \varepsilon\)):</strong>
+            \(\ell(x \circ \varepsilon) = \ell(x) = \ell(x) + 0 = \ell(x) + \ell(\varepsilon)\). ✓</p>
+          <p><strong>Βήμα (\(y = wa\) για \(w \in \Sigma^*, a \in \Sigma\)):</strong>
+            Ε.Υ.: \(\ell(x \circ w) = \ell(x) + \ell(w)\).
+            \[\ell(x \circ (wa)) = \ell((x \circ w)a) = \ell(x \circ w) + 1 \stackrel{\text{Ε.Υ.}}{=} \ell(x) + \ell(w) + 1 = \ell(x) + \ell(wa). \quad\square\]
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">Β2.</span>
+        <span class="ex-tag">Δομική Επαγωγή</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span>
+        </span>
+      </div>
+      <div class="statement">
+        Ορίζουμε ΚΔΔ (Κ.Δ.Δ.) δομικά: βασικό = ένας κόμβος (φύλλο),
+        κανόνας: \(T = v(T_L, T_R)\). Αποδείξτε:
+        το πλήθος φύλλων \(\text{leaves}(T) \le 2^{h(T)}\).
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p><strong>Βάση (φύλλο \(T = v\)):</strong> \(\text{leaves}(T) = 1 \le 2^0 = 1\). ✓</p>
+          <p><strong>Βήμα (\(T = \text{root}(T_L, T_R)\)):</strong>
+            Ε.Υ.: \(\text{leaves}(T_L) \le 2^{h(T_L)}\) και \(\text{leaves}(T_R) \le 2^{h(T_R)}\).
+            \[\text{leaves}(T) = \text{leaves}(T_L) + \text{leaves}(T_R)
+            \le 2^{h(T_L)} + 2^{h(T_R)}
+            \le 2 \cdot 2^{\max(h_L,h_R)} = 2^{h(T)}. \quad\square\]
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">Β3.</span>
+        <span class="ex-tag">Δομική + Ισχυρή Επαγωγή</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span>
+        </span>
+        <span class="ex-source"><a href="../lectures/lecture3.html">Δ3</a></span>
+      </div>
+      <div class="statement">
+        Ορίζουμε γλώσσα \(L \subseteq \{0,1\}^*\) ως:
+        (i) \(\varepsilon \in L\); (ii) αν \(w \in L\) τότε \(0w1, 1w0 \in L\);
+        (iii) αν \(u, v \in L\) τότε \(uv \in L\).
+        Αποδείξτε ότι \(L = \{w : \#_0(w) = \#_1(w)\}\) (ίσος αριθμός 0 και 1).
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p>Συμβολίζουμε \(B = \{w : \#_0(w) = \#_1(w)\}\).</p>
+          <p><strong>(\(L \subseteq B\)) — Δομική επαγωγή:</strong></p>
+          <ul>
+            <li>Βάση: \(\#_0(\varepsilon) = \#_1(\varepsilon) = 0\). ✓</li>
+            <li>Κανόνας (ii): αν \(w \in B\), τότε \(\#_0(0w1) = \#_0(w)+1 = \#_1(w)+1 = \#_1(0w1)\). ✓</li>
+            <li>Κανόνας (iii): αν \(u,v \in B\), τότε \(\#_0(uv) = \#_0(u)+\#_0(v) = \#_1(u)+\#_1(v) = \#_1(uv)\). ✓</li>
+          </ul>
+          <p><strong>(\(B \subseteq L\)) — Ισχυρή επαγωγή στο \(|w|\):</strong></p>
+          <p>Βάση \(|w|=0\): \(w=\varepsilon \in L\). ✓</p>
+          <p>Βήμα: \(w \in B\), \(|w| \ge 2\).
+            Αν \(w\) αρχίζει με 0: τότε \(w = 0w'\), και επειδή \(\#_0(w) = \#_1(w)\),
+            βρίσκουμε πρόθεμα \(0w''\) με \(\#_0 = \#_1\) (δηλ. «κλειστό» στο πρώτο σημείο ισορροπίας).
+            Άρα \(w = (0w'')(w''')\) όπου και τα δύο ανήκουν σε \(B\).
+            Από Ε.Υ. και κανόνα (iii): \(w \in L\). ✓ \(\square\)
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ═══ ΠΕΡΙΣΤΕΡΕΩΝΑΣ ═══ -->
+    <div class="category-header" id="cat-pigeonhole">Γ. Αρχή Περιστερεώνα</div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">Γ1.</span>
+        <span class="ex-tag">Περιστερεώνας</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot"></span><span class="dot"></span>
+        </span>
+        <span class="ex-source"><a href="../lectures/lecture4.html">Δ4</a></span>
+      </div>
+      <div class="statement">
+        Σε οποιοδήποτε σύνολο 13 ακεραίων, υπάρχουν δύο με ίδιο υπόλοιπο mod 12.
+        Αποδείξτε το.
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p>Τα υπόλοιπα mod 12 είναι \(\{0, 1, 2, \ldots, 11\}\) — 12 συρτάρια.
+            Έχουμε 13 ακεραίους (περιστέρια). Από αρχή περιστερεώνα, δύο έχουν ίδιο υπόλοιπο
+            mod 12, άρα ίδιο υπόλοιπο. \(\square\)
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">Γ2.</span>
+        <span class="ex-tag">Περιστερεώνας</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span>
+        </span>
+        <span class="ex-source"><a href="../lectures/lecture4.html">Δ4</a></span>
+      </div>
+      <div class="statement">
+        Αποδείξτε: σε οποιοδήποτε σύνολο 5 σημείων εντός τετραγώνου πλευράς 2,
+        υπάρχουν δύο σε απόσταση \(\le \sqrt{2}\).
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p>Χωρίζουμε το τετράγωνο σε 4 υπο-τετράγωνα πλευράς 1 (τα «συρτάρια»).
+            Με 5 σημεία σε 4 συρτάρια, κάποιο περιέχει \(\ge 2\) σημεία.
+            Η διάμετρος κάθε υπο-τετραγώνου είναι \(\sqrt{1^2+1^2} = \sqrt{2}\).
+            Άρα τα δύο σημεία απέχουν \(\le \sqrt{2}\). \(\square\)
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">Γ3.</span>
+        <span class="ex-tag">Dirichlet</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span>
+        </span>
+        <span class="ex-source"><a href="../lectures/lecture4.html">Δ4 §6</a></span>
+      </div>
+      <div class="statement">
+        Αποδείξτε το Θεώρημα Dirichlet: για κάθε \(\theta \in \R\) και \(m \in \N\), υπάρχουν
+        \(p, q \in \Z\) με \(1 \le q \le m\) και \(\left|\theta - \frac{p}{q}\right| < \frac{1}{mq}\).
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p>Θεωρούμε τους \(m+1\) αριθμούς \(\{k\theta\} = k\theta - \lfloor k\theta \rfloor\)
+            για \(k = 0, 1, \ldots, m\).
+          </p>
+          <p>Χωρίζουμε το \([0,1)\) σε \(m\) διαστήματα \([i/m, (i+1)/m)\) για \(i=0,\ldots,m-1\).</p>
+          <p>Από αρχή περιστερεώνα: δύο από τους \(m+1\) αριθμούς ανήκουν στο ίδιο διάστημα.
+            Έστω \(\{j\theta\}\) και \(\{k\theta\}\) με \(j > k \ge 0\) στο ίδιο διάστημα:
+            \(|\{j\theta\} - \{k\theta\}| < 1/m\).
+          </p>
+          <p>Θέτουμε \(q = j-k\) (με \(1 \le q \le m\)) και \(p = \lfloor j\theta \rfloor - \lfloor k\theta \rfloor\).
+            Τότε:
+            \[|q\theta - p| = |(j-k)\theta - (\lfloor j\theta\rfloor - \lfloor k\theta\rfloor)|
+            = |\{j\theta\} - \{k\theta\}| < \frac{1}{m}.\]
+            Διαιρώ δια \(q\): \(\left|\theta - \frac{p}{q}\right| < \frac{1}{mq}\). \(\square\)
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ═══ ΓΡΑΦΗΜΑΤΑ ═══ -->
+    <div class="category-header" id="cat-graphs">Δ. Γραφήματα</div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">Δ1.</span>
+        <span class="ex-tag">Χειραψία</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot"></span><span class="dot"></span>
+        </span>
+        <span class="ex-source"><a href="../lectures/lecture6.html">Δ6</a></span>
+      </div>
+      <div class="statement">
+        Σε πάρτι με 10 άτομα, κάποιοι αντάλλαξαν χειραψίες.
+        Αποδείξτε ότι ο αριθμός των ατόμων που έκαναν περιττό αριθμό χειραψιών είναι ζυγός.
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p>Μοντελοποιούμε ως γράφο \(G\) (κόμβοι = άτομα, ακμές = χειραψίες).
+            Από λήμμα χειραψίας: \(\sum_{v} \deg(v) = 2|E|\) — ζυγός αριθμός.
+          </p>
+          <p>Ο αριθμός κόμβων με περιττό βαθμό πρέπει να είναι ζυγός, γιατί:
+            \[\sum_v \deg(v) = \underbrace{\sum_{v: \text{ζυγός}} \deg(v)}_{\text{ζυγό}} + \underbrace{\sum_{v: \text{μονός}} \deg(v)}_{\text{πρέπει να είναι ζυγό}}.\]
+            Άθροισμα μονών αριθμών είναι ζυγό \(\iff\) πλήθος τους ζυγό. \(\square\)
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">Δ2.</span>
+        <span class="ex-tag">Euler Κύκλος</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span>
+        </span>
+        <span class="ex-source"><a href="../lectures/lecture6.html">Δ6 §Γ</a></span>
+      </div>
+      <div class="statement">
+        Ο γράφος \(G\) έχει κόμβους \(\{1,2,3,4,5\}\) και ακμές
+        \(\{12, 13, 14, 23, 24, 34, 35, 45\}\) (π.χ. \(12\) = ακμή μεταξύ 1 και 2).
+        (α) Έχει Euler κύκλο; (β) Αν όχι, ποιες ακμές να αφαιρέσουμε ώστε να έχει;
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p>Υπολογίζουμε βαθμούς:
+            \(\deg(1) = 3\) (ακμές 12,13,14),
+            \(\deg(2) = 3\) (12,23,24),
+            \(\deg(3) = 4\) (13,23,34,35),
+            \(\deg(4) = 4\) (14,24,34,45),
+            \(\deg(5) = 2\) (35,45).
+          </p>
+          <p>(α) Κόμβοι με περιττό βαθμό: 1, 2 — δύο κόμβοι. Άρα ΔΕΝ υπάρχει Euler κύκλος
+            (αλλά υπάρχει Euler μονοπάτι από 1 ως 2).
+          </p>
+          <p>(β) Αφαιρούμε ακμή 12: τότε \(\deg(1)=2, \deg(2)=2\) — όλοι ζυγοί. ✓
+            Ο γράφος παραμένει συνεκτικός, άρα έχει Euler κύκλο. \(\square\)
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">Δ3.</span>
+        <span class="ex-tag">Επίπεδος Γράφος</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span>
+        </span>
+        <span class="ex-source"><a href="../lectures/lecture6.html">Δ6 §Δ</a></span>
+      </div>
+      <div class="statement">
+        Αποδείξτε ότι \(K_{3,3}\) δεν είναι επίπεδος.
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p>\(K_{3,3}\): \(n=6\), \(m=9\).</p>
+          <p>Για διμερή επίπεδο γράφο με \(n \ge 3\): \(m \le 2n-4 = 2\cdot6-4 = 8\).
+            Αλλά \(m = 9 > 8\). Αντίφαση — \(K_{3,3}\) δεν είναι επίπεδος. \(\square\)
+          </p>
+          <p><em>Παρατήρηση:</em> Το φράγμα \(m \le 2n-4\) ισχύει για διμερείς γιατί κάθε
+            πρόσωπο έχει \(\ge 4\) ακμές (δεν υπάρχουν τρίγωνα σε διμερή γράφο).
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">Δ4.</span>
+        <span class="ex-tag">Δέντρα</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span>
+        </span>
+      </div>
+      <div class="statement">
+        Ο γράφος \(G\) είναι δάσος (forest) με \(n\) κόμβους και \(k\) συνεκτικές συνιστώσες.
+        Αποδείξτε ότι έχει \(n-k\) ακμές.
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p>Κάθε συνιστώσα είναι δέντρο (συνεκτικό δάσος). Αν συνιστώσα \(i\) έχει \(n_i\) κόμβους,
+            τότε έχει \(n_i - 1\) ακμές (Θεώρημα Δέντρων).
+          </p>
+          <p>Σύνολο ακμών:
+            \[\sum_{i=1}^k (n_i - 1) = \sum_{i=1}^k n_i - k = n - k. \quad\square\]
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">Δ5.</span>
+        <span class="ex-tag">Χρωματισμός</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span>
+        </span>
+      </div>
+      <div class="statement">
+        Αποδείξτε ότι κάθε επίπεδος γράφος χρωματίζεται με \(\le 6\) χρώματα.
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p><strong>Ισχυρή επαγωγή στο \(n = |V|\).</strong></p>
+          <p>Βάσεις \(n \le 6\): τετριμμένο (χρωματίζουμε με ξεχωριστό χρώμα ανά κόμβο).</p>
+          <p>Βήμα: έστω επίπεδος \(G\) με \(n > 6\).
+            Από \(m \le 3n-6\): \(\frac{2m}{n} < 6\), άρα μέσος βαθμός \(< 6\).
+            Άρα υπάρχει κόμβος \(v\) με \(\deg(v) \le 5\).
+          </p>
+          <p>Αφαιρούμε \(v\): ο \(G - v\) είναι επίπεδος με \(n-1\) κόμβους.
+            Από Ε.Υ.: \(G-v\) χρωματίζεται με \(\le 6\) χρώματα.
+            Ο \(v\) έχει \(\le 5 < 6\) γείτονες, άρα υπάρχει χρώμα για τον \(v\). \(\square\)
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ═══ HALL ═══ -->
+    <div class="category-header" id="cat-hall">Ε. Hall / Ταιριάσματα</div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">Ε1.</span>
+        <span class="ex-tag">Hall's Theorem</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span>
+        </span>
+        <span class="ex-source"><a href="../lectures/lecture7.html">Δ7</a></span>
+      </div>
+      <div class="statement">
+        Υπάρχουν 4 φοιτητές \(\{A,B,C,D\}\) και 4 εργαστήρια \(\{1,2,3,4\}\).
+        Κάθε φοιτητής μπορεί να παρακολουθήσει ορισμένα εργαστήρια:
+        \(A\to\{1,2\}\), \(B\to\{2,3\}\), \(C\to\{1,3,4\}\), \(D\to\{2,4\}\).
+        Υπάρχει ανάθεση ώστε κάθε φοιτητής να ανατεθεί σε διαφορετικό εργαστήριο;
+        Ελέγξτε Hall's condition.
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p>Ελέγχουμε \(|N(S)| \ge |S|\) για όλα τα \(S \subseteq \{A,B,C,D\}\):</p>
+          <ul>
+            <li>Μεμονωμένοι: \(|N(A)|=2\ge1, |N(B)|=2\ge1, |N(C)|=3\ge1, |N(D)|=2\ge1\). ✓</li>
+            <li>\(S=\{A,B\}\): \(N=\{1,2,3\}\), \(|N|=3\ge2\). ✓</li>
+            <li>\(S=\{A,D\}\): \(N=\{1,2,4\}\), \(|N|=3\ge2\). ✓</li>
+            <li>\(S=\{B,D\}\): \(N=\{2,3,4\}\), \(|N|=3\ge2\). ✓</li>
+            <li>\(S=\{A,B,D\}\): \(N=\{1,2,3,4\}\), \(|N|=4\ge3\). ✓</li>
+            <li>Όλα τα \(|S|=4\): \(N=\{1,2,3,4\}\), \(|N|=4\ge4\). ✓</li>
+          </ul>
+          <p>Hall condition ικανοποιείται → υπάρχει τέλειο ταίριασμα.</p>
+          <p>Π.χ.: \(A\to1, B\to3, C\to4, D\to2\). ✓ \(\square\)</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">Ε2.</span>
+        <span class="ex-tag">Hall + Defect</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span>
+        </span>
+        <span class="ex-source"><a href="../lectures/lecture7.html">Δ7 §5</a></span>
+      </div>
+      <div class="statement">
+        Σε διμερή γράφο \(G=(L\cup R, E)\) με \(|L|=5, |R|=5\), γνωρίζετε ότι
+        \(\max_{S\subseteq L}(|S|-|N(S)|) = 2\) (defect \(\delta=2\)).
+        Ποιο είναι το μέγιστο μέγεθος ταιριάσματος;
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p>Από Defect Version του Hall: το μέγιστο ταίριασμα καλύπτει \(|L| - \delta = 5 - 2 = 3\) κόμβους του \(L\).
+            Άρα το μέγιστο ταίριασμα έχει μέγεθος 3. \(\square\)
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ═══ DILWORTH ═══ -->
+    <div class="category-header" id="cat-dilworth">ΣΤ. Dilworth / Sperner</div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">ΣΤ1.</span>
+        <span class="ex-tag">Dilworth</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span>
+        </span>
+        <span class="ex-source"><a href="../lectures/lecture8.html">Δ8</a></span>
+      </div>
+      <div class="statement">
+        Στο poset \((\{1,2,3,4,5,6\}, \mid)\) (διαιρετότητα):
+        (α) Βρείτε μέγιστη αντιαλυσίδα.
+        (β) Βρείτε ελάχιστη κάλυψη αλυσίδων και επαληθεύστε Dilworth.
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p>(α) Αντιαλυσίδα: \(\{2, 3, 5\}\) — αμοιβαία μη-διαιρετά. Ελέγξτε: \(2\nmid3, 3\nmid2, 2\nmid5, 5\nmid2, 3\nmid5, 5\nmid3\). ✓ Μέγεθος 3.
+          </p>
+          <p>(β) Κάλυψη: \(\{1,2,4\}\), \(\{3,6\}\), \(\{5\}\) — 3 αλυσίδες.
+            Δεν μπορούμε να τα καλύψουμε με 2 (γιατί \(\alpha=3\)).
+            Από Dilworth: \(c = \alpha = 3\). \(\square\)
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">ΣΤ2.</span>
+        <span class="ex-tag">Sperner</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span>
+        </span>
+        <span class="ex-source"><a href="../lectures/lecture8.html">Δ8 §11</a></span>
+      </div>
+      <div class="statement">
+        Αποδείξτε ότι σε οποιαδήποτε αντιαλυσίδα \(\mathcal{F} \subseteq 2^{[5]}\),
+        \(|\mathcal{F}| \le \binom{5}{2} = 10\).
+        Δώστε και αντιαλυσίδα μεγίστου μεγέθους.
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p>Από Θεώρημα Sperner: \(|\mathcal{F}| \le \binom{n}{\lfloor n/2\rfloor} = \binom{5}{2} = 10\).</p>
+          <p>Μέγιστη αντιαλυσίδα: όλα τα υποσύνολα μεγέθους 2:
+            \[\mathcal{F} = \binom{[5]}{2} = \{\{1,2\},\{1,3\},\{1,4\},\{1,5\},\{2,3\},\{2,4\},\{2,5\},\{3,4\},\{3,5\},\{4,5\}\}.\]
+            Κανένα δεν περιέχει άλλο (ίδιο μέγεθος) → αντιαλυσίδα. Μέγεθος 10. \(\square\)
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <!-- ═══ ΜΙΚΤΕΣ ═══ -->
+    <div class="category-header" id="cat-mixed">Ζ. Μικτές Ασκήσεις</div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">Ζ1.</span>
+        <span class="ex-tag">Πιθανοτική</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span>
+        </span>
+        <span class="ex-source"><a href="../lectures/lecture4.html">Δ4</a></span>
+      </div>
+      <div class="statement">
+        Αποδείξτε ότι \(R(3,3) \le 6\), δηλ. κάθε 2-χρωματισμός (κόκκινο/μπλε)
+        των ακμών του \(K_6\) περιέχει μονόχρωμο τρίγωνο.
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p>Έστω \(v\) κόμβος. Έχει 5 ακμές. Από περιστερεώνα, τουλάχιστον
+            \(\lceil 5/2 \rceil = 3\) ακμές έχουν ίδιο χρώμα.
+          </p>
+          <p>Ε.κ.τ.: 3 ακμές κόκκινες σε \(u_1, u_2, u_3\).
+            Αν κάποια ακμή \(u_i u_j\) κόκκινη: κόκκινο τρίγωνο \(v, u_i, u_j\). ✓
+            Αν καμία από \(u_1u_2, u_1u_3, u_2u_3\) δεν είναι κόκκινη: τότε όλες μπλε → μπλε τρίγωνο. ✓
+            \(\square\)
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <div class="exercise-block">
+      <div class="ex-header">
+        <span class="ex-num">Ζ2.</span>
+        <span class="ex-tag">Cantor / Halting</span>
+        <span class="ex-difficulty">
+          <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span>
+        </span>
+        <span class="ex-source"><a href="../lectures/lecture5.html">Δ5</a></span>
+      </div>
+      <div class="statement">
+        Αποδείξτε ότι το σύνολο όλων των γλωσσών \(\mathcal{L} = \{L : L \subseteq \{0,1\}^*\}\)
+        είναι μη-απαριθμήσιμο, ενώ το σύνολο των αναγνωρίσιμων γλωσσών είναι απαριθμήσιμο.
+        Συναγάγετε ότι υπάρχουν μη-αναγνωρίσιμες γλώσσες.
+      </div>
+      <details>
+        <summary>&#9654; Πλήρης Λύση</summary>
+        <div class="solution-body">
+          <p><strong>Γλώσσες μη-απαριθμήσιμες:</strong>
+            \(\mathcal{L} = 2^{\{0,1\}^*}\). Το \(\{0,1\}^*\) είναι απαριθμήσιμο (Δ5).
+            Από Cantor: \(2^S\) είναι μη-απαριθμήσιμο για κάθε απαριθμήσιμο \(S\).
+            Άρα \(\mathcal{L}\) μη-απαριθμήσιμο.
+          </p>
+          <p><strong>Αναγνωρίσιμες γλώσσες απαριθμήσιμες:</strong>
+            Κάθε αναγνωρίσιμη γλώσσα ορίζεται από ένα πρόγραμμα (Turing machine).
+            Τα προγράμματα είναι απαριθμήσιμα (συμβολοσειρές πάνω σε πεπερασμένο αλφάβητο).
+            Άρα το πλήθος των αναγνωρίσιμων γλωσσών \(\le |\text{programs}| = |\N|\) — απαριθμήσιμο.
+          </p>
+          <p><strong>Συνέπεια:</strong> Απαριθμήσιμο \(\subsetneq\) μη-απαριθμήσιμο, άρα υπάρχουν
+            γλώσσες που δεν αναγνωρίζονται από κανένα πρόγραμμα. \(\square\)
+          </p>
+        </div>
+      </details>
+    </div>
+
+    <nav class="lecture-nav" aria-label="Πλοήγηση">
+      <a href="../topics/proofs-cheatsheet.html" class="lecture-nav__btn">← Cheatsheet Αποδείξεων</a>
+      <span class="lecture-nav__current">Λυμένες Ασκήσεις</span>
+      <a href="../exam-prep/formulas.html" class="lecture-nav__btn">Εξεταστική →</a>
+    </nav>
+
   </main>
+</div>
 
-  <footer>
-    <p>Σημειώσεις Μαθηματικών Πληροφορικής — ΕΚΠΑ</p>
-  </footer>
+<footer class="site-footer">
+  <p>Μαθηματικά Πληροφορικής · ΕΚΠΑ · Τμήμα Πληροφορικής &amp; Τηλεπικοινωνιών</p>
+  <p>
+    <a href="../index.html">Αρχική</a> ·
+    <a href="../topics/induction.html">Οδηγός Επαγωγής</a> ·
+    <a href="../topics/graphs.html">Οδηγός Γραφημάτων</a>
+  </p>
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+  });
+</script>
 </body>
 </html>
