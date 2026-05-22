@@ -1,71 +1,457 @@
 <!DOCTYPE html>
-<html lang="el">
+<html lang="el" data-page="index">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Μαθηματικά Πληροφορικής — ΕΚΠΑ</title>
+  <meta name="description" content="Σημειώσεις για το μάθημα Μαθηματικά Πληροφορικής — ΕΚΠΑ, Τμήμα Πληροφορικής &amp; Τηλεπικοινωνιών. Διαλέξεις, ασκήσεις, θεωρήματα.">
+  <title>Μαθηματικά Πληροφορικής — Σημειώσεις ΕΚΠΑ</title>
   <link rel="stylesheet" href="./css/style.css">
+
+  <!--
+    MathJax config: ΠΡΕΠΕΙ να είναι πριν το CDN script.
+    Ορίζει inline math ($...$) και display math ($$...$$).
+  -->
   <script>
-    window.MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };
+    window.MathJax = {
+      tex: {
+        inlineMath:  [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        tags: 'ams'
+      },
+      options: {
+        skipHtmlTags: ['script','noscript','style','textarea','pre']
+      },
+      startup: {
+        typeset: true
+      }
+    };
+
+    // Εφαρμογή theme ΑΜΕΣΑ (αποφεύγει flash-of-unstyled-content)
+    (function () {
+      const t = localStorage.getItem('math-plir-theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
   </script>
+
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-  <script src="./js/main.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <!-- Fuse.js: φορτώνεται ΠΡΙΝ τα deferred scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+  <script src="./js/main.js"   defer></script>
+  <script src="./js/search.js" defer></script>
 </head>
 <body>
-  <header>
-    <h1>Μαθηματικά Πληροφορικής</h1>
-    <p>ΕΚΠΑ — Τμήμα Πληροφορικής &amp; Τηλεπικοινωνιών</p>
+
+  <!-- ════════════════════════════════════════════════
+       HEADER
+  ════════════════════════════════════════════════ -->
+  <header class="site-header" role="banner">
+    <div class="site-header__inner">
+      <a href="./index.html" class="site-header__title">
+        &#8469; Μαθηματικά Πληροφορικής
+      </a>
+
+      <nav class="site-nav" aria-label="Κύρια πλοήγηση">
+        <a href="./index.html"                  aria-current="page">Αρχική</a>
+        <a href="./lectures/lecture1.html">Διαλέξεις</a>
+        <a href="./topics/induction.html">Θέματα</a>
+        <a href="./exercises/solved.html">Ασκήσεις</a>
+        <a href="./exam-prep/formulas.html">Εξεταστική</a>
+      </nav>
+
+      <button id="theme-toggle" class="btn-theme-toggle"
+              aria-label="Εναλλαγή σκοτεινής λειτουργίας">
+        &#127769; Σκοτεινό
+      </button>
+    </div>
   </header>
 
-  <nav>
-    <a href="./index.html">Αρχική</a>
-    <a href="./lectures/lecture1.html">Διαλέξεις</a>
-    <a href="./topics/induction.html">Θέματα</a>
-    <a href="./exercises/solved.html">Ασκήσεις</a>
-    <a href="./exam-prep/formulas.html">Εξετάσεις</a>
-  </nav>
+  <!-- ════════════════════════════════════════════════
+       MAIN CONTENT
+  ════════════════════════════════════════════════ -->
+  <div class="container">
 
-  <main>
-    <section id="search-bar">
-      <input type="search" id="search-input" placeholder="Αναζήτηση...">
+    <!-- ── Search ── -->
+    <section aria-label="Αναζήτηση" style="margin-top:1.5rem;">
+      <div class="search-wrap">
+        <span class="search-wrap__icon" aria-hidden="true">&#128269;</span>
+        <input
+          type="search"
+          id="search-input"
+          class="search-input"
+          placeholder="Αναζήτηση θεωρήματος, διάλεξης, έννοιας…"
+          aria-label="Αναζήτηση στις σημειώσεις"
+          spellcheck="false"
+        >
+        <div id="search-results" class="search-results" role="listbox"
+             aria-label="Αποτελέσματα αναζήτησης"></div>
+      </div>
     </section>
 
-    <section id="lectures">
-      <h2>Διαλέξεις</h2>
-      <ul>
-        <li><a href="./lectures/lecture1.html">1. Υποθέσεις — Εικασίες — Θεωρήματα</a></li>
-        <li><a href="./lectures/lecture2.html">2. Αποδείξεις</a></li>
-        <li><a href="./lectures/lecture3.html">3. Δομική Επαγωγή</a></li>
-        <li><a href="./lectures/lecture4.html">4. Αποδείξεις Ύπαρξης &amp; Αρχή Περιστερεώνα</a></li>
-        <li><a href="./lectures/lecture5.html">5. Διαγωνοποίηση &amp; Υπολογισιμότητα</a></li>
-        <li><a href="./lectures/lecture6.html">6. Γραφήματα, Δέντρα, Euler, Επίπεδα</a></li>
-        <li><a href="./lectures/lecture7.html">7. Ταιριάσματα — Θεώρημα Hall</a></li>
-        <li><a href="./lectures/lecture8.html">8. Σχέσεις, Μερικές Διατάξεις, Dilworth</a></li>
-      </ul>
+    <!-- ── Intro ── -->
+    <section class="intro" aria-labelledby="intro-heading">
+      <h1 id="intro-heading">
+        Σημειώσεις Μαθηματικών Πληροφορικής
+        <span style="display:block; font-size:0.55em; font-weight:400; color:var(--color-text-muted); margin-top:0.2rem;">
+          ΕΚΠΑ &mdash; Τμήμα Πληροφορικής &amp; Τηλεπικοινωνιών
+        </span>
+      </h1>
+
+      <p>
+        Αυτές οι σημειώσεις καλύπτουν την ύλη του μαθήματος <strong>Μαθηματικά Πληροφορικής</strong>
+        (Διακριτά Μαθηματικά) του Τμήματος Πληροφορικής &amp; Τηλεπικοινωνιών του ΕΚΠΑ.
+        Παρουσιάζονται <strong>8 διαλέξεις</strong> που πηγαίνουν από τη
+        μαθηματική λογική και τις τεχνικές απόδειξης, περνούν από επαγωγή και
+        υπολογισιμότητα, και καταλήγουν στη θεωρία γραφημάτων και τις σχέσεις διάταξης.
+      </p>
+      <p>
+        Σε κάθε διάλεξη θα βρεις πλήρεις ορισμούς, θεωρήματα με αποδείξεις,
+        λυμένα παραδείγματα και callout-boxes με σημεία που τονίζονται συχνά στις εξετάσεις.
+        Χρησιμοποίησε το <strong>Progress Tracker</strong> παρακάτω για να παρακολουθείς
+        πόσα έχεις ήδη μελετήσει.
+      </p>
+      <p>
+        Η ύλη χρησιμοποιεί $\LaTeX$ (μέσω MathJax) για τους τύπους και Mermaid για
+        διαγράμματα γραφημάτων, οπότε αποδίδεται καλύτερα σε σύγχρονο browser.
+      </p>
     </section>
 
-    <section id="topics">
-      <h2>Θέματα</h2>
-      <ul>
-        <li><a href="./topics/induction.html">Επαγωγή</a></li>
-        <li><a href="./topics/graphs.html">Γραφήματα</a></li>
-        <li><a href="./topics/proofs-cheatsheet.html">Cheat Sheet Αποδείξεων</a></li>
-      </ul>
+    <!-- ── Lecture Cards ── -->
+    <section id="lecture-cards" aria-labelledby="lectures-heading">
+      <p class="section-label" id="lectures-heading">&#128218; Διαλέξεις</p>
+
+      <div class="cards-grid">
+
+        <!-- Κάρτα 1 -->
+        <a href="./lectures/lecture1.html" class="card card--accent"
+           aria-label="Διάλεξη 1: Υποθέσεις, Εικασίες, Θεωρήματα">
+          <div class="card__meta-top">
+            <span class="card__number">Διάλεξη 01</span>
+            <span class="card__difficulty" title="Δυσκολία: Εύκολη">&#9679;&#9675;&#9675;</span>
+          </div>
+          <h3 class="card__title">Υποθέσεις, Εικασίες, Θεωρήματα</h3>
+          <p class="card__desc">
+            Τυπική γλώσσα μαθηματικών: αξιώματα, ορισμοί, λήμματα, πορίσματα.
+            Λογικές προτάσεις, κβαντοδότες $\forall$ και $\exists$, σχέσεις συνεπαγωγής και ισοδυναμίας.
+          </p>
+          <div class="card__tags">
+            <span class="tag">Λογική</span>
+            <span class="tag">Κβαντοδότες</span>
+            <span class="tag">Θεωρήματα</span>
+          </div>
+          <div class="card__footer">
+            <span class="card__time">&#9200; 1&ndash;2 ώρες</span>
+            <span class="card__exam exam-high">&#127919; Υψηλή</span>
+          </div>
+        </a>
+
+        <!-- Κάρτα 2 -->
+        <a href="./lectures/lecture2.html" class="card card--accent"
+           aria-label="Διάλεξη 2: Αποδείξεις">
+          <div class="card__meta-top">
+            <span class="card__number">Διάλεξη 02</span>
+            <span class="card__difficulty" title="Δυσκολία: Μεσαία">&#9679;&#9679;&#9675;</span>
+          </div>
+          <h3 class="card__title">Αποδείξεις</h3>
+          <p class="card__desc">
+            Μέθοδοι απόδειξης: άμεση, αντιθετοαντίστροφη, εις άτοπον, εξαντλητική.
+            Πώς να χτίσεις ένα αποδεικτικό επιχείρημα από τις υποθέσεις στο ζητούμενο συμπέρασμα.
+          </p>
+          <div class="card__tags">
+            <span class="tag">Άμεση</span>
+            <span class="tag">Εις Άτοπον</span>
+            <span class="tag">Αντιθετοαντίστροφη</span>
+          </div>
+          <div class="card__footer">
+            <span class="card__time">&#9200; 2&ndash;3 ώρες</span>
+            <span class="card__exam exam-high">&#127919; Υψηλή</span>
+          </div>
+        </a>
+
+        <!-- Κάρτα 3 -->
+        <a href="./lectures/lecture3.html" class="card card--accent"
+           aria-label="Διάλεξη 3: Δομική Επαγωγή">
+          <div class="card__meta-top">
+            <span class="card__number">Διάλεξη 03</span>
+            <span class="card__difficulty" title="Δυσκολία: Μεσαία">&#9679;&#9679;&#9675;</span>
+          </div>
+          <h3 class="card__title">Δομική Επαγωγή</h3>
+          <p class="card__desc">
+            Μαθηματική επαγωγή (αδύναμη &amp; ισχυρή) με τυπικά σχήματα.
+            Δομική επαγωγή σε δέντρα και γλωσσολογικές δομές.
+            Παγίδες και κλασσικά λάθη.
+          </p>
+          <div class="card__tags">
+            <span class="tag">Αδύναμη Επαγωγή</span>
+            <span class="tag">Ισχυρή Επαγωγή</span>
+            <span class="tag">Δομική Επαγωγή</span>
+          </div>
+          <div class="card__footer">
+            <span class="card__time">&#9200; 2&ndash;3 ώρες</span>
+            <span class="card__exam exam-high">&#127919; Υψηλή</span>
+          </div>
+        </a>
+
+        <!-- Κάρτα 4 -->
+        <a href="./lectures/lecture4.html" class="card card--accent"
+           aria-label="Διάλεξη 4: Αποδείξεις Ύπαρξης & Αρχή Περιστερεώνα">
+          <div class="card__meta-top">
+            <span class="card__number">Διάλεξη 04</span>
+            <span class="card__difficulty" title="Δυσκολία: Μεσαία">&#9679;&#9679;&#9675;</span>
+          </div>
+          <h3 class="card__title">Αποδείξεις Ύπαρξης &amp; Περιστερεώνας</h3>
+          <p class="card__desc">
+            Κατασκευαστικές και μη-κατασκευαστικές αποδείξεις ύπαρξης.
+            Αρχή Περιστερεώνα (Pigeonhole Principle) με εφαρμογές στη συνδυαστική.
+          </p>
+          <div class="card__tags">
+            <span class="tag">Ύπαρξη</span>
+            <span class="tag">Pigeonhole</span>
+            <span class="tag">Συνδυαστική</span>
+          </div>
+          <div class="card__footer">
+            <span class="card__time">&#9200; 1&ndash;2 ώρες</span>
+            <span class="card__exam exam-mid">&#127919; Μεσαία</span>
+          </div>
+        </a>
+
+        <!-- Κάρτα 5 -->
+        <a href="./lectures/lecture5.html" class="card card--accent"
+           aria-label="Διάλεξη 5: Διαγωνοποίηση & Υπολογισιμότητα">
+          <div class="card__meta-top">
+            <span class="card__number">Διάλεξη 05</span>
+            <span class="card__difficulty" title="Δυσκολία: Δύσκολη">&#9679;&#9679;&#9679;</span>
+          </div>
+          <h3 class="card__title">Διαγωνοποίηση &amp; Υπολογισιμότητα</h3>
+          <p class="card__desc">
+            Διαγωνισμός Cantor, μη-αρίθμηση $\mathbb{R}$.
+            Θεώρημα Halting Problem, αναγωγές.
+            Μη-αποφασίσιμα υπολογιστικά προβλήματα.
+          </p>
+          <div class="card__tags">
+            <span class="tag">Cantor</span>
+            <span class="tag">Halting Problem</span>
+            <span class="tag">Αναγωγή</span>
+          </div>
+          <div class="card__footer">
+            <span class="card__time">&#9200; 2&ndash;3 ώρες</span>
+            <span class="card__exam exam-high">&#127919; Υψηλή</span>
+          </div>
+        </a>
+
+        <!-- Κάρτα 6 -->
+        <a href="./lectures/lecture6.html" class="card card--accent"
+           aria-label="Διάλεξη 6: Γραφήματα, Δέντρα, Euler, Επίπεδα">
+          <div class="card__meta-top">
+            <span class="card__number">Διάλεξη 06</span>
+            <span class="card__difficulty" title="Δυσκολία: Δύσκολη">&#9679;&#9679;&#9679;</span>
+          </div>
+          <h3 class="card__title">Γραφήματα, Δέντρα, Euler, Επίπεδα</h3>
+          <p class="card__desc">
+            Θεωρία γραφημάτων: συνεκτικότητα, BFS/DFS, δέντρα.
+            Κυκλώματα Euler. Επίπεδα γραφήματα, τύπος $v - e + f = 2$,
+            θεώρημα Kuratowski.
+          </p>
+          <div class="card__tags">
+            <span class="tag">Euler</span>
+            <span class="tag">Δέντρα</span>
+            <span class="tag">Επίπεδα</span>
+            <span class="tag">Kuratowski</span>
+          </div>
+          <div class="card__footer">
+            <span class="card__time">&#9200; 4&ndash;5 ώρες</span>
+            <span class="card__exam exam-high">&#127919; Υψηλή</span>
+          </div>
+        </a>
+
+        <!-- Κάρτα 7 -->
+        <a href="./lectures/lecture7.html" class="card card--accent"
+           aria-label="Διάλεξη 7: Ταιριάσματα & Θεώρημα Hall">
+          <div class="card__meta-top">
+            <span class="card__number">Διάλεξη 07</span>
+            <span class="card__difficulty" title="Δυσκολία: Μεσαία">&#9679;&#9679;&#9675;</span>
+          </div>
+          <h3 class="card__title">Ταιριάσματα &amp; Θεώρημα Hall</h3>
+          <p class="card__desc">
+            Ταιριάσματα (matching) σε διμερή γραφήματα, μέγιστο ταίριασμα.
+            Θεώρημα Hall: αναγκαία &amp; ικανή συνθήκη για τέλειο ταίριασμα.
+          </p>
+          <div class="card__tags">
+            <span class="tag">Matching</span>
+            <span class="tag">Διμερή</span>
+            <span class="tag">Θεώρημα Hall</span>
+          </div>
+          <div class="card__footer">
+            <span class="card__time">&#9200; 2&ndash;3 ώρες</span>
+            <span class="card__exam exam-high">&#127919; Υψηλή</span>
+          </div>
+        </a>
+
+        <!-- Κάρτα 8 -->
+        <a href="./lectures/lecture8.html" class="card card--accent"
+           aria-label="Διάλεξη 8: Σχέσεις, Μερικές Διατάξεις, Dilworth">
+          <div class="card__meta-top">
+            <span class="card__number">Διάλεξη 08</span>
+            <span class="card__difficulty" title="Δυσκολία: Δύσκολη">&#9679;&#9679;&#9679;</span>
+          </div>
+          <h3 class="card__title">Σχέσεις, Μερικές Διατάξεις, Dilworth</h3>
+          <p class="card__desc">
+            Σχέσεις ισοδυναμίας και μερικής διάταξης, Hasse διαγράμματα.
+            Αλυσίδες, αντι-αλυσίδες.
+            Θεωρήματα Dilworth και Mirsky με αποδείξεις.
+          </p>
+          <div class="card__tags">
+            <span class="tag">Poset</span>
+            <span class="tag">Hasse</span>
+            <span class="tag">Dilworth</span>
+            <span class="tag">Mirsky</span>
+          </div>
+          <div class="card__footer">
+            <span class="card__time">&#9200; 2&ndash;3 ώρες</span>
+            <span class="card__exam exam-mid">&#127919; Μεσαία</span>
+          </div>
+        </a>
+
+      </div><!-- /.cards-grid -->
     </section>
 
-    <section id="exam-prep">
-      <h2>Προετοιμασία Εξετάσεων</h2>
-      <ul>
-        <li><a href="./exam-prep/formulas.html">Τύποι</a></li>
-        <li><a href="./exam-prep/key-theorems.html">Βασικά Θεωρήματα</a></li>
-        <li><a href="./exam-prep/tips.html">Συμβουλές</a></li>
-      </ul>
-    </section>
-  </main>
+    <!-- ── Roadmap Εξεταστικής ── -->
+    <section id="roadmap" aria-labelledby="roadmap-heading">
+      <p class="section-label" id="roadmap-heading">&#128197; Roadmap Εξεταστικής &mdash; 7 Ημέρες</p>
 
-  <footer>
-    <p>Σημειώσεις Μαθηματικών Πληροφορικής — ΕΚΠΑ</p>
+      <div class="roadmap-grid">
+
+        <div class="roadmap-day">
+          <span class="roadmap-day__num">Μέρα 1</span>
+          <span class="roadmap-day__theme">Θεμέλια Λογικής</span>
+          <ul>
+            <li><a href="./lectures/lecture1.html">Διάλεξη 1</a> — Υποθέσεις, Εικασίες, Θεωρήματα</li>
+          </ul>
+          <p class="roadmap-day__tip">&#128161; Μάθε απέξω τη διαφορά αξιώματος / ορισμού / θεωρήματος</p>
+        </div>
+
+        <div class="roadmap-day">
+          <span class="roadmap-day__num">Μέρα 2</span>
+          <span class="roadmap-day__theme">Τεχνικές Απόδειξης</span>
+          <ul>
+            <li><a href="./lectures/lecture2.html">Διάλεξη 2</a> — Αποδείξεις</li>
+            <li><a href="./topics/proofs-cheatsheet.html">Cheat Sheet Αποδείξεων</a></li>
+          </ul>
+          <p class="roadmap-day__tip">&#128161; Γράψε 2&ndash;3 παραδείγματα εις άτοπον και αντιθετοαντίστροφης</p>
+        </div>
+
+        <div class="roadmap-day">
+          <span class="roadmap-day__num">Μέρα 3</span>
+          <span class="roadmap-day__theme">Δομική Επαγωγή</span>
+          <ul>
+            <li><a href="./lectures/lecture3.html">Διάλεξη 3</a> — Δομική Επαγωγή</li>
+            <li><a href="./topics/induction.html">Σύνοψη Επαγωγής</a></li>
+          </ul>
+          <p class="roadmap-day__tip">&#128161; Εξάσκησε το template της ισχυρής επαγωγής</p>
+        </div>
+
+        <div class="roadmap-day">
+          <span class="roadmap-day__num">Μέρα 4</span>
+          <span class="roadmap-day__theme">Ύπαρξη &amp; Υπολογισιμότητα</span>
+          <ul>
+            <li><a href="./lectures/lecture4.html">Διάλεξη 4</a> — Περιστερεώνας</li>
+            <li><a href="./lectures/lecture5.html">Διάλεξη 5</a> — Διαγωνοποίηση</li>
+          </ul>
+          <p class="roadmap-day__tip">&#128161; Αναπαράγαγε την απόδειξη του Cantor από μνήμης</p>
+        </div>
+
+        <div class="roadmap-day roadmap-day--featured">
+          <span class="roadmap-day__num">Μέρα 5&ndash;6</span>
+          <span class="roadmap-day__theme">&#11088; Γραφήματα (εκτεταμένο)</span>
+          <ul>
+            <li><a href="./lectures/lecture6.html">Διάλεξη 6</a> — Γραφήματα, Δέντρα, Euler, Επίπεδα</li>
+            <li><a href="./topics/graphs.html">Σύνοψη Γραφημάτων</a></li>
+          </ul>
+          <p class="roadmap-day__tip">&#9888;&#65039; Αφιέρωσε 2 μέρες — είναι η πιο εκτεταμένη ενότητα</p>
+        </div>
+
+        <div class="roadmap-day">
+          <span class="roadmap-day__num">Μέρα 7</span>
+          <span class="roadmap-day__theme">Hall, Dilworth &amp; Revision</span>
+          <ul>
+            <li><a href="./lectures/lecture7.html">Διάλεξη 7</a> — Θεώρημα Hall</li>
+            <li><a href="./lectures/lecture8.html">Διάλεξη 8</a> — Dilworth &amp; Mirsky</li>
+            <li><a href="./exam-prep/key-theorems.html">Βασικά Θεωρήματα</a> &mdash; επανάληψη</li>
+          </ul>
+          <p class="roadmap-day__tip">&#128161; Mock εξέταση: λύσε παλιά θέματα με χρονόμετρο</p>
+        </div>
+
+      </div><!-- /.roadmap-grid -->
+    </section>
+
+    <!-- ── Quick Links ── -->
+    <section id="quick-links" aria-labelledby="quicklinks-heading">
+      <p class="section-label" id="quicklinks-heading">&#9889; Γρήγοροι Σύνδεσμοι</p>
+
+      <div class="quick-links-grid">
+
+        <a href="./exam-prep/formulas.html" class="quick-link">
+          <span class="quick-link__icon">&#10133;</span>
+          <span class="quick-link__label">Τύποι &amp; Φόρμουλες</span>
+          <span class="quick-link__sub">Άμεση αναφορά</span>
+        </a>
+
+        <a href="./exam-prep/key-theorems.html" class="quick-link">
+          <span class="quick-link__icon">&#128220;</span>
+          <span class="quick-link__label">Βασικά Θεωρήματα</span>
+          <span class="quick-link__sub">Hall, Dilworth, Euler…</span>
+        </a>
+
+        <a href="./topics/proofs-cheatsheet.html" class="quick-link">
+          <span class="quick-link__icon">&#128195;</span>
+          <span class="quick-link__label">Cheat Sheet Αποδείξεων</span>
+          <span class="quick-link__sub">Πότε; Πώς;</span>
+        </a>
+
+        <a href="./exercises/solved.html" class="quick-link">
+          <span class="quick-link__icon">&#9999;&#65039;</span>
+          <span class="quick-link__label">Λυμένες Ασκήσεις</span>
+          <span class="quick-link__sub">Παλιά θέματα</span>
+        </a>
+
+      </div><!-- /.quick-links-grid -->
+    </section>
+
+    <!-- ── Progress Tracker ── -->
+    <section id="progress-section" aria-labelledby="progress-heading">
+      <p class="section-label" id="progress-heading">&#9989; Πρόοδος Μελέτης</p>
+      <!--
+        Αυτό το div γεμίζει από το main.js (initProgressTracker).
+        3 checkboxes ανά διάλεξη × 8 διαλέξεις = 24 σύνολο.
+        Αποθηκεύεται στο localStorage ('math-plir-progress').
+      -->
+      <div id="progress-tracker" role="region" aria-label="Tracker προόδου μελέτης">
+        <noscript>
+          <p style="color:var(--color-text-muted); font-style:italic;">
+            Ο Progress Tracker απαιτεί JavaScript.
+          </p>
+        </noscript>
+      </div>
+    </section>
+
+  </div><!-- /.container -->
+
+  <!-- ════════════════════════════════════════════════
+       FOOTER
+  ════════════════════════════════════════════════ -->
+  <footer class="site-footer" role="contentinfo">
+    <p>
+      Σημειώσεις Μαθηματικών Πληροφορικής &mdash; ΕΚΠΑ &nbsp;|&nbsp;
+      <a href="https://github.com" target="_blank" rel="noopener noreferrer">
+        &#128279; GitHub
+      </a>
+      &nbsp;|&nbsp;
+      Τελευταία ενημέρωση: <time datetime="2026-05-22">22 Μαΐου 2026</time>
+    </p>
+    <p style="margin-top:0.3rem; font-size:0.68rem;">
+      Δεν υπάρχει επίσημη σχέση με τον διδάσκοντα &mdash; χρησιμοποίησε κριτικά.
+    </p>
   </footer>
+
 </body>
 </html>
