@@ -3,35 +3,522 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Διάλεξη 5 — Διαγωνοποίηση &amp; Υπολογισιμότητα</title>
+  <meta name="description"
+        content="Διάλεξη 5 — Διαγωνοποίηση & Υπολογισιμότητα. Αριθμήσιμα Σύνολα, Cantor, Πραγματικοί, Halting Problem.">
+  <title>Διάλεξη 5 — Διαγωνοποίηση &amp; Υπολογισιμότητα | Μαθ. Πληροφορικής ΕΚΠΑ</title>
   <link rel="stylesheet" href="../css/style.css">
   <script>
-    window.MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };
+    window.MathJax = {
+      tex: {
+        inlineMath:  [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        tags: 'ams',
+        macros: {
+          floor: ['\\lfloor #1 \\rfloor', 1],
+          N:  '\\mathbb{N}',
+          Z:  '\\mathbb{Z}',
+          R:  '\\mathbb{R}',
+          Q:  '\\mathbb{Q}',
+          vp: '\\varphi'
+        }
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+    };
+    (function () {
+      const t = localStorage.getItem('math-plir-theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <script src="../js/main.js" defer></script>
 </head>
 <body>
-  <header>
-    <h1>Διάλεξη 5 — Διαγωνοποίηση &amp; Υπολογισιμότητα</h1>
-    <a href="../index.html">← Αρχική</a>
-  </header>
 
-  <nav>
-    <a href="lecture4.html">← Προηγούμενη</a>
-    <span>|</span>
-    <a href="../index.html">Αρχική</a>
-    <span>|</span>
-    <a href="lecture6.html">Επόμενη →</a>
-  </nav>
+<header class="site-header" role="banner">
+  <div class="site-header__inner">
+    <a href="../index.html" class="site-header__title">&#8469; Μαθηματικά Πληροφορικής</a>
+    <nav class="site-nav" aria-label="Κύρια πλοήγηση">
+      <a href="../index.html">Αρχική</a>
+      <a href="lecture1.html" aria-current="page">Διαλέξεις</a>
+      <a href="../topics/induction.html">Θέματα</a>
+      <a href="../exercises/solved.html">Ασκήσεις</a>
+      <a href="../exam-prep/formulas.html">Εξεταστική</a>
+    </nav>
+    <button id="theme-toggle" class="btn-theme-toggle"
+            aria-label="Εναλλαγή σκοτεινής λειτουργίας">&#127769; Σκοτεινό</button>
+  </div>
+</header>
 
-  <main>
-    <p><em>Placeholder — περιεχόμενο θα συμπληρωθεί.</em></p>
+<div class="page-wrapper">
+
+  <!-- ── Sidebar TOC ── -->
+  <aside class="sidebar-toc" aria-label="Περιεχόμενα σελίδας">
+    <button class="toc-toggle" aria-expanded="true">&#128203; Περιεχόμενα &#9662;</button>
+    <div class="sidebar-toc__title">Περιεχόμενα</div>
+    <ol class="sidebar-toc__list">
+      <li class="toc-h2"><a href="#sec-tldr">TL;DR</a></li>
+      <li class="toc-h2"><a href="#sec-countable">1. Αριθμήσιμα Σύνολα</a>
+        <ol>
+          <li class="toc-h3"><a href="#sec-count-def">Ορισμός</a></li>
+          <li class="toc-h3"><a href="#sec-rationals">Αριθμήσιμα ℚ⁺</a></li>
+          <li class="toc-h3"><a href="#sec-strings-count">Σ* και Δένδρα</a></li>
+        </ol>
+      </li>
+      <li class="toc-h2"><a href="#sec-diagonal">2. Μέθοδος Διαγωνίου</a></li>
+      <li class="toc-h2"><a href="#sec-reals">3. ℝ Μη Αριθμήσιμο</a></li>
+      <li class="toc-h2"><a href="#sec-computation">4. Εφαρμογή: Θεωρία Υπολογισμού</a>
+        <ol>
+          <li class="toc-h3"><a href="#sec-programs">Προγράμματα ως Συμβολοσειρές</a></li>
+          <li class="toc-h3"><a href="#sec-halting">Πρόβλημα Τερματισμού</a></li>
+        </ol>
+      </li>
+      <li class="toc-h2"><a href="#sec-exam">Ερωτήσεις Εξετάσεων</a></li>
+    </ol>
+  </aside>
+
+  <!-- ── Main Content ── -->
+  <main class="main-content" id="main-content">
+
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <div class="breadcrumbs__item"><a href="../index.html">Αρχική</a></div>
+      <div class="breadcrumbs__item"><a href="../index.html#lecture-cards">Διαλέξεις</a></div>
+      <div class="breadcrumbs__item"><span class="breadcrumbs__current">Διάλεξη 5</span></div>
+    </nav>
+
+    <h1>Διάλεξη 5 &mdash; Διαγωνοποίηση &amp; Υπολογισιμότητα</h1>
+
+    <!-- TL;DR -->
+    <section id="sec-tldr">
+      <div class="callout callout-tldr">
+        <div class="callout-title">TL;DR</div>
+        <ul>
+          <li>Ένα σύνολο είναι <strong>αριθμήσιμο</strong> αν μπορεί να τοποθετηθεί σε αντιστοιχία 1-1 με τους φυσικούς.</li>
+          <li>\(\mathbb{N},\, \mathbb{Z},\, \mathbb{Q}^+,\, \Sigma^*\) είναι αριθμήσιμα. Το \(\mathbb{R}\) <strong>δεν</strong> είναι.</li>
+          <li><strong>Επιχείρημα Cantor (διαγωνισμός)</strong>: κατασκεύασε αριθμό που διαφέρει από κάθε \(r_i\) στο \(i\)-ό ψηφίο.</li>
+          <li><strong>Halting Problem</strong>: δεν υπάρχει πρόγραμμα \(H(P,x)\) που αποφασίζει αν \(P\) τερματίζει για είσοδο \(x\) — με διαγωνισμό.</li>
+          <li>Προγράμματα αριθμήσιμα, αλλά γλώσσες (ή συναρτήσεις) μη-αριθμήσιμα — άρα υπάρχουν μη-αναγνωρίσιμα προβλήματα.</li>
+        </ul>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- §1 -->
+    <section id="sec-countable">
+      <h2 id="h-countable">1. Αριθμήσιμα Σύνολα</h2>
+
+      <section id="sec-count-def">
+        <h3 id="h-count-def">1.1 Ορισμός</h3>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Αριθμήσιμο Σύνολο</div>
+          <p>Ένα σύνολο \(S\) είναι <strong>αριθμήσιμο</strong> (countable) αν υπάρχει
+             επί (surjective) ή 1-1-αντιστοιχία (bijection) \(f : \mathbb{N} \to S\).</p>
+          <ul>
+            <li>Αριθμήσιμα: \(\mathbb{N}, \mathbb{Z}, \mathbb{Q}, \Sigma^*\), κάθε πεπερασμένο σύνολο.</li>
+            <li>Μη-αριθμήσιμα: \(\mathbb{R}\), το σύνολο όλων των γλωσσών πάνω από \(\{0,1\}\).</li>
+          </ul>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Παραδείγματα Αριθμήσιμων</div>
+          <table>
+            <thead><tr><th>Σύνολο</th><th>Απαρίθμηση</th></tr></thead>
+            <tbody>
+              <tr><td>\(\mathbb{N}\)</td><td>\(0, 1, 2, 3, \ldots\)</td></tr>
+              <tr><td>\(\mathbb{Z}\)</td><td>\(0, 1, -1, 2, -2, 3, -3, \ldots\)</td></tr>
+              <tr><td>\(\{0,1\}^*\)</td><td>\(\varepsilon, 0, 1, 00, 01, 10, 11, 000, \ldots\) (κατά μήκος)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="sec-rationals">
+        <h3 id="h-rationals">1.2 Αριθμήσιμοι οι ℚ⁺</h3>
+
+        <p>Η «αφελής» απαρίθμηση \(1/1, 1/2, 1/3, \ldots, 2/1, 2/2, \ldots\)
+           <em>αποτυγχάνει</em>: ποτέ δεν φτάνουμε στο \(2/1\) αν ακολουθήσουμε
+           μόνο τη σειρά \(1/n\).</p>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα — ℚ⁺ Αριθμήσιμο</div>
+          <p>Το \(\mathbb{Q}^+ = \{p/q \mid p,q \in \mathbb{N},\, q \ge 1,\, \gcd(p,q)=1\}\) είναι αριθμήσιμο.</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <div class="callout-title">Απόδειξη — Απαρίθμηση κατά Άθροισμα p+q</div>
+          <details open>
+            <summary>Προβολή απόδειξης</summary>
+            <div class="proof-body">
+              <p>Απαριθμούμε τα \(p/q\) (σε απλοποιημένη μορφή) ανά τιμή \(p+q = 2, 3, 4, \ldots\):</p>
+              \[ \frac{1}{1},\; \frac{1}{2},\; \frac{2}{1},\; \frac{1}{3},\; \frac{3}{1},\; \frac{1}{4},\; \frac{2}{3},\; \frac{3}{2},\; \frac{4}{1},\; \ldots \]
+              <p>Για κάθε άθροισμα \(s = p+q\), ο αριθμός κλασμάτων \(p/q\) με \(p+q=s\) και \(\gcd(p,q)=1\)
+                 είναι πεπερασμένος (\(\le s-1\)). Άρα κάθε \(p/q\) εμφανίζεται σε πεπερασμένη θέση. \(\square\)</p>
+
+              <p><em>Εναλλακτικά</em>: Cantor's zigzag — απαριθμούμε όλους τους θετικούς \(p/q\)
+                 (με επαναλήψεις) κατά διαγώνιες του πίνακα \(\mathbb{N}\times\mathbb{N}\),
+                 παραλείποντας τα μη-απλοποιημένα.</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Cantor's Zigzag — Οπτικοποίηση</div>
+          <pre style="font-family:monospace;line-height:1.8">
+  q\p   1     2     3     4   ...
+  1   1/1 → 2/1   3/1 → 4/1
+        ↙         ↙
+  2   1/2   2/2   3/2
+    ↙
+  3   1/3 → 2/3   ...
+        ↙
+  4   1/4
+  ...
+          </pre>
+          <p>Ακολουθούμε τα βέλη: \(1/1, 2/1, 1/2, 1/3, 2/2, 3/1, 4/1, 3/2, \ldots\)
+             (παραλείπουμε τα μη-απλοποιημένα όπως \(2/2\)).</p>
+        </div>
+      </section>
+
+      <section id="sec-strings-count">
+        <h3 id="h-strings-count">1.3 Συμβολοσειρές και Δένδρα</h3>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα — Σ* Αριθμήσιμο</div>
+          <p>Για κάθε πεπερασμένο αλφάβητο \(\Sigma\), το \(\Sigma^*\) είναι αριθμήσιμο.</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <div class="callout-title">Απόδειξη</div>
+          <details>
+            <summary>Προβολή απόδειξης</summary>
+            <div class="proof-body">
+              <p>Για κάθε \(n \ge 0\), το \(\Sigma^n = \{w \in \Sigma^* \mid \ell(w) = n\}\) έχει \(|\Sigma|^n\) στοιχεία (πεπερασμένο).
+                 Απαριθμούμε: πρώτα \(\Sigma^0 = \{\varepsilon\}\), μετά \(\Sigma^1\) (με οποιαδήποτε σειρά), μετά \(\Sigma^2\), κ.ο.κ.
+                 Κάθε \(w \in \Sigma^*\) εμφανίζεται σε πεπερασμένη θέση. \(\square\)</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Δένδρα με Ετικέτες — Αριθμήσιμα</div>
+          <p>Τα ΚΔΔ με ακέραιες ετικέτες είναι αριθμήσιμα:
+             κάθε τέτοιο δένδρο κωδικοποιείται ως συμβολοσειρά (π.χ. in-order ή pre-order),
+             οπότε εμπίπτει στην αριθμήσιμη \(\Sigma^*\).</p>
+        </div>
+      </section>
+    </section>
+
+    <hr>
+
+    <!-- §2 -->
+    <section id="sec-diagonal">
+      <h2 id="h-diagonal">2. Μέθοδος Διαγωνίου — Cantor</h2>
+
+      <p>Η διαισθητική ιδέα: φαντάσου έναν <em>άπειρο πίνακα</em> όπου κάθε γραμμή \(i\)
+         περιγράφει ένα υποψήφιο αντικείμενο \(r_i\). Κατασκευάζουμε ένα αντικείμενο \(a\)
+         που διαφέρει από το \(r_i\) στη θέση \(i\) (τη «διαγώνιο»).
+         Τότε \(a\) δεν συμπίπτει με κανένα \(r_i\).</p>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Διαισθητικό Παράδειγμα</div>
+        <p>Φανταστείτε 5 «αριθμούς» \(r_1,\ldots,r_5\) στο \([0,1)\), γραμμένους σε δεκαδική ανάπτυξη:</p>
+        <pre style="font-family:monospace;line-height:1.8">
+r₁ = 0.<u>3</u>1415...    ← αλλάζω ψηφίο 1: 3→4
+r₂ = 0.1<u>4</u>142...    ← αλλάζω ψηφίο 2: 4→5
+r₃ = 0.71<u>8</u>28...    ← αλλάζω ψηφίο 3: 8→9
+r₄ = 0.141<u>5</u>9...    ← αλλάζω ψηφίο 4: 5→6
+r₅ = 0.2718<u>2</u>...    ← αλλάζω ψηφίο 5: 2→3
+
+a  = 0.45963...        ← διαφέρει από κάθε rᵢ στο ψηφίο i
+        </pre>
+        <p>Ο \(a\) δεν μπορεί να είναι κανένα \(r_i\) γιατί διαφέρει στο \(i\)-ό ψηφίο.</p>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Λεπτομέρεια: αποφυγή 0.999… = 1</div>
+        <p>Η δεκαδική ανάπτυξη έχει αμφισημία: \(0.999\ldots = 1.000\ldots\).
+           Για να αποφύγουμε αυτό, επιλέγουμε το νέο ψηφίο να μην είναι <strong>ούτε 0 ούτε 9</strong>:
+           π.χ. αν το \(i\)-ό ψηφίο του \(r_i\) είναι \(d\), το νέο ψηφίο είναι \(4\) αν \(d \ne 4\),
+           ή \(5\) αν \(d = 4\). Έτσι ο \(a\) δεν έχει ούτε τερματική σειρά 0 ούτε 9.</p>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- §3 -->
+    <section id="sec-reals">
+      <h2 id="h-reals">3. ℝ είναι Μη Αριθμήσιμο</h2>
+
+      <div class="callout callout-theorem">
+        <div class="callout-title">Θεώρημα Cantor — ℝ Μη Αριθμήσιμο</div>
+        <p>Το διάστημα \((0,1) \subseteq \mathbb{R}\) (και άρα το \(\mathbb{R}\)) δεν είναι αριθμήσιμο.</p>
+      </div>
+
+      <div class="callout callout-proof">
+        <div class="callout-title">Απόδειξη — Επιχείρημα Cantor (1891)</div>
+        <details open>
+          <summary>Προβολή απόδειξης</summary>
+          <div class="proof-body">
+            <p><strong>Απόδειξη με άτοπο</strong>. Υποθέτουμε ότι \((0,1)\) είναι αριθμήσιμο,
+               δηλ. υπάρχει ακολουθία \(r_1, r_2, r_3, \ldots\) που περιέχει <em>όλους</em>
+               τους πραγματικούς του \((0,1)\).</p>
+
+            <p>Γράφουμε κάθε \(r_i\) σε δεκαδική ανάπτυξη:
+               \(r_i = 0.d_{i1}d_{i2}d_{i3}\ldots\) (επιλέγουμε την ανάπτυξη χωρίς τερματική σειρά 9).</p>
+
+            <p><strong>Κατασκευή</strong>: Ορίζουμε τον αριθμό \(a = 0.a_1 a_2 a_3 \ldots\) ως εξής:
+               για κάθε \(i \in \mathbb{N}\):</p>
+            \[ a_i = \begin{cases} 5 & \text{αν } d_{ii} \ne 5 \\ 6 & \text{αν } d_{ii} = 5 \end{cases} \]
+            <p>(Επιλέγουμε ψηφία διαφορετικά από 0, 9 ώστε να αποφύγουμε αμφισημία.)</p>
+
+            <p><strong>Ισχυρισμός</strong>: \(a \in (0,1)\) αλλά \(a \ne r_i\) για κάθε \(i\).</p>
+            <p><em>Απόδειξη</em>: Για κάθε \(i\), \(a\) διαφέρει από \(r_i\) στο \(i\)-ό ψηφίο
+               (αφού \(a_i \ne d_{ii}\)). Άρα \(a \ne r_i\). Αλλά υποθέσαμε ότι η ακολουθία
+               περιέχει όλους τους πραγματικούς — αντίφαση. \(\square\)</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Τι σημαίνει αυτό;</div>
+        <p>Υπάρχουν «πολύ περισσότεροι» πραγματικοί αριθμοί από φυσικούς.
+           Πιο τυπικά: δεν υπάρχει επίρριψη από \(\mathbb{N}\) στο \(\mathbb{R}\) —
+           τα δύο σύνολα έχουν <em>διαφορετικές μεγεθύνσεις</em> (cardinalities):
+           \(|\mathbb{N}| = \aleph_0 < |\mathbb{R}| = \mathfrak{c}\).</p>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Υπόθεση Συνεχούς (CH)</div>
+        <p>Δεν υπάρχει σύνολο \(S\) με \(\aleph_0 < |S| < \mathfrak{c}\).
+           Αυτή η <strong>Υπόθεση Συνεχούς</strong> είναι <em>ανεξάρτητη</em> από τα αξιώματα ZFC
+           (Gödel 1940, Cohen 1963) — ούτε αποδεικνύεται ούτε καταρρίπτεται.</p>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- §4 -->
+    <section id="sec-computation">
+      <h2 id="h-computation">4. Εφαρμογή στη Θεωρία Υπολογισμού</h2>
+
+      <section id="sec-programs">
+        <h3 id="h-programs">4.1 Προγράμματα ως Συμβολοσειρές — Αριθμήσιμα</h3>
+
+        <p>Κάθε πρόγραμμα (C, Python, Turing Machine, κ.λπ.) είναι μια πεπερασμένη
+           συμβολοσειρά πάνω από αλφάβητο ASCII. Άρα το σύνολο όλων των προγραμμάτων
+           είναι υποσύνολο του \(\Sigma^*\) — <strong>αριθμήσιμο</strong>.</p>
+
+        <p>Μπορούμε να τα απαριθμήσουμε: \(P_0, P_1, P_2, \ldots\) (κατά μήκος, λεξικογραφικά).</p>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Πίνακας Εκτέλεσης</div>
+          <p>Ορίζουμε τον άπειρο πίνακα \(G\):
+             γραμμή \(i\) = πρόγραμμα \(P_i\), στήλη \(j\) = είσοδος \(P_j\),
+             τιμή \(G[i][j]\):</p>
+          \[ G[i][j] = \begin{cases} 1 & \text{αν } P_i \text{ τερματίζει με είσοδο } P_j \\ 0 & \text{αν } P_i \text{ δεν τερματίζει με είσοδο } P_j \end{cases} \]
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Γιατί αριθμήσιμο ≠ επαρκές</div>
+          <p>Το σύνολο <em>γλωσσών</em> πάνω από \(\{0,1\}\) είναι το \(\mathcal{P}(\{0,1\}^*)\)
+             — το σύνολο δυνάμεων ενός αριθμήσιμου, άρα <strong>μη-αριθμήσιμο</strong>.
+             Αλλά υπάρχουν μόνο αριθμήσιμα προγράμματα.
+             Άρα <em>υπάρχουν γλώσσες χωρίς αντίστοιχο πρόγραμμα</em> — μη-αναγνωρίσιμα προβλήματα.</p>
+        </div>
+      </section>
+
+      <section id="sec-halting">
+        <h3 id="h-halting">4.2 Πρόβλημα Τερματισμού (Halting Problem)</h3>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Ορισμός — Halting Problem</div>
+          <p>Το <strong>πρόβλημα τερματισμού</strong> \(H\) ζητά:
+             δεδομένων ενός προγράμματος \(P\) και εισόδου \(x\),
+             αποφάνσου αν \(P\) τερματίζει για είσοδο \(x\).</p>
+          <p>Θέλουμε πρόγραμμα \(H(P, x)\) που να το λύνει για <em>κάθε</em> \(P, x\).</p>
+        </div>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα Turing (1936)</div>
+          <p>Δεν υπάρχει πρόγραμμα \(H\) που να λύνει το Halting Problem.</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <div class="callout-title">Απόδειξη — Διαγωνισμός</div>
+          <details open>
+            <summary>Προβολή απόδειξης</summary>
+            <div class="proof-body">
+              <p><strong>Απόδειξη με άτοπο</strong>. Υποθέτουμε ότι υπάρχει τέτοιο \(H\).
+                 Κατασκευάζουμε πρόγραμμα \(D\) ως εξής:</p>
+
+              <pre><code>D(P):
+  if H(P, P) = "τερματίζει":
+    while True: pass   // loop forever
+  else:
+    return             // τερμάτισε</code></pre>
+
+              <p>Το \(D\) παίρνει ένα πρόγραμμα \(P\) και το «διαγωνίζεται»:
+                 αν \(P(P)\) τερματίζει, το \(D\) δεν τερματίζει· αν \(P(P)\) δεν τερματίζει, το \(D\) τερματίζει.</p>
+
+              <p>Τώρα εξετάζουμε τι γίνεται αν τρέξουμε \(D(D)\):</p>
+              <ul>
+                <li><strong>Αν \(D(D)\) τερματίζει</strong>: τότε \(H(D, D) = \text{"τερματίζει"}\), οπότε ο κώδικας \(D\) μπαίνει σε ατέρμονα βρόχο — δεν τερματίζει. Αντίφαση.</li>
+                <li><strong>Αν \(D(D)\) δεν τερματίζει</strong>: τότε \(H(D, D) = \text{"δεν τερματίζει"}\), οπότε \(D\) τερματίζει. Αντίφαση.</li>
+              </ul>
+              <p>Και οι δύο περιπτώσεις οδηγούν σε αντίφαση. Άρα \(H\) δεν υπάρχει. \(\square\)</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Σύνδεση με Cantor</div>
+          <p>Η απόδειξη είναι ακριβώς ο <em>διαγωνισμός Cantor</em> εφαρμοσμένος σε προγράμματα.
+             Ο πίνακας \(G[i][j]\) είναι ο «άπειρος πίνακας», το \(D\) κατασκευάζει
+             τη «διαγώνιο» που διαφέρει από κάθε γραμμή στη θέση \(j=i\).</p>
+
+          <table>
+            <thead><tr><th></th><th>\(P_0\)</th><th>\(P_1\)</th><th>\(P_2\)</th><th>\(\ldots\)</th><th>\(D\) (= \(P_k\))</th></tr></thead>
+            <tbody>
+              <tr><td>\(P_0(P_0)\)</td><td><strong>1</strong></td><td>0</td><td>1</td><td>\(\ldots\)</td><td></td></tr>
+              <tr><td>\(P_1(P_1)\)</td><td>1</td><td><strong>0</strong></td><td>0</td><td>\(\ldots\)</td><td></td></tr>
+              <tr><td>\(P_2(P_2)\)</td><td>0</td><td>1</td><td><strong>1</strong></td><td>\(\ldots\)</td><td></td></tr>
+              <tr><td>\(\vdots\)</td><td colspan="5">\(\ddots\)</td></tr>
+              <tr><td>\(D(D) = P_k(P_k)\)</td><td></td><td></td><td></td><td></td><td><strong>?</strong></td></tr>
+            </tbody>
+          </table>
+          <p>Το \(D\) «αντιστρέφει» τη διαγώνιο: \(G[k][k] = 1 \Rightarrow D(D)\) = 0, και αντίστροφα.
+             Άρα το \(D\) δεν μπορεί να εμφανιστεί στον πίνακα.</p>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">Ιστορικό — Alan Turing</div>
+          <p>Ο Alan Turing (1912–1954) απέδειξε το 1936 ότι το Halting Problem είναι άλυτο,
+             <em>πριν ακόμα υπάρξουν πραγματικοί υπολογιστές</em>.
+             Εργάστηκε με μαθηματική αφαίρεση (Μηχανές Turing).
+             Η εργασία του καθόρισε τα όρια της υπολογιστικής ισχύος.</p>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Πρακτικές Συνέπειες</div>
+          <ul>
+            <li>Δεν υπάρχει καθολικό anti-virus που ανιχνεύει κάθε κακόβουλο πρόγραμμα.</li>
+            <li>Δεν μπορούμε να αποδείξουμε αυτόματα αν ένα αυθαίρετο πρόγραμμα είναι σωστό.</li>
+            <li>Κάθε ισχυρό σύστημα αποδείξεων έχει <em>αληθείς αλλά μη-αποδείξιμες</em> προτάσεις (Gödel).</li>
+          </ul>
+        </div>
+      </section>
+    </section>
+
+    <hr>
+
+    <!-- ΕΡΩΤΗΣΕΙΣ ΕΞΕΤΑΣΕΩΝ -->
+    <section id="sec-exam">
+      <h2 id="h-exam">Συχνές Ερωτήσεις Εξετάσεων</h2>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 1</div>
+        <p>Τι είναι αριθμήσιμο σύνολο; Αποδείξτε ότι το \(\mathbb{Q}^+\) είναι αριθμήσιμο.</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Αριθμήσιμο: υπάρχει 1-1-αντιστοιχία με \(\mathbb{N}\).
+               \(\mathbb{Q}^+\): απαριθμούμε \(p/q\) κατά άθροισμα \(p+q\). Για κάθε \(s \ge 2\),
+               υπάρχουν πεπερασμένα κλάσματα \(p/q\) (σε απλοποιημένη μορφή) με \(p+q=s\).
+               Άρα κάθε ρητός εμφανίζεται σε πεπερασμένη θέση. ✓</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 2</div>
+        <p>Αποδείξτε ότι \((0,1) \subseteq \mathbb{R}\) δεν είναι αριθμήσιμο (Cantor).</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Με άτοπο: έστω \(r_1, r_2, \ldots\) απαρίθμηση του \((0,1)\).
+               Κατασκεύασε \(a = 0.a_1 a_2 \ldots\) με \(a_i \ne d_{ii}\) (αν \(d_{ii}\ne 5\): \(a_i=5\), αλλιώς \(a_i=6\)).
+               Τότε \(a \in (0,1)\) αλλά \(a \ne r_i\) για κάθε \(i\). Αντίφαση. ✓</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 3</div>
+        <p>Γιατί το σύνολο γλωσσών \(\mathcal{P}(\{0,1\}^*)\) είναι μη-αριθμήσιμο;</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Το \(\{0,1\}^*\) είναι αριθμήσιμο. Κάθε γλώσσα \(L \subseteq \{0,1\}^*\) αντιστοιχεί
+               σε μια συνάρτηση \(\chi_L : \{0,1\}^* \to \{0,1\}\) (χαρακτηριστική).
+               Αυτές αντιστοιχούν σε δυαδικές ακολουθίες \(\{0,1\}^{\mathbb{N}}\),
+               που είναι ισοπληθείς με \(\mathbb{R}\) — άρα μη-αριθμήσιμες. ✓</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 4</div>
+        <p>Αποδείξτε ότι δεν υπάρχει πρόγραμμα \(H\) για το Halting Problem.</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Υποθέτουμε \(H\) υπάρχει. Κατασκευάζουμε \(D(P)\): αν \(H(P,P)=\text{"τερματίζει"}\)
+               τότε loop, αλλιώς return. Εξετάζουμε \(D(D)\):
+               αν τερματίζει → \(H(D,D)=\text{"τερματίζει"}\) → loop. Αντίφαση.
+               Αν δεν τερματίζει → \(H(D,D)\ne\text{"τερματίζει"}\) → return. Αντίφαση.
+               Άρα \(H\) δεν υπάρχει. ✓</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 5</div>
+        <p>Εξηγήστε τη σύνδεση μεταξύ Cantor και Halting Problem.</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Και οι δύο χρησιμοποιούν <em>διαγωνισμό</em>. Ο Cantor κατασκευάζει αριθμό \(a\)
+               που διαφέρει από κάθε \(r_i\) στο \(i\)-ό ψηφίο.
+               Για το Halting Problem: ο πίνακας \(G[i][j]\) = «τερματίζει το \(P_i\) για \(P_j\);»,
+               και το \(D\) «αντιστρέφει» τη διαγώνιο \(G[i][i]\), οδηγώντας σε αντίφαση.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 6</div>
+        <p>Γιατί ο κατασκευαστής \(a\) στον Cantor αποφεύγει τα ψηφία 0 και 9;</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Επειδή \(0.999\ldots = 1.000\ldots\) στη δεκαδική ανάπτυξη.
+               Αν επιτρέψουμε ψηφία 0 ή 9, ο \(a\) μπορεί να ταυτίζεται με κάποιο \(r_i\)
+               μέσω αυτής της αμφισημίας. Αποφεύγοντας 0 και 9, κάθε πραγματικός έχει μοναδική
+               αναπαράσταση και η απόδειξη είναι αυστηρή.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ── Lecture Navigation ── -->
+    <nav class="lecture-nav" aria-label="Πλοήγηση διαλέξεων">
+      <a href="lecture4.html" class="lecture-nav__btn">&#8592; Διάλεξη 4</a>
+      <span class="lecture-nav__current">Διάλεξη 5 / 8</span>
+      <a href="lecture6.html" class="lecture-nav__btn">Διάλεξη 6: Γραφήματα &amp; Δένδρα &#8594;</a>
+    </nav>
+
   </main>
+</div>
 
-  <footer>
-    <p>Σημειώσεις Μαθηματικών Πληροφορικής — ΕΚΠΑ</p>
-  </footer>
+<footer class="site-footer" role="contentinfo">
+  <p>
+    Σημειώσεις Μαθηματικών Πληροφορικής &mdash; ΕΚΠΑ &nbsp;|&nbsp;
+    <a href="../index.html">Αρχική</a> &nbsp;|&nbsp;
+    Τελευταία ενημέρωση: <time datetime="2026-05-22">22 Μαΐου 2026</time>
+  </p>
+</footer>
+
 </body>
 </html>

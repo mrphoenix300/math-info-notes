@@ -3,35 +3,631 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Διάλεξη 4 — Αποδείξεις Ύπαρξης &amp; Αρχή Περιστερεώνα</title>
+  <meta name="description"
+        content="Διάλεξη 4 — Αποδείξεις Ύπαρξης & Αρχή Περιστερεώνα. Πιθανοτική Μέθοδος, Erdős-Szekeres, Θεώρημα Dirichlet.">
+  <title>Διάλεξη 4 — Ύπαρξη &amp; Περιστερεώνας | Μαθ. Πληροφορικής ΕΚΠΑ</title>
   <link rel="stylesheet" href="../css/style.css">
   <script>
-    window.MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };
+    window.MathJax = {
+      tex: {
+        inlineMath:  [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        tags: 'ams',
+        macros: {
+          floor: ['\\lfloor #1 \\rfloor', 1],
+          ceil:  ['\\lceil #1 \\rceil',  1],
+          N:  '\\mathbb{N}',
+          Z:  '\\mathbb{Z}',
+          R:  '\\mathbb{R}',
+          Q:  '\\mathbb{Q}',
+          vp: '\\varphi'
+        }
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+    };
+    (function () {
+      const t = localStorage.getItem('math-plir-theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <script src="../js/main.js" defer></script>
 </head>
 <body>
-  <header>
-    <h1>Διάλεξη 4 — Αποδείξεις Ύπαρξης &amp; Αρχή Περιστερεώνα</h1>
-    <a href="../index.html">← Αρχική</a>
-  </header>
 
-  <nav>
-    <a href="lecture3.html">← Προηγούμενη</a>
-    <span>|</span>
-    <a href="../index.html">Αρχική</a>
-    <span>|</span>
-    <a href="lecture5.html">Επόμενη →</a>
-  </nav>
+<header class="site-header" role="banner">
+  <div class="site-header__inner">
+    <a href="../index.html" class="site-header__title">&#8469; Μαθηματικά Πληροφορικής</a>
+    <nav class="site-nav" aria-label="Κύρια πλοήγηση">
+      <a href="../index.html">Αρχική</a>
+      <a href="lecture1.html" aria-current="page">Διαλέξεις</a>
+      <a href="../topics/induction.html">Θέματα</a>
+      <a href="../exercises/solved.html">Ασκήσεις</a>
+      <a href="../exam-prep/formulas.html">Εξεταστική</a>
+    </nav>
+    <button id="theme-toggle" class="btn-theme-toggle"
+            aria-label="Εναλλαγή σκοτεινής λειτουργίας">&#127769; Σκοτεινό</button>
+  </div>
+</header>
 
-  <main>
-    <p><em>Placeholder — περιεχόμενο θα συμπληρωθεί.</em></p>
+<div class="page-wrapper">
+
+  <!-- ── Sidebar TOC ── -->
+  <aside class="sidebar-toc" aria-label="Περιεχόμενα σελίδας">
+    <button class="toc-toggle" aria-expanded="true">&#128203; Περιεχόμενα &#9662;</button>
+    <div class="sidebar-toc__title">Περιεχόμενα</div>
+    <ol class="sidebar-toc__list">
+      <li class="toc-h2"><a href="#sec-tldr">TL;DR</a></li>
+      <li class="toc-h2"><a href="#sec-existence">1. Είδη Αποδείξεων Ύπαρξης</a></li>
+      <li class="toc-h2"><a href="#sec-nonconstr">2. Μη Κατασκευαστική Απόδειξη</a></li>
+      <li class="toc-h2"><a href="#sec-extended-euclid">3. Γενικευμένος Αλγόριθμος Ευκλείδη</a></li>
+      <li class="toc-h2"><a href="#sec-probabilistic">4. Πιθανοτική Μέθοδος</a>
+        <ol>
+          <li class="toc-h3"><a href="#sec-2color">Διχρωματικά Σύνολα</a></li>
+          <li class="toc-h3"><a href="#sec-ramsey-lb">Κάτω Φράγμα R(t)</a></li>
+        </ol>
+      </li>
+      <li class="toc-h2"><a href="#sec-pigeonhole">5. Αρχή Περιστερεώνα</a>
+        <ol>
+          <li class="toc-h3"><a href="#sec-ph-basic">Βασικές Εφαρμογές</a></li>
+          <li class="toc-h3"><a href="#sec-erdos-szekeres">Erdős-Szekeres</a></li>
+          <li class="toc-h3"><a href="#sec-dirichlet">Θεώρημα Dirichlet</a></li>
+          <li class="toc-h3"><a href="#sec-monochromatic">Μονοχρωματικό Ορθογώνιο</a></li>
+        </ol>
+      </li>
+      <li class="toc-h2"><a href="#sec-exam">Ερωτήσεις Εξετάσεων</a></li>
+    </ol>
+  </aside>
+
+  <!-- ── Main Content ── -->
+  <main class="main-content" id="main-content">
+
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <div class="breadcrumbs__item"><a href="../index.html">Αρχική</a></div>
+      <div class="breadcrumbs__item"><a href="../index.html#lecture-cards">Διαλέξεις</a></div>
+      <div class="breadcrumbs__item"><span class="breadcrumbs__current">Διάλεξη 4</span></div>
+    </nav>
+
+    <h1>Διάλεξη 4 &mdash; Αποδείξεις Ύπαρξης &amp; Αρχή Περιστερεώνα</h1>
+
+    <!-- TL;DR -->
+    <section id="sec-tldr">
+      <div class="callout callout-tldr">
+        <div class="callout-title">TL;DR</div>
+        <ul>
+          <li><strong>Κατασκευαστικές</strong> vs <strong>μη-κατασκευαστικές</strong> αποδείξεις ύπαρξης:
+              στη δεύτερη, ξέρουμε ότι κάτι υπάρχει χωρίς να ξέρουμε τι.</li>
+          <li><strong>Πιθανοτική μέθοδος</strong>: δείχνουμε \(P(\text{ιδιότητα}) > 0\), άρα το αντικείμενο υπάρχει.</li>
+          <li>Αν \(\binom{n}{t} \cdot 2^{1-\binom{t}{2}} < 1\), τότε \(R(t) > n\) (Θεώρημα Erdős 1947).</li>
+          <li><strong>Αρχή Περιστερεώνα</strong>: \(n+1\) αντικείμενα σε \(n\) κατηγορίες → τουλ. 2 σε μία.</li>
+          <li><strong>Erdős-Szekeres</strong>: \(n^2+1\) αριθμοί → μονότονη υποακολουθία μήκους \(n+1\).</li>
+          <li><strong>Θεώρημα Dirichlet</strong>: \(\forall \theta \in \mathbb{R}\setminus\mathbb{Q},\; \forall m\):
+              υπάρχει \(q \le m\) με \(|\theta - p/q| < 1/(mq)\).</li>
+        </ul>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- §1 -->
+    <section id="sec-existence">
+      <h2 id="h-existence">1. Είδη Αποδείξεων Ύπαρξης</h2>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Κατασκευαστική vs Μη Κατασκευαστική</div>
+        <table>
+          <thead><tr><th>Είδος</th><th>Τι δίνουμε</th><th>Πλεονέκτημα</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Κατασκευαστική</strong></td>
+              <td>Ρητή κατασκευή του αντικειμένου</td>
+              <td>Υπολογίσιμο, εφαρμόσιμο</td>
+            </tr>
+            <tr>
+              <td><strong>Μη κατασκευαστική</strong></td>
+              <td>Επιχείρημα ότι το αντικείμενο πρέπει να υπάρχει</td>
+              <td>Συχνά απλούστερη, πιο γενική</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Ο αριθμός 1729 — Ramanujan</div>
+        <p>Το 1729 είναι ο <em>μικρότερος</em> αριθμός που γράφεται ως άθροισμα δύο κύβων με δύο διαφορετικούς τρόπους:</p>
+        \[ 1729 = 1^3 + 12^3 = 9^3 + 10^3. \]
+        <p>Ο G.H. Hardy επισκέφθηκε τον Ramanujan άρρωστο και ανέφερε τον αριθμό του ταξί (1729) ως «βαρετό».
+           Ο Ramanujan απάντησε αμέσως με τη διπλή αναπαράσταση — κατασκευαστική απόδειξη ύπαρξης.</p>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- §2 -->
+    <section id="sec-nonconstr">
+      <h2 id="h-nonconstr">2. Μη Κατασκευαστική Απόδειξη</h2>
+
+      <div class="callout callout-theorem">
+        <div class="callout-title">Θεώρημα — Άρρητος σε Ρητή Δύναμη</div>
+        <p>Υπάρχουν άρρητοι \(x, y\) τέτοιοι ώστε \(x^y \in \mathbb{Q}\).</p>
+      </div>
+
+      <div class="callout callout-proof">
+        <div class="callout-title">Απόδειξη — Διχοτόμηση χωρίς απόφαση</div>
+        <details open>
+          <summary>Προβολή απόδειξης</summary>
+          <div class="proof-body">
+            <p>Εξετάζουμε τον αριθμό \(\alpha = \sqrt{2}^{\sqrt{2}}\).</p>
+            <p><strong>Περίπτωση 1</strong>: Αν \(\alpha \in \mathbb{Q}\), τότε
+               \(x = \sqrt{2}\) (άρρητος) και \(y = \sqrt{2}\) (άρρητος) δίνουν \(x^y = \alpha \in \mathbb{Q}\). ✓</p>
+            <p><strong>Περίπτωση 2</strong>: Αν \(\alpha \notin \mathbb{Q}\), τότε θέτουμε
+               \(x = \alpha = \sqrt{2}^{\sqrt{2}}\) (άρρητος εξ υποθέσεως) και \(y = \sqrt{2}\) (άρρητος). Τότε:</p>
+            \[ x^y = \bigl(\sqrt{2}^{\sqrt{2}}\bigr)^{\sqrt{2}} = \sqrt{2}^{\sqrt{2} \cdot \sqrt{2}} = \sqrt{2}^2 = 2 \in \mathbb{Q}. \quad \checkmark \]
+            <p>Σε κάθε περίπτωση, υπάρχουν άρρητοι \(x, y\) με \(x^y \in \mathbb{Q}\). \(\square\)</p>
+            <p><em>Σημείωση</em>: Η απόδειξη δεν αποκαλύπτει ποιο από τα δύο ζεύγη είναι το σωστό.
+               (Στην πραγματικότητα \(\sqrt{2}^{\sqrt{2}}\) είναι άρρητος — Θεώρημα Gelfond-Schneider 1934 —
+               οπότε η Περίπτωση 2 ισχύει, αλλά δεν το χρειαζόμαστε για την απόδειξη.)</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Ο παράδοξος χαρακτήρας της απόδειξης</div>
+        <p>Η απόδειξη είναι <em>έγκυρη</em> παρόλο που δεν γνωρίζουμε ποιο ζεύγος \((x,y)\) είναι το σωστό.
+           Αυτό είναι το ουσιώδες χαρακτηριστικό της <em>μη-κατασκευαστικής</em> απόδειξης:
+           η ύπαρξη εγγυάται χωρίς ρητή κατασκευή.</p>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- §3 -->
+    <section id="sec-extended-euclid">
+      <h2 id="h-extended-euclid">3. Γενικευμένος Αλγόριθμος Ευκλείδη (Κατασκευαστικό Bézout)</h2>
+
+      <p>Το Λήμμα Bézout (\(\gcd(a,b) = ax+by\)) αποδείχθηκε στη Διάλεξη 2 μη-κατασκευαστικά
+         (χρησιμοποιώντας το ελάχιστο στοιχείο \(d = \min S\)).
+         Ο <em>Γενικευμένος Αλγόριθμος Ευκλείδη</em> δίνει κατασκευαστική απόδειξη.</p>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Αλγόριθμος Extended-GCD</div>
+        <pre><code>ExtGCD(a, b):
+  // Επιστρέφει (δ, x, y) με δ = gcd(a,b) και ax + by = δ
+  if b = 0:
+    return (a, 1, 0)          // a·1 + 0·0 = a = gcd(a,0)
+  (δ, x', y') ← ExtGCD(b, a mod b)
+  x ← y'
+  y ← x' − ⌊a/b⌋ · y'
+  return (δ, x, y)</code></pre>
+      </div>
+
+      <div class="callout callout-proof">
+        <div class="callout-title">Ορθότητα</div>
+        <details>
+          <summary>Προβολή απόδειξης</summary>
+          <div class="proof-body">
+            <p>Με επαγωγή στο \(b\). Βάση \(b=0\): \(a \cdot 1 + 0 \cdot 0 = a = \gcd(a,0)\). ✓</p>
+            <p>Βήμα: από ΥΕ, \(\delta = bx' + (a \bmod b)y'\). Χρησιμοποιούμε \(a \bmod b = a - \lfloor a/b \rfloor b\):</p>
+            \[\delta = bx' + (a - \lfloor a/b\rfloor b)y' = ay' + b(x' - \lfloor a/b\rfloor y').\]
+            <p>Θέτουμε \(x = y'\) και \(y = x' - \lfloor a/b \rfloor y'\). Τότε \(\delta = ax + by\). ✓</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Παράδειγμα: ExtGCD(35, 15)</div>
+        <table>
+          <thead><tr><th>Κλήση</th><th>\(a\)</th><th>\(b\)</th><th>\(\delta\)</th><th>\(x\)</th><th>\(y\)</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>35</td><td>15</td><td>5</td><td>1</td><td>−2</td></tr>
+            <tr><td>2</td><td>15</td><td>5</td><td>5</td><td>0</td><td>1</td></tr>
+            <tr><td>3</td><td>5</td><td>0</td><td>5</td><td>1</td><td>0</td></tr>
+          </tbody>
+        </table>
+        <p>Επαλήθευση: \(35 \cdot 1 + 15 \cdot (-2) = 35 - 30 = 5 = \gcd(35,15)\). ✓</p>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Κατασκευαστική vs Μη-Κατασκευαστική Bézout</div>
+        <table>
+          <thead><tr><th>Μέθοδος</th><th>Αποδεικνύει ύπαρξη;</th><th>Δίνει \(x, y\);</th></tr></thead>
+          <tbody>
+            <tr><td>Ελάχιστο στοιχείο \(S\) (Δ2)</td><td>Ναι</td><td>Όχι</td></tr>
+            <tr><td>ExtGCD</td><td>Ναι</td><td>Ναι</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- §4 -->
+    <section id="sec-probabilistic">
+      <h2 id="h-probabilistic">4. Πιθανοτική Μέθοδος</h2>
+
+      <p>Θέλουμε να δείξουμε ότι ένα αντικείμενο με κάποια ιδιότητα <em>υπάρχει</em>.
+         Αντί να το κατασκευάσουμε, ορίζουμε τυχαία κατανομή πάνω σε υποψήφια αντικείμενα
+         και δείχνουμε ότι η πιθανότητα να έχουν την ιδιότητα είναι <em>θετική</em>.
+         Τότε τουλάχιστον ένα αντικείμενο υπάρχει.</p>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Σχήμα Πιθανοτικής Μεθόδου</div>
+        <ol>
+          <li>Ορίζω τυχαία κατανομή πάνω σε υποψήφια αντικείμενα.</li>
+          <li>Δείχνω \(P(\text{«ιδιότητα»}) > 0\) (χρησιμοποιώ συνήθως union bound: \(P(A \cup B) \le P(A) + P(B)\)).</li>
+          <li>Συμπεραίνω: τουλάχιστον ένα αντικείμενο έχει την ιδιότητα.</li>
+        </ol>
+      </div>
+
+      <section id="sec-2color">
+        <h3 id="h-2color">4.1 Διχρωματικά Σύνολα</h3>
+
+        <p>Έχουμε οικογένεια \(\mathcal{E} = \{E_1, \ldots, E_m\}\) υποσυνόλων του \([n] = \{1,\ldots,n\}\).
+           Ένας <strong>2-χρωματισμός</strong> χρωματίζει κάθε στοιχείο κόκκινο ή μπλε.
+           Ένα σύνολο \(E_i\) είναι <strong>μονοχρωματικό</strong> αν όλα τα στοιχεία έχουν το ίδιο χρώμα.
+           Θέλουμε χρωματισμό χωρίς μονοχρωματικά σύνολα.</p>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα — Διχρωματισμός</div>
+          <p>Αν \(m < 2^{n-1}\) (δηλ. \(|\mathcal{E}| < 2^{n-1}\)) και κάθε \(|E_i| = n\),
+             τότε υπάρχει 2-χρωματισμός του \([n]\) χωρίς μονοχρωματικό σύνολο.</p>
+          <p>Ισοδύναμα: \(m(n) \ge 2^{n-1}\), όπου \(m(n)\) το ελάχιστο \(m\) που δεν επιτρέπει διχρωματισμό.</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <div class="callout-title">Απόδειξη — Πιθανοτική Μέθοδος</div>
+          <details open>
+            <summary>Προβολή απόδειξης</summary>
+            <div class="proof-body">
+              <p>Χρωματίζουμε κάθε στοιχείο ανεξάρτητα: κόκκινο ή μπλε με πιθανότητα \(1/2\) έκαστο.</p>
+              <p>Για κάθε \(E_i\) με \(|E_i| = n\):
+                 \(P(E_i \text{ μονοχρωματικό}) = 2 \cdot (1/2)^n = 2^{1-n}\).</p>
+              <p>(Και τα \(n\) στοιχεία κόκκινα ή και τα \(n\) μπλε.)</p>
+              <p>Union bound:</p>
+              \[ P(\exists i: E_i \text{ μονοχρωματικό}) \le \sum_{i=1}^m 2^{1-n} = m \cdot 2^{1-n}. \]
+              <p>Αν \(m < 2^{n-1}\), τότε \(m \cdot 2^{1-n} < 2^{n-1} \cdot 2^{1-n} = 1\).</p>
+              <p>Άρα \(P(\text{κανένα μονοχρωματικό}) > 0\), οπότε υπάρχει τέτοιος χρωματισμός. \(\square\)</p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="sec-ramsey-lb">
+        <h3 id="h-ramsey-lb">4.2 Κάτω Φράγμα για R(t) — Θεώρημα Erdős 1947</h3>
+
+        <p>Ο αριθμός Ramsey \(R(t)\) είναι ο ελάχιστος \(n\) ώστε κάθε 2-χρωματισμός των ακμών
+           \(K_n\) να περιέχει μονοχρωματικό \(K_t\).</p>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα Erdős 1947 — Κάτω Φράγμα R(t)</div>
+          <p>Αν \(\dbinom{n}{t} \cdot 2^{1-\binom{t}{2}} < 1\), τότε \(R(t) > n\).</p>
+          <p>Συνέπεια: \(R(t) > 2^{t/2}\) για \(t \ge 3\).</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <div class="callout-title">Απόδειξη</div>
+          <details open>
+            <summary>Προβολή απόδειξης</summary>
+            <div class="proof-body">
+              <p>Χρωματίζουμε κάθε ακμή του \(K_n\) ανεξάρτητα: κόκκινη ή μπλε με \(p = 1/2\).</p>
+              <p>Για κάθε σύνολο \(S\) κορυφών με \(|S| = t\) (υπάρχουν \(\binom{n}{t}\) τέτοια):
+                 \(P(K_t[S] \text{ μονοχρωματικό}) = 2 \cdot (1/2)^{\binom{t}{2}} = 2^{1-\binom{t}{2}}\).</p>
+              <p>Union bound:</p>
+              \[ P(\exists S \text{ μονοχρωματικό } K_t) \le \binom{n}{t} \cdot 2^{1-\binom{t}{2}}. \]
+              <p>Αν αυτή η ποσότητα \(< 1\), τότε \(P(\text{κανένα μονοχρωματικό } K_t) > 0\),
+                 οπότε υπάρχει χρωματισμός χωρίς μονοχρωματικό \(K_t\), άρα \(R(t) > n\). \(\square\)</p>
+
+              <p><strong>Επιλογή \(n = \lfloor 2^{t/2} \rfloor\)</strong>:</p>
+              \[\binom{n}{t} \le \frac{n^t}{t!} \le \frac{2^{t^2/2}}{t!}, \quad 2^{1-\binom{t}{2}} = 2^{1-t(t-1)/2}.\]
+              <p>Για \(t\) αρκετά μεγάλο: \(\binom{n}{t}\cdot 2^{1-\binom{t}{2}} < 1\), άρα \(R(t) > 2^{t/2}\). \(\square\)</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Ιστορική σημασία</div>
+          <p>Πριν τον Erdős (1947), ήταν γνωστό ότι \(R(t)\) είναι πεπερασμένο αλλά δεν υπήρχε κάτω φράγμα.
+             Ο Erdős απέδειξε \(R(t) > 2^{t/2}\) χωρίς να κατασκευάσει ούτε έναν «καλό» χρωματισμό —
+             αυτή ήταν η πρώτη μεγάλη εφαρμογή της πιθανοτικής μεθόδου.</p>
+        </div>
+      </section>
+    </section>
+
+    <hr>
+
+    <!-- §5 -->
+    <section id="sec-pigeonhole">
+      <h2 id="h-pigeonhole">5. Αρχή του Περιστερεώνα</h2>
+
+      <div class="callout callout-theorem">
+        <div class="callout-title">Αρχή Περιστερεώνα (απλή μορφή)</div>
+        <p>Αν \(n+1\) περιστέρια κατανέμονται σε \(n\) φωλιές, τουλάχιστον μία φωλιά
+           περιέχει \(\ge 2\) περιστέρια.</p>
+      </div>
+
+      <div class="callout callout-theorem">
+        <div class="callout-title">Γενικευμένη Αρχή Περιστερεώνα</div>
+        <p>Αν \(n\) περιστέρια κατανέμονται σε \(m\) φωλιές, τουλάχιστον μία φωλιά
+           περιέχει \(\ge \lceil n/m \rceil\) περιστέρια.</p>
+      </div>
+
+      <section id="sec-ph-basic">
+        <h3 id="h-ph-basic">5.1 Βασικές Εφαρμογές</h3>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Εφαρμογή 1: Κοινός Μήνας Γεννήσεων</div>
+          <p>Σε κάθε ομάδα 13 ατόμων, τουλάχιστον 2 γεννήθηκαν τον ίδιο μήνα.</p>
+          <p><em>Απόδειξη</em>: 13 περιστέρια (άνθρωποι), 12 φωλιές (μήνες).
+             \(\lceil 13/12 \rceil = 2\). \(\square\)</p>
+        </div>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Εφαρμογή 2: Πολλαπλάσιο της μορφής 11...100...0</div>
+          <p>Για κάθε \(n\) με \(\gcd(n, 10) = 1\), υπάρχει πολλαπλάσιο του \(n\) που
+             σε δεκαδική αναπαράσταση έχει μόνο ψηφία 1 και 0 (μορφή \(\underbrace{11\ldots1}_{k}\underbrace{00\ldots0}_{j}\)).</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <div class="callout-title">Απόδειξη</div>
+          <details>
+            <summary>Προβολή απόδειξης</summary>
+            <div class="proof-body">
+              <p>Εξετάζουμε τους \(n+1\) αριθμούς \(a_k = \underbrace{11\ldots1}_{k}\) για \(k = 1, \ldots, n+1\).
+                 Οι υπόλοιποι \(a_k \bmod n\) ανήκουν στο \(\{0, 1, \ldots, n-1\}\) (\(n\) τιμές).
+                 Από αρχή περιστερεώνα, δύο από αυτούς έχουν ίδιο υπόλοιπο: \(a_i \equiv a_j \pmod{n}\) για \(i < j\).
+                 Τότε \(a_j - a_i = \underbrace{11\ldots1}_{j-i}\underbrace{00\ldots0}_{i}\) είναι πολλαπλάσιο \(n\). \(\square\)</p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="sec-erdos-szekeres">
+        <h3 id="h-erdos-szekeres">5.2 Θεώρημα Erdős-Szekeres</h3>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα Erdős-Szekeres</div>
+          <p>Σε κάθε ακολουθία \(n^2 + 1\) διαφορετικών πραγματικών αριθμών
+             υπάρχει μονότονη (αύξουσα ή φθίνουσα) υποακολουθία μήκους τουλάχιστον \(n+1\).</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <div class="callout-title">Απόδειξη — Αρχή Περιστερεώνα</div>
+          <details open>
+            <summary>Προβολή απόδειξης</summary>
+            <div class="proof-body">
+              <p>Έστω \(a_1, a_2, \ldots, a_{n^2+1}\) η ακολουθία.
+                 Για κάθε \(i\), ορίζουμε:</p>
+              <ul>
+                <li>\(d_i\) = μήκος της <em>μεγαλύτερης αύξουσας</em> υποακολουθίας που αρχίζει από \(a_i\).</li>
+              </ul>
+              <p>Κάθε \(d_i \in \{1, 2, \ldots, n^2+1\}\).</p>
+
+              <p><strong>Αν κάποιο \(d_i \ge n+1\)</strong>: βρήκαμε αύξουσα υποακολουθία μήκους \(\ge n+1\). ✓</p>
+
+              <p><strong>Αλλιώς</strong>: κάθε \(d_i \in \{1, \ldots, n\}\) (\(n\) πιθανές τιμές,
+                 \(n^2+1\) στοιχεία). Από αρχή περιστερεώνα:
+                 υπάρχουν \(n+1\) στοιχεία \(a_{i_1}, a_{i_2}, \ldots, a_{i_{n+1}}\)
+                 (με \(i_1 < i_2 < \cdots < i_{n+1}\)) με <em>ίδιο</em> \(d_{i_j} = c\).</p>
+
+              <p>Ισχυριζόμαστε ότι \(a_{i_1} > a_{i_2} > \cdots > a_{i_{n+1}}\) (φθίνουσα υποακολουθία):</p>
+              <p>Αν \(a_{i_j} < a_{i_{j+1}}\) για κάποιο \(j\), τότε θα μπορούσαμε να επεκτείνουμε
+                 την αύξουσα υποακολουθία που αρχίζει από \(a_{i_j}\) χρησιμοποιώντας την από \(a_{i_{j+1}}\):
+                 \(d_{i_j} \ge d_{i_{j+1}} + 1 = c+1 \ne c\). Αντίφαση.</p>
+              <p>Άρα \(a_{i_1} > \cdots > a_{i_{n+1}}\) είναι φθίνουσα υποακολουθία μήκους \(n+1\). \(\square\)</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Παράδειγμα: n = 2, ακολουθία μήκους 5</div>
+          <p>Ακολουθία: \(3, 1, 4, 2, 5\). Τιμές \(d_i\): \(d_1=3,\, d_2=2,\, d_3=2,\, d_4=1,\, d_5=1\).</p>
+          <p>Αύξουσα μήκους 3: \(1, 2, 5\). ✓</p>
+        </div>
+      </section>
+
+      <section id="sec-dirichlet">
+        <h3 id="h-dirichlet">5.3 Θεώρημα Dirichlet — Προσέγγιση Αρρήτων</h3>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα Dirichlet (1842)</div>
+          <p>Για κάθε \(\theta \in \mathbb{R}\) και κάθε \(m \in \mathbb{N}\) με \(m \ge 1\),
+             υπάρχουν ακέραιοι \(p, q\) με \(1 \le q \le m\) ώστε:</p>
+          \[ \left|\theta - \frac{p}{q}\right| < \frac{1}{mq}. \]
+        </div>
+
+        <div class="callout callout-proof">
+          <div class="callout-title">Απόδειξη — Αρχή Περιστερεώνα</div>
+          <details open>
+            <summary>Προβολή απόδειξης</summary>
+            <div class="proof-body">
+              <p>Ορίζουμε τα \(m+1\) κλασματικά μέρη:</p>
+              \[ \{0\cdot\theta\}, \{1\cdot\theta\}, \{2\cdot\theta\}, \ldots, \{m\cdot\theta\} \in [0,1) \]
+              <p>όπου \(\{x\} = x - \lfloor x \rfloor\).</p>
+
+              <p>Χωρίζουμε το \([0,1)\) σε \(m\) ισοπλατή διαστήματα:
+                 \([0, 1/m),\, [1/m, 2/m),\, \ldots,\, [(m-1)/m, 1)\).</p>
+
+              <p>Έχουμε \(m+1\) τιμές σε \(m\) διαστήματα.
+                 Από αρχή περιστερεώνα, δύο τιμές βρίσκονται στο ίδιο διάστημα:</p>
+              \[ |\{j\theta\} - \{i\theta\}| < \frac{1}{m} \quad \text{για κάποιο } 0 \le i < j \le m. \]
+
+              <p>Θέτουμε \(q = j - i \in \{1,\ldots,m\}\).
+                 Τότε \(|\{j\theta\} - \{i\theta\}| = |q\theta - k|\) για κάποιο ακέραιο \(k\)
+                 (αφού \(\{j\theta\}-\{i\theta\} = (j-i)\theta - \text{ακέραιος}\)).</p>
+
+              <p>Άρα \(|q\theta - k| < 1/m\), δηλ. \(|\theta - k/q| < 1/(mq)\).
+                 Θέτουμε \(p = k\). \(\square\)</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Πόρισμα — Άπειρες Προσεγγίσεις</div>
+          <p>Για κάθε άρρητο \(\theta\) υπάρχουν άπειροι ρητοί \(p/q\) με:</p>
+          \[ \left|\theta - \frac{p}{q}\right| < \frac{1}{q^2}. \]
+        </div>
+
+        <div class="callout callout-proof">
+          <div class="callout-title">Απόδειξη Πορίσματος</div>
+          <details>
+            <summary>Προβολή απόδειξης</summary>
+            <div class="proof-body">
+              <p>Από Dirichlet για \(m = 1, 2, 3, \ldots\): σε κάθε περίπτωση βρίσκουμε \(p_m/q_m\)
+                 με \(q_m \le m\) και \(|\theta - p_m/q_m| < 1/(m q_m)\).
+                 Αφού \(m \to \infty\) και \(\theta\) άρρητος, οι \(p_m/q_m\) δεν μπορούν να σταθεροποιηθούν
+                 (διαφορετικά θα είχαμε \(|\theta - c| < 1/(mq_m) \to 0\), άρα \(\theta = c \in \mathbb{Q}\)).
+                 Άρα υπάρχουν άπειροι διαφορετικοί \(p/q\) με \(|\theta - p/q| < 1/(mq_m) \le 1/q_m^2\). \(\square\)</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">Θεώρημα Roth (1955, Μετάλλιο Fields)</div>
+          <p>Για κάθε \(\varepsilon > 0\) και άρρητο αλγεβρικό \(\theta\), υπάρχουν μόνο
+             <em>πεπερασμένοι</em> ρητοί \(p/q\) με \(|\theta - p/q| < 1/q^{2+\varepsilon}\).
+             Δηλαδή, το εκθετικό \(q^2\) του Dirichlet είναι βέλτιστο για αλγεβρικούς αριθμούς.</p>
+        </div>
+      </section>
+
+      <section id="sec-monochromatic">
+        <h3 id="h-monochromatic">5.4 Μονοχρωματικό Ορθογώνιο</h3>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα — Μονοχρωματικό Ορθογώνιο</div>
+          <p>Αν χρωματίσουμε τα στοιχεία του \(\{1,\ldots,m\} \times \{1,\ldots,n\}\)
+             με 2 χρώματα (κόκκινο/μπλε), για αρκετά μεγάλο \(m\) υπάρχουν
+             \(i_1 < i_2\) και \(j_1 < j_2\) ώστε τα 4 σημεία
+             \((i_1,j_1), (i_1,j_2), (i_2,j_1), (i_2,j_2)\)
+             να είναι ομόχρωμα (μονοχρωματικό ορθογώνιο).</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <div class="callout-title">Απόδειξη</div>
+          <details>
+            <summary>Προβολή απόδειξης</summary>
+            <div class="proof-body">
+              <p>Κάθε στήλη \(j\) έχει \(m\) σημεία, κάθε χρωματισμένο κόκκινο ή μπλε.
+                 Κάθε στήλη ορίζει ένα ζεύγος \((R_j, B_j)\) από υποσύνολα γραμμών.
+                 Σε κάθε στήλη επιλέγουμε το «κυρίαρχο χρώμα»: αν \(|R_j| \ge m/2\),
+                 αλλιώς \(|B_j| \ge m/2\).</p>
+
+              <p>Για 2 στήλες με ίδιο κυρίαρχο χρώμα (π.χ. κόκκινο) και \(|R_{j_1}|, |R_{j_2}| \ge m/2\):
+                 από αρχή περιστερεώνα σε \(|R_{j_1} \cap R_{j_2}| \ge m/2 + m/2 - m = 0\)
+                 (χρειαζόμαστε \(m > n \cdot \binom{m/2}{2}\) —
+                 ο ακριβής υπολογισμός δίνει \(m \ge 2\binom{n}{2}+1 = n^2-n+1\)). \(\square\)</p>
+            </div>
+          </details>
+        </div>
+      </section>
+    </section>
+
+    <hr>
+
+    <!-- ΕΡΩΤΗΣΕΙΣ ΕΞΕΤΑΣΕΩΝ -->
+    <section id="sec-exam">
+      <h2 id="h-exam">Συχνές Ερωτήσεις Εξετάσεων</h2>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 1</div>
+        <p>Τι είναι μη-κατασκευαστική απόδειξη ύπαρξης; Δώστε παράδειγμα.</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Δείχνουμε ότι κάτι υπάρχει χωρίς να το κατασκευάσουμε. Παράδειγμα:
+               \(\sqrt{2}^{\sqrt{2}}\) είτε ρητός (και τότε \(x=\sqrt{2}, y=\sqrt{2}\)) είτε
+               \((\sqrt{2}^{\sqrt{2}})^{\sqrt{2}}=2\) (και τότε \(x=\sqrt{2}^{\sqrt{2}}, y=\sqrt{2}\)).
+               Σε κάθε περίπτωση υπάρχει άρρητος σε ρητή δύναμη.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 2</div>
+        <p>Αποδείξτε το Θεώρημα Erdős για κάτω φράγμα \(R(t)\) με πιθανοτική μέθοδο.</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Τυχαίος 2-χρωματισμός ακμών \(K_n\). Για κάθε \(t\)-υποσύνολο \(S\):
+               \(P(K_t[S] \text{ μονοχρωμ.}) = 2^{1-\binom{t}{2}}\).
+               Union bound: \(P(\exists \text{ μονοχρωμ. } K_t) \le \binom{n}{t} 2^{1-\binom{t}{2}}\).
+               Αν \(< 1\): \(R(t) > n\).</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 3</div>
+        <p>Αποδείξτε το Θεώρημα Erdős-Szekeres: κάθε ακολουθία \(n^2+1\) αριθμών
+           περιέχει μονότονη υποακολουθία μήκους \(n+1\).</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Ορίζω \(d_i\) = μήκος μέγιστης αύξουσας από \(a_i\). Αν κάποιο \(d_i \ge n+1\): τέλος.
+               Αλλιώς: \(n^2+1\) τιμές σε \(\{1,\ldots,n\}\), αρχή περιστερεώνα → \(n+1\) ίδιες.
+               Αυτές αποτελούν φθίνουσα υποακολουθία (αλλιώς κάποιο \(d_i\) θα μεγάλωνε). ✓</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 4</div>
+        <p>Αποδείξτε το Θεώρημα Dirichlet: για κάθε \(\theta, m\) υπάρχει \(p/q\) με \(q\le m\) και \(|\theta-p/q|&lt;1/(mq)\).</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Εξετάζω \(m+1\) κλασματικά μέρη \(\{0\theta\},\ldots,\{m\theta\}\) στο \([0,1)\)
+               χωρισμένο σε \(m\) διαστήματα πλάτους \(1/m\). Αρχή περιστερεώνα: 2 από αυτά απέχουν \(&lt;1/m\).
+               Αφαίρεση δίνει \(q = j-i\), \(|q\theta - p| &lt; 1/m\), οπότε \(|\theta - p/q| &lt; 1/(mq)\). ✓</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 5</div>
+        <p>Τι είναι το σχήμα union bound και γιατί χρησιμοποιείται στην πιθανοτική μέθοδο;</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Union bound: \(P(A_1 \cup \cdots \cup A_k) \le P(A_1) + \cdots + P(A_k)\).
+               Στην πιθανοτική μέθοδο: ορίζω \(A_i\) = «το \(i\)-ο αντικείμενο αποτυγχάνει».
+               Αν \(\sum P(A_i) &lt; 1\), τότε \(P(\text{κανένα δεν αποτυγχάνει}) &gt; 0\),
+               άρα υπάρχει αντικείμενο που δεν αποτυγχάνει.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 6</div>
+        <p>Σε τι διαφέρει ο Γενικευμένος Αλγόριθμος Ευκλείδη από τη μη-κατασκευαστική απόδειξη Bézout;</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Η μη-κατασκευαστική (ελάχιστο \(S\)) δείχνει ύπαρξη αλλά δεν δίνει \(x,y\).
+               Ο ExtGCD επιστρέφει ρητά \((δ, x, y)\) με \(ax+by=δ\) σε χρόνο \(O(\log\min(a,b))\).
+               Χρήσιμο στην κρυπτογραφία (RSA: εύρεση αντιστρόφου mod \(n\)).</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ── Lecture Navigation ── -->
+    <nav class="lecture-nav" aria-label="Πλοήγηση διαλέξεων">
+      <a href="lecture3.html" class="lecture-nav__btn">&#8592; Διάλεξη 3</a>
+      <span class="lecture-nav__current">Διάλεξη 4 / 8</span>
+      <a href="lecture5.html" class="lecture-nav__btn">Διάλεξη 5: Διαγωνοποίηση &amp; Υπολογισιμότητα &#8594;</a>
+    </nav>
+
   </main>
+</div>
 
-  <footer>
-    <p>Σημειώσεις Μαθηματικών Πληροφορικής — ΕΚΠΑ</p>
-  </footer>
+<footer class="site-footer" role="contentinfo">
+  <p>
+    Σημειώσεις Μαθηματικών Πληροφορικής &mdash; ΕΚΠΑ &nbsp;|&nbsp;
+    <a href="../index.html">Αρχική</a> &nbsp;|&nbsp;
+    Τελευταία ενημέρωση: <time datetime="2026-05-22">22 Μαΐου 2026</time>
+  </p>
+</footer>
+
 </body>
 </html>

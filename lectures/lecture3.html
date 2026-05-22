@@ -3,35 +3,685 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Διάλεξη 3 — Δομική Επαγωγή</title>
+  <meta name="description"
+        content="Διάλεξη 3 — Δομική Επαγωγή. Αλφάβητα, Συμβολοσειρές, Γλώσσες, Κανονικά Δυαδικά Δένδρα.">
+  <title>Διάλεξη 3 — Δομική Επαγωγή | Μαθ. Πληροφορικής ΕΚΠΑ</title>
   <link rel="stylesheet" href="../css/style.css">
   <script>
-    window.MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };
+    window.MathJax = {
+      tex: {
+        inlineMath:  [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        tags: 'ams',
+        macros: {
+          floor: ['\\lfloor #1 \\rfloor', 1],
+          ceil:  ['\\lceil #1 \\rceil',  1],
+          N:  '\\mathbb{N}',
+          Z:  '\\mathbb{Z}',
+          R:  '\\mathbb{R}',
+          vp: '\\varphi'
+        }
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+    };
+    (function () {
+      const t = localStorage.getItem('math-plir-theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <script src="../js/main.js" defer></script>
 </head>
 <body>
-  <header>
-    <h1>Διάλεξη 3 — Δομική Επαγωγή</h1>
-    <a href="../index.html">← Αρχική</a>
-  </header>
 
-  <nav>
-    <a href="lecture2.html">← Προηγούμενη</a>
-    <span>|</span>
-    <a href="../index.html">Αρχική</a>
-    <span>|</span>
-    <a href="lecture4.html">Επόμενη →</a>
-  </nav>
+<header class="site-header" role="banner">
+  <div class="site-header__inner">
+    <a href="../index.html" class="site-header__title">&#8469; Μαθηματικά Πληροφορικής</a>
+    <nav class="site-nav" aria-label="Κύρια πλοήγηση">
+      <a href="../index.html">Αρχική</a>
+      <a href="lecture1.html" aria-current="page">Διαλέξεις</a>
+      <a href="../topics/induction.html">Θέματα</a>
+      <a href="../exercises/solved.html">Ασκήσεις</a>
+      <a href="../exam-prep/formulas.html">Εξεταστική</a>
+    </nav>
+    <button id="theme-toggle" class="btn-theme-toggle"
+            aria-label="Εναλλαγή σκοτεινής λειτουργίας">&#127769; Σκοτεινό</button>
+  </div>
+</header>
 
-  <main>
-    <p><em>Placeholder — περιεχόμενο θα συμπληρωθεί.</em></p>
+<div class="page-wrapper">
+
+  <!-- ── Sidebar TOC ── -->
+  <aside class="sidebar-toc" aria-label="Περιεχόμενα σελίδας">
+    <button class="toc-toggle" aria-expanded="true">&#128203; Περιεχόμενα &#9662;</button>
+    <div class="sidebar-toc__title">Περιεχόμενα</div>
+    <ol class="sidebar-toc__list">
+      <li class="toc-h2"><a href="#sec-tldr">TL;DR</a></li>
+      <li class="toc-h2"><a href="#sec-intro">1. Εισαγωγή</a>
+        <ol>
+          <li class="toc-h3"><a href="#sec-motivating">Παράδειγμα Κινήτρου</a></li>
+        </ol>
+      </li>
+      <li class="toc-h2"><a href="#sec-formal">2. Τυπικός Ορισμός</a></li>
+      <li class="toc-h2"><a href="#sec-strings">3. Αλφάβητα &amp; Συμβολοσειρές</a>
+        <ol>
+          <li class="toc-h3"><a href="#sec-length">Μήκος</a></li>
+          <li class="toc-h3"><a href="#sec-concat">Παράθεση</a></li>
+        </ol>
+      </li>
+      <li class="toc-h2"><a href="#sec-languages">4. Γλώσσες</a></li>
+      <li class="toc-h2"><a href="#sec-balanced">5. Ισοκατανεμημένες Συμβολοσειρές</a>
+        <ol>
+          <li class="toc-h3"><a href="#sec-bal-def">Επαγωγικός Ορισμός L</a></li>
+          <li class="toc-h3"><a href="#sec-bal-fwd">Πρόταση (L ⊆ B)</a></li>
+          <li class="toc-h3"><a href="#sec-bal-rev">Αντίστροφη (B ⊆ L)</a></li>
+        </ol>
+      </li>
+      <li class="toc-h2"><a href="#sec-bst">6. Κανονικά Δυαδικά Δένδρα</a>
+        <ol>
+          <li class="toc-h3"><a href="#sec-bst-def">Ορισμός</a></li>
+          <li class="toc-h3"><a href="#sec-bst-prop">n(T) ≤ 2^(h+1)−1</a></li>
+        </ol>
+      </li>
+      <li class="toc-h2"><a href="#sec-exercises">Ασκήσεις</a></li>
+      <li class="toc-h2"><a href="#sec-exam">Ερωτήσεις Εξετάσεων</a></li>
+    </ol>
+  </aside>
+
+  <!-- ── Main Content ── -->
+  <main class="main-content" id="main-content">
+
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <div class="breadcrumbs__item"><a href="../index.html">Αρχική</a></div>
+      <div class="breadcrumbs__item"><a href="../index.html#lecture-cards">Διαλέξεις</a></div>
+      <div class="breadcrumbs__item"><span class="breadcrumbs__current">Διάλεξη 3</span></div>
+    </nav>
+
+    <h1>Διάλεξη 3 &mdash; Δομική Επαγωγή</h1>
+
+    <!-- TL;DR -->
+    <section id="sec-tldr">
+      <div class="callout callout-tldr">
+        <div class="callout-title">TL;DR</div>
+        <ul>
+          <li><strong>Δομική επαγωγή</strong>: ακολουθεί τη δομή του επαγωγικού ορισμού — βάση και κανόνες κατασκευής.</li>
+          <li>Ο ορισμός \(\Sigma^*\): βάση \(\varepsilon\), κανόνας \(w\sigma\). Ακολουθεί ο ορισμός \(\ell\) και \(\circ\).</li>
+          <li><strong>\(\ell(x \circ y) = \ell(x) + \ell(y)\)</strong>: πλήρης απόδειξη με δομική επαγωγή στο \(y\).</li>
+          <li>Η γλώσσα \(L\) (επαγωγικός ορισμός με \(0w1v\), \(1w0v\)) ταυτίζεται με το \(B = \{w \mid \#_0 = \#_1\}\): απόδειξη με διπλό εγκλεισμό.</li>
+          <li>ΚΔΔ: \(n(T) \le 2^{h(T)+1}-1\), άρα \(h(T) \ge \lceil\log_2(n+1)\rceil - 1\).</li>
+        </ul>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- §1 -->
+    <section id="sec-intro">
+      <h2 id="h-intro">1. Δομική Επαγωγή — Εισαγωγή</h2>
+
+      <p>Η μαθηματική επαγωγή λειτουργεί για τους <em>φυσικούς αριθμούς</em> γιατί εκμεταλλεύεται
+         τη διάταξη \(0 < 1 < 2 < \cdots\). Αλλά στην Πληροφορική συναντάμε συχνά
+         δομές που δεν είναι αριθμοί: συμβολοσειρές, δένδρα, γράφοι, παραστάσεις.
+         Αυτές ορίζονται <em>επαγωγικά</em> — μέσω βασικών στοιχείων και κανόνων κατασκευής.
+         Η <strong>δομική επαγωγή</strong> αποδεικνύει ιδιότητες ακολουθώντας
+         ακριβώς αυτή τη δομή.</p>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Σχήμα Δομικής Επαγωγής</div>
+        <p>Έστω \(S\) επαγωγικά ορισμένο σύνολο (βάση \(B\), κανόνες \(R_1,\ldots\)).
+           Για να αποδείξουμε ιδιότητα \(P\) για κάθε \(x \in S\):</p>
+        <ol>
+          <li><strong>Βάση</strong>: Δείξε \(P(b)\) για κάθε \(b \in B\).</li>
+          <li><strong>Επαγωγικό Βήμα</strong>: Για κάθε κανόνα \(R_i\): αν \(P\) ισχύει
+              για τα «υλικά» (τα στοιχεία που χρησιμοποιεί ο κανόνας), τότε ισχύει και για
+              το αποτέλεσμα.</li>
+        </ol>
+        <p>Συμπέρασμα: \(P(x)\) για κάθε \(x \in S\).</p>
+      </div>
+
+      <section id="sec-motivating">
+        <h3 id="h-motivating">1.1 Παράδειγμα Κινήτρου</h3>
+
+        <p>Ορίζουμε \(S \subseteq \mathbb{N}\) επαγωγικά:</p>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Επαγωγικός Ορισμός του S</div>
+          <ul>
+            <li><strong>Βάση</strong>: \(3 \in S\).</li>
+            <li><strong>Κανόνας</strong>: Αν \(x, y \in S\), τότε \(x + y \in S\).</li>
+          </ul>
+        </div>
+
+        <p><strong>Ισχυρισμός</strong>: \(S = \{3, 6, 9, 12, \ldots\}\) (θετικά πολλαπλάσια του 3).</p>
+
+        <div class="callout callout-proof">
+          <div class="callout-title">Απόδειξη — Διπλός Εγκλεισμός</div>
+          <details open>
+            <summary>Προβολή απόδειξης</summary>
+            <div class="proof-body">
+              <p>Θέτουμε \(A = \{3k \mid k \ge 1\}\). Χρειάζεται \(A \subseteq S\) και \(S \subseteq A\).</p>
+
+              <p><strong>Μέρος 1: \(A \subseteq S\)</strong> — Μαθηματική Επαγωγή στο \(k\).</p>
+              <ul>
+                <li><em>Βάση</em> \(k=1\): \(3 \in S\) από ορισμό. ✓</li>
+                <li><em>Βήμα</em>: ΥΕ: \(3k \in S\). Τότε \(3(k+1) = 3k + 3\).
+                    Έχουμε \(3k \in S\) (ΥΕ) και \(3 \in S\) (βάση), άρα \(3k+3 \in S\) (κανόνας). ✓</li>
+              </ul>
+
+              <p><strong>Μέρος 2: \(S \subseteq A\)</strong> — Δομική Επαγωγή στο \(S\).</p>
+              <ul>
+                <li><em>Βάση</em>: \(3 = 3 \cdot 1 \in A\). ✓</li>
+                <li><em>Βήμα</em>: Έστω \(x, y \in S\) με ΥΕ \(x = 3a,\, y = 3b\) για \(a,b \ge 1\).
+                    Τότε \(x + y = 3a + 3b = 3(a+b) \in A\). ✓</li>
+              </ul>
+              <p>Άρα \(S = A\). \(\square\)</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">Γιατί χρειάζεται διπλός εγκλεισμός;</div>
+          <p>Μόνο \(A \subseteq S\) επιτρέπει \(S\) να περιέχει «επιπλέον» στοιχεία (π.χ. 5).
+             Μόνο \(S \subseteq A\) επιτρέπει \(S = \{3\}\). Ο διπλός εγκλεισμός εξαλείφει και τις δύο περιπτώσεις.</p>
+        </div>
+      </section>
+    </section>
+
+    <hr>
+
+    <!-- §2 -->
+    <section id="sec-formal">
+      <h2 id="h-formal">2. Τυπικός Ορισμός</h2>
+
+      <p>Ένα σύνολο \(S\) <em>ορίζεται επαγωγικά</em> όταν έχουμε:</p>
+      <ul>
+        <li><strong>Βάση \(B\)</strong>: πεπερασμένο σύνολο βασικών στοιχείων.</li>
+        <li><strong>Κανόνες</strong>: κάθε κανόνας παίρνει υπάρχοντα στοιχεία του \(S\) και παράγει νέο.</li>
+      </ul>
+      <p>Το \(S\) ορίζεται ως το <em>ελάχιστο</em> σύνολο που κλείνεται ως προς τους κανόνες
+         και περιέχει \(B\). Κάθε \(x \in S\) έχει μια <em>εξαγωγή</em> (derivation tree):
+         ένα δένδρο που δείχνει ακριβώς πώς κατασκευάστηκε.</p>
+
+      <div class="callout callout-theorem">
+        <div class="callout-title">Αρχή Δομικής Επαγωγής (τυπικά)</div>
+        <p>Αν \(P(b)\) για κάθε \(b \in B\), και για κάθε κανόνα: αν \(P(x_1), \ldots, P(x_k)\) τότε \(P(R(x_1,\ldots,x_k))\),
+           τότε \(P(x)\) για κάθε \(x \in S\).</p>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Μαθηματική Επαγωγή ⊆ Δομική Επαγωγή</div>
+        <p>Το \(\mathbb{N}\): βάση \(\{0\}\), κανόνας \(n \mapsto n+1\). Η συνήθης επαγωγή
+           είναι δομική επαγωγή πάνω σε αυτή τη δομή.</p>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- §3 -->
+    <section id="sec-strings">
+      <h2 id="h-strings">3. Αλφάβητα και Συμβολοσειρές</h2>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμός — Αλφάβητο</div>
+        <p>Ένα <strong>αλφάβητο</strong> \(\Sigma\) είναι ένα πεπερασμένο μη-κενό σύνολο
+           (τα «σύμβολα» ή «χαρακτήρες»).</p>
+      </div>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Επαγωγικός Ορισμός του Σ*</div>
+        <p>Το \(\Sigma^*\) (σύνολο <strong>συμβολοσειρών</strong>) ορίζεται:</p>
+        <ul>
+          <li><strong>Βάση</strong>: \(\varepsilon \in \Sigma^*\) (κενή συμβολοσειρά, μήκος 0).</li>
+          <li><strong>Κανόνας</strong>: Αν \(w \in \Sigma^*\) και \(\sigma \in \Sigma\),
+              τότε \(w\sigma \in \Sigma^*\) (επέκταση με ένα σύμβολο).</li>
+        </ul>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Παραδείγματα</div>
+        <table>
+          <thead><tr><th>Αλφάβητο</th><th>Στοιχεία \(\Sigma^*\)</th></tr></thead>
+          <tbody>
+            <tr><td>\(\{0,1\}\)</td><td>\(\varepsilon,\ 0,\ 1,\ 00,\ 01,\ 10,\ 11,\ 000,\ldots\)</td></tr>
+            <tr><td>\(\{α,β,\ldots,ω\}\)</td><td>\(\varepsilon,\ α,\ αβ,\ \text{ευρηκα},\ldots\)</td></tr>
+            <tr><td>ASCII</td><td>κάθε πρόγραμμα, κείμενο, HTML αρχείο, …</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <section id="sec-length">
+        <h3 id="h-length">3.1 Μήκος Συμβολοσειράς</h3>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Επαγωγικός Ορισμός Μήκους \(\ell\)</div>
+          <ul>
+            <li>\(\ell(\varepsilon) = 0\)</li>
+            <li>\(\ell(w\sigma) = \ell(w) + 1\) για κάθε \(w \in \Sigma^*,\, \sigma \in \Sigma\)</li>
+          </ul>
+        </div>
+
+        <p>Παράδειγμα: \(\ell(\text{"αβγ"}) = \ell(\text{"αβ"}\cdot\text{γ}) = \ell(\text{"αβ"})+1 = \ell(\text{"α"})+1+1 = \ell(\varepsilon)+3 = 3\).</p>
+      </section>
+
+      <section id="sec-concat">
+        <h3 id="h-concat">3.2 Παράθεση και Ιδιότητά της</h3>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Επαγωγικός Ορισμός Παράθεσης \(w_1 \circ w_2\)</div>
+          <ul>
+            <li>\(w_1 \circ \varepsilon = w_1\)</li>
+            <li>\(w_1 \circ (w_2\sigma) = (w_1 \circ w_2)\sigma\) για \(\sigma \in \Sigma\)</li>
+          </ul>
+        </div>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Πρόταση — Μήκος Παράθεσης</div>
+          \[ \ell(x \circ y) = \ell(x) + \ell(y) \quad \forall x, y \in \Sigma^* \]
+        </div>
+
+        <div class="callout callout-proof">
+          <div class="callout-title">Απόδειξη — Δομική Επαγωγή στο y</div>
+          <details open>
+            <summary>Προβολή απόδειξης</summary>
+            <div class="proof-body">
+              <p>Σταθεροποιούμε αυθαίρετο \(x \in \Sigma^*\). Επαγωγή στο \(y\).</p>
+
+              <p><strong>Βάση</strong> \((y = \varepsilon)\):</p>
+              \[ \ell(x \circ \varepsilon) = \ell(x) = \ell(x) + 0 = \ell(x) + \ell(\varepsilon). \quad \checkmark \]
+
+              <p><strong>Επαγωγικό Βήμα</strong> \((y = z\sigma,\; z \in \Sigma^*,\; \sigma \in \Sigma)\):</p>
+              <p>ΥΕ: \(\ell(x \circ z) = \ell(x) + \ell(z)\).</p>
+              \[\begin{align}
+                \ell(x \circ (z\sigma))
+                  &= \ell\!\bigl((x \circ z)\sigma\bigr)    &\text{(ορισμός } \circ \text{)}\\
+                  &= \ell(x \circ z) + 1                    &\text{(ορισμός } \ell \text{)}\\
+                  &= \ell(x) + \ell(z) + 1                  &\text{(ΥΕ)}\\
+                  &= \ell(x) + \ell(z\sigma).               &\text{(ορισμός } \ell \text{)}\quad\square
+              \end{align}\]
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Γιατί επαγωγή στο y και όχι στο x;</div>
+          <p>Ο ορισμός της \(\circ\) είναι επαγωγικός ως προς το <em>δεξιό</em> όρισμα \(y\).
+             Επομένως η φυσική επαγωγή είναι επί \(y\), και το \(x\) παραμένει παθητικό.</p>
+        </div>
+      </section>
+    </section>
+
+    <hr>
+
+    <!-- §4 -->
+    <section id="sec-languages">
+      <h2 id="h-languages">4. Γλώσσες</h2>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμός — Γλώσσα</div>
+        <p>Μια <strong>γλώσσα</strong> \(L\) πάνω από \(\Sigma\) είναι οποιοδήποτε
+           \(L \subseteq \Sigma^*\).</p>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Παραδείγματα Γλωσσών</div>
+        <table>
+          <thead><tr><th>Γλώσσα</th><th>Είδος</th></tr></thead>
+          <tbody>
+            <tr><td>Συμβολοσειρές δεκαδικών αριθμών που αρχίζουν από μονό ψηφίο</td><td>Κανονική</td></tr>
+            <tr><td>Λέξεις ελληνικής γλώσσας (λεξικό)</td><td>Πεπερασμένη</td></tr>
+            <tr><td>Σωστά C προγράμματα</td><td>Context-free (περίπου)</td></tr>
+            <tr><td>Προγράμματα που τερματίζουν</td><td>Μη αναγνωρίσιμη (Turing)</td></tr>
+            <tr><td>\(\emptyset\) (κενή)</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Γλώσσα ≠ Σύνολο Αριθμών</div>
+        <p>Το \(\{11, 100\}\) ως <em>γλώσσα</em> πάνω από \(\{0,1\}\) περιέχει
+           τις συμβολοσειρές «11» και «100» (μήκη 2 και 3).
+           Ως <em>σύνολο αριθμών</em> θα ήταν \(\{11, 100\}\) (δεκαδικά).
+           Η διάκριση είναι κρίσιμη στη θεωρία υπολογισμού, όπου τα προβλήματα κωδικοποιούνται ως γλώσσες.</p>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- §5 -->
+    <section id="sec-balanced">
+      <h2 id="h-balanced">5. Γλώσσα με Ίσο Αριθμό 0 και 1</h2>
+
+      <p>Θέλουμε να χαρακτηρίσουμε το σύνολο
+         \(B = \{w \in \{0,1\}^* \mid \#_0(w) = \#_1(w)\}\).
+         Το ορίζουμε επαγωγικά ως \(L\) και δείχνουμε \(L = B\).</p>
+
+      <section id="sec-bal-def">
+        <h3 id="h-bal-def">5.1 Επαγωγικός Ορισμός της L</h3>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Γλώσσα L ⊆ {0,1}*</div>
+          <ul>
+            <li><strong>Βάση</strong>: \(\varepsilon \in L\).</li>
+            <li><strong>Κανόνας 1</strong>: Αν \(w, v \in L\), τότε \(0w1v \in L\).</li>
+            <li><strong>Κανόνας 2</strong>: Αν \(w, v \in L\), τότε \(1w0v \in L\).</li>
+          </ul>
+        </div>
+
+        <p>Κατασκευές: \(\varepsilon \in L\), οπότε \(01 = 0\varepsilon 1\varepsilon \in L\),
+           \(10 = 1\varepsilon 0\varepsilon \in L\), \(0011 = 0\cdot\varepsilon\cdot 1\cdot 01 \in L\),
+           \(0110 = 0\cdot 01\cdot 1\cdot \varepsilon \in L\).</p>
+      </section>
+
+      <section id="sec-bal-fwd">
+        <h3 id="h-bal-fwd">5.2 Πρόταση: L ⊆ B</h3>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Πρόταση — Κάθε στοιχείο του L έχει ίσα 0 και 1</div>
+          <p>Αν \(w \in L\), τότε \(\#_0(w) = \#_1(w)\).</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <div class="callout-title">Απόδειξη — Δομική Επαγωγή</div>
+          <details open>
+            <summary>Προβολή απόδειξης</summary>
+            <div class="proof-body">
+              <p>Ορίζουμε \(P(w)\) = «\(\#_0(w) = \#_1(w)\)».</p>
+              <p><strong>Βάση</strong> \((w = \varepsilon)\): \(\#_0 = \#_1 = 0\). ✓</p>
+              <p><strong>Βήμα Κανόνα 1</strong> \((u = 0w1v)\): ΥΕ: \(\#_0(w) = \#_1(w)\) και \(\#_0(v) = \#_1(v)\).</p>
+              \[\begin{align}
+                \#_0(u) &= 1 + \#_0(w) + \#_0(v)\\
+                \#_1(u) &= \#_1(w) + 1 + \#_1(v)
+              \end{align}\]
+              <p>Από ΥΕ: \(\#_0(w) = \#_1(w)\) και \(\#_0(v) = \#_1(v)\),
+                 οπότε \(\#_0(u) = \#_1(u)\). ✓</p>
+              <p><strong>Βήμα Κανόνα 2</strong>: Συμμετρικά. ✓ \(\square\)</p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="sec-bal-rev">
+        <h3 id="h-bal-rev">5.3 Αντίστροφη: B ⊆ L</h3>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Πρόταση — Κάθε ισοκατανεμημένη ∈ L</div>
+          <p>Αν \(u \in \{0,1\}^*\) με \(\#_0(u) = \#_1(u)\), τότε \(u \in L\).</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <div class="callout-title">Απόδειξη — Ισχυρή Επαγωγή στο μήκος</div>
+          <details open>
+            <summary>Προβολή απόδειξης</summary>
+            <div class="proof-body">
+              <p>Ορίζουμε τη <strong>συνάρτηση ισορροπίας</strong>:
+                 \(b(k) = \#_1(u[1..k]) - \#_0(u[1..k])\),
+                 τη διαφορά πλήθους 1 και 0 στο πρόθεμα μήκους \(k\).
+                 Ισχύει \(b(0) = 0\) και \(b(\ell(u)) = 0\) (από υπόθεση).
+                 Κάθε βήμα αλλάζει \(b\) κατά \(\pm 1\).</p>
+
+              <p>Επαγωγή στο \(n = \ell(u)\).</p>
+              <p><em>Βάση</em> \(n = 0\): \(u = \varepsilon \in L\). ✓</p>
+              <p><em>Βήμα</em>: Έστω \(u \neq \varepsilon\) και ΥΕ ισχύει για όλες τις μικρότερες ισοκατανεμημένες.</p>
+
+              <ul>
+                <li>Αναζητούμε \(k^* = \min\{k : 1 \le k < n,\; b(k) = 0\}\).</li>
+                <li><em>Αν δεν υπάρχει τέτοιο \(k^*\)</em>: η \(b\) μηδενίζεται μόνο στα άκρα.
+                    Αναλόγως αν \(u[1] = 0\) (τότε \(b(1) = -1 < 0\)):
+                    αναζητούμε \(k^* = \min\{k : b(k) = 0,\; u[k]=1\}\).
+                    Γράφουμε \(u = 0 \cdot w \cdot 1 \cdot v\) όπου \(w = u[2..k^*-1]\) και \(v = u[k^*+1..n]\).
+                    Ισχύει \(\#_0(w) = \#_1(w)\) και \(\#_0(v) = \#_1(v)\) (αφού \(b\) δεν μηδενίζεται ενδιάμεσα).
+                    Από ΥΕ: \(w, v \in L\), οπότε \(u = 0w1v \in L\) (Κανόνας 1). ✓</li>
+                <li><em>Αν υπάρχει \(k^*\)</em>: \(u = u_1 \cdot u_2\) με \(\ell(u_1) = k^*\),
+                    και τα \(u_1, u_2\) είναι ισοκατανεμημένα με μήκη \(< n\).
+                    Από ΥΕ: \(u_1, u_2 \in L\).
+                    Αλλά κάθε \(w_1, w_2 \in L\) με \(w_1 w_2 = u\) δεν αρκεί απ' ευθείας.
+                    Εφαρμόζουμε αναδρομικά: αν \(u_1[1]=0\), γράφουμε \(u_1 = 0 w' 1 v'\) (αφού \(u_1\in L\))
+                    και \(u = 0 w' 1 (v' u_2)\) — ελέγχουμε ότι \(v' u_2 \in L\) και εφαρμόζουμε Κανόνα 1. ✓</li>
+              </ul>
+              <p>Ομοίως αν \(u[1]=1\) (Κανόνας 2). \(\square\)</p>
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Διάγραμμα b(k) για u = 001011</div>
+          <pre style="font-family:monospace;line-height:2">
+  b(k)
+  0 |*- - - - - - - - - - - - - - - *
+ -1 |    *               *
+ -2 |        *       *
+    +----+----+----+----+----+----+--→ k
+    0    1    2    3    4    5    6
+u :      0    0    1    0    1    1
+          </pre>
+          <p>Η \(b\) αρχίζει και τελειώνει στο 0, επιστρέφει στο 0 μόνο στο \(k=6\) (τέλος).
+             Βρίσκουμε \(k^* = 6\) (το τελευταίο 1 που επαναφέρει \(b=0\)), δηλαδή
+             \(u = 0 \cdot \text{"0101"} \cdot 1 \cdot \varepsilon\), και επαληθεύουμε \(0101 \in L\).</p>
+        </div>
+      </section>
+    </section>
+
+    <hr>
+
+    <!-- §6 -->
+    <section id="sec-bst">
+      <h2 id="h-bst">6. Κανονικά Δυαδικά Δένδρα (ΚΔΔ)</h2>
+
+      <section id="sec-bst-def">
+        <h3 id="h-bst-def">6.1 Ορισμός</h3>
+
+        <p>Ο <em>σχολικός</em> ορισμός («κάθε κόμβος έχει 0 ή 2 παιδιά») είναι δύσκολος για αποδείξεις.
+           Ο επαγωγικός ορισμός ακολουθεί τη δομή απευθείας:</p>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Επαγωγικός Ορισμός ΚΔΔ</div>
+          <ul>
+            <li><strong>Βάση</strong>: Ένας μεμονωμένος κόμβος \(\bullet\) (φύλλο) είναι ΚΔΔ.</li>
+            <li><strong>Κανόνας</strong>: Αν \(T_1\) και \(T_2\) είναι ΚΔΔ και \(r\) νέος κόμβος,
+                τότε το δένδρο \(T = r(T_1, T_2)\) (ρίζα \(r\), αριστερό \(T_1\), δεξί \(T_2\)) είναι ΚΔΔ.</li>
+          </ul>
+        </div>
+
+        <div class="mermaid" aria-label="Παράδειγμα ΚΔΔ ύψους 2">
+graph TD
+    r["r"] --> T1
+    r --> T2
+    T1["φύλλο α"]
+    T2["φύλλο β"]
+    style r fill:#1a3a6e,color:#fff
+        </div>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Πλήθος Κόμβων n(T) και Ύψος h(T)</div>
+          <table>
+            <thead><tr><th></th><th>Φύλλο \(\bullet\)</th><th>Κόμβος \(r(T_1,T_2)\)</th></tr></thead>
+            <tbody>
+              <tr><td>\(n(T)\)</td><td>\(1\)</td><td>\(1 + n(T_1) + n(T_2)\)</td></tr>
+              <tr><td>\(h(T)\)</td><td>\(0\)</td><td>\(1 + \max(h(T_1), h(T_2))\)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="sec-bst-prop">
+        <h3 id="h-bst-prop">6.2 Πρόταση: n(T) ≤ 2^(h(T)+1) − 1</h3>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα — Φράγμα Κόμβων ΚΔΔ</div>
+          <p>Για κάθε ΚΔΔ \(T\):</p>
+          \[ n(T) \le 2^{h(T)+1} - 1. \]
+          <p>Ισότητα όταν και μόνον όταν το \(T\) είναι <em>πλήρες</em> (κάθε εσωτερικός κόμβος έχει ακριβώς 2 παιδιά, κάθε επίπεδο γεμάτο).</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <div class="callout-title">Απόδειξη — Δομική Επαγωγή</div>
+          <details open>
+            <summary>Προβολή απόδειξης</summary>
+            <div class="proof-body">
+              <p><strong>Βάση</strong> \((T = \bullet)\):
+                 \(n(T) = 1\) και \(2^{0+1}-1 = 1\). Ισχύει. ✓</p>
+              <p><strong>Επαγωγικό Βήμα</strong> \((T = r(T_1, T_2))\):
+                 Έστω \(h_1 = h(T_1)\) και \(h_2 = h(T_2)\).</p>
+              <p>ΥΕ: \(n(T_1) \le 2^{h_1+1}-1\) και \(n(T_2) \le 2^{h_2+1}-1\).</p>
+              \[\begin{align}
+                n(T) &= 1 + n(T_1) + n(T_2)\\
+                     &\le 1 + (2^{h_1+1}-1) + (2^{h_2+1}-1)\\
+                     &= 2^{h_1+1} + 2^{h_2+1} - 1\\
+                     &\le 2 \cdot 2^{\max(h_1,h_2)+1} - 1 \quad (\text{αφού } 2^a + 2^b \le 2 \cdot 2^{\max(a,b)})\\
+                     &= 2^{\max(h_1,h_2)+2} - 1\\
+                     &= 2^{h(T)+1} - 1. \quad \square
+              \end{align}\]
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Πόρισμα: Κάτω Φράγμα Ύψους</div>
+          <p>Αν \(n(T) = n\), τότε \(h(T) \ge \lceil \log_2(n+1) \rceil - 1 = \Omega(\log n)\).</p>
+          <p>Αυτό χρησιμοποιείται για να αποδείξουμε ότι τα balanced BST (AVL, Red-Black)
+             έχουν ύψος \(O(\log n)\), οπότε αναζήτηση/εισαγωγή είναι \(O(\log n)\).</p>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Ακραίες Περιπτώσεις</div>
+          <table>
+            <thead><tr><th>Δένδρο</th><th>\(n(T)\)</th><th>\(h(T)\)</th><th>Σχέση</th></tr></thead>
+            <tbody>
+              <tr><td>Πλήρες ύψους \(k\)</td><td>\(2^{k+1}-1\)</td><td>\(k\)</td><td>Ισότητα</td></tr>
+              <tr><td>Αλυσίδα (μόνο ριζικοί κόμβοι)</td><td>\(n\)</td><td>\(n-1\)</td><td>\(n \ll 2^n-1\)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <hr>
+
+    <!-- ΑΣΚΗΣΕΙΣ -->
+    <section id="sec-exercises">
+      <h2 id="h-exercises">Ασκήσεις</h2>
+      <div class="callout callout-exam">
+        <div class="callout-title">Ασκήσεις Πρακτικής</div>
+        <ol>
+          <li>Ορίστε επαγωγικά το σύνολο \(E\) των άρτιων φυσικών αριθμών και αποδείξτε \(E = \{2k \mid k \in \mathbb{N}\}\) με διπλό εγκλεισμό.</li>
+          <li>Αποδείξτε με δομική επαγωγή ότι η παράθεση \(\circ\) είναι προσεταιριστική:
+              \((x \circ y) \circ z = x \circ (y \circ z)\) για κάθε \(x,y,z \in \Sigma^*\).</li>
+          <li>Ορίστε επαγωγικά το αντίστροφο \(\mathrm{rev}(w)\) μιας συμβολοσειράς
+              και αποδείξτε \(\ell(\mathrm{rev}(w)) = \ell(w)\).</li>
+          <li>Αποδείξτε ότι το σύνολο \(P\) των σωστά παρενθεσιασμένων εκφράσεων
+              (\(\varepsilon \in P\), αν \(u,v \in P\) τότε \((u)v \in P\))
+              έχει σε κάθε \(w \in P\) ίσο πλήθος '(' και ')'. </li>
+          <li>Για ΚΔΔ \(T\), ορίστε επαγωγικά το πλήθος φύλλων \(\lambda(T)\)
+              και αποδείξτε \(\lambda(T) = (n(T)+1)/2\).</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ΕΡΩΤΗΣΕΙΣ ΕΞΕΤΑΣΕΩΝ -->
+    <section id="sec-exam">
+      <h2 id="h-exam">Συχνές Ερωτήσεις Εξετάσεων</h2>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 1</div>
+        <p>Τι είναι η δομική επαγωγή; Πώς διαφέρει από τη μαθηματική επαγωγή;</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Η δομική επαγωγή αποδεικνύει ιδιότητες για στοιχεία επαγωγικά ορισμένου συνόλου
+               ακολουθώντας τη δομή του ορισμού: βάση + κανόνες. Η μαθηματική επαγωγή είναι ειδική περίπτωση
+               (σύνολο \(\mathbb{N}\) με κανόνα \(n \mapsto n+1\)). Δομική επαγωγή χρησιμοποιείται
+               για συμβολοσειρές, δένδρα, γλώσσες κ.λπ.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 2</div>
+        <p>Αποδείξτε \(\ell(x \circ y) = \ell(x) + \ell(y)\) με δομική επαγωγή στο \(y\).</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Βάση \(y=\varepsilon\): \(\ell(x\circ\varepsilon)=\ell(x)=\ell(x)+\ell(\varepsilon)\). ✓
+               Βήμα \(y=z\sigma\) (ΥΕ: \(\ell(x\circ z)=\ell(x)+\ell(z)\)):
+               \(\ell(x\circ z\sigma)=\ell((x\circ z)\sigma)=\ell(x\circ z)+1=\ell(x)+\ell(z)+1=\ell(x)+\ell(z\sigma)\). ✓</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 3</div>
+        <p>Αποδείξτε ότι κάθε \(w \in L\) (γλώσσα ίσων 0,1) έχει \(\#_0(w) = \#_1(w)\).</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Δομική επαγωγή. Βάση: \(\varepsilon\), \(\#_0=\#_1=0\). Βήμα κανόνα 1 (\(u=0w1v\)):
+               \(\#_0(u)=1+\#_0(w)+\#_0(v)\stackrel{\text{ΥΕ}}{=}1+\#_1(w)+\#_1(v)=\#_1(u)\). Ομοίως κανόνας 2. ✓</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 4</div>
+        <p>Αποδείξτε \(n(T) \le 2^{h(T)+1} - 1\) με δομική επαγωγή στο ΚΔΔ \(T\).</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Βάση: φύλλο, \(1 \le 2^1-1=1\). Βήμα \(T=r(T_1,T_2)\) (ΥΕ: \(n(T_i)\le 2^{h_i+1}-1\)):
+               \(n(T)=1+n(T_1)+n(T_2)\le 1+(2^{h_1+1}-1)+(2^{h_2+1}-1)=2^{h_1+1}+2^{h_2+1}-1
+               \le 2\cdot 2^{\max(h_1,h_2)+1}-1=2^{h(T)+1}-1\). ✓</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 5</div>
+        <p>Εξηγήστε γιατί στον ορισμό \(L = B\) χρειάζεται <em>διπλός εγκλεισμός</em>
+           και ποια κατεύθυνση αποδεικνύεται με δομική (έναντι μαθηματικής) επαγωγή.</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>\(L \subseteq B\): δομική επαγωγή στη δομή κατασκευής του \(L\) (βάση + κανόνες 1,2).
+               \(B \subseteq L\): ισχυρή επαγωγή στο μήκος, με επιχείρημα μέσω της συνάρτησης \(b(k)\)
+               που βρίσκει τη θέση διάσπασης \(k^*\). Ο διπλός εγκλεισμός αποδεικνύει ισότητα
+               (αντί απλού \(L \subseteq B\)).</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 6</div>
+        <p>Τι σημαίνει ότι ο επαγωγικός ορισμός δίνει το <em>ελάχιστο</em> σύνολο;
+           Δώστε παράδειγμα όπου αυτό κάνει διαφορά.</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Σημαίνει ότι κανένα «επιπλέον» στοιχείο δεν ανήκει στο σύνολο αν δεν εξάγεται από τους κανόνες.
+               Π.χ. αν ορίσουμε \(S\) με βάση \(\{3\}\) και κανόνα \(x,y \mapsto x+y\):
+               αν δεν υπήρχε «ελαχιστότητα», τότε και το \(S = \mathbb{N}_{\ge 3}\) ικανοποιεί τους κανόνες
+               — αλλά εμείς θέλουμε μόνο τα πολλαπλάσια του 3. Η ελαχιστότητα αποκλείει το 4,5,7,…</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ── Lecture Navigation ── -->
+    <nav class="lecture-nav" aria-label="Πλοήγηση διαλέξεων">
+      <a href="lecture2.html" class="lecture-nav__btn">&#8592; Διάλεξη 2</a>
+      <span class="lecture-nav__current">Διάλεξη 3 / 8</span>
+      <a href="lecture4.html" class="lecture-nav__btn">Διάλεξη 4: Ύπαρξη &amp; Περιστερεώνας &#8594;</a>
+    </nav>
+
   </main>
+</div>
 
-  <footer>
-    <p>Σημειώσεις Μαθηματικών Πληροφορικής — ΕΚΠΑ</p>
-  </footer>
+<footer class="site-footer" role="contentinfo">
+  <p>
+    Σημειώσεις Μαθηματικών Πληροφορικής &mdash; ΕΚΠΑ &nbsp;|&nbsp;
+    <a href="../index.html">Αρχική</a> &nbsp;|&nbsp;
+    Τελευταία ενημέρωση: <time datetime="2026-05-22">22 Μαΐου 2026</time>
+  </p>
+</footer>
+
 </body>
 </html>
