@@ -3,33 +3,751 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Διάλεξη 1 — Υποθέσεις, Εικασίες, Θεωρήματα</title>
+  <meta name="description"
+        content="Διάλεξη 1 — Υποθέσεις, Εικασίες, Θεωρήματα. Χρυσή Τομή φ, Θεώρημα Beatty, Διάσημες Εικασίες, P vs NP.">
+  <title>Διάλεξη 1 — Υποθέσεις, Εικασίες, Θεωρήματα | Μαθ. Πληροφορικής ΕΚΠΑ</title>
   <link rel="stylesheet" href="../css/style.css">
+
   <script>
-    window.MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };
+    window.MathJax = {
+      tex: {
+        inlineMath:  [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        tags: 'ams',
+        macros: {
+          floor: ['\\lfloor #1 \\rfloor', 1],
+          N:     '\\mathbb{N}',
+          R:     '\\mathbb{R}',
+          Z:     '\\mathbb{Z}',
+          vp:    '\\varphi'
+        }
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+    };
+    (function () {
+      const t = localStorage.getItem('math-plir-theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <script src="../js/main.js" defer></script>
 </head>
 <body>
-  <header>
-    <h1>Διάλεξη 1 — Υποθέσεις, Εικασίες, Θεωρήματα</h1>
-    <a href="../index.html">← Αρχική</a>
-  </header>
 
-  <nav>
-    <a href="../index.html">Αρχική</a>
-    <span>|</span>
-    <a href="lecture2.html">Επόμενη →</a>
-  </nav>
+<!-- ════════════════════════════════════════════════
+     HEADER
+════════════════════════════════════════════════ -->
+<header class="site-header" role="banner">
+  <div class="site-header__inner">
+    <a href="../index.html" class="site-header__title">&#8469; Μαθηματικά Πληροφορικής</a>
+    <nav class="site-nav" aria-label="Κύρια πλοήγηση">
+      <a href="../index.html">Αρχική</a>
+      <a href="lecture1.html" aria-current="page">Διαλέξεις</a>
+      <a href="../topics/induction.html">Θέματα</a>
+      <a href="../exercises/solved.html">Ασκήσεις</a>
+      <a href="../exam-prep/formulas.html">Εξεταστική</a>
+    </nav>
+    <button id="theme-toggle" class="btn-theme-toggle"
+            aria-label="Εναλλαγή σκοτεινής λειτουργίας">
+      &#127769; Σκοτεινό
+    </button>
+  </div>
+</header>
 
-  <main>
-    <p><em>Placeholder — περιεχόμενο θα συμπληρωθεί.</em></p>
-  </main>
+<!-- ════════════════════════════════════════════════
+     PAGE WRAPPER: sidebar + main
+════════════════════════════════════════════════ -->
+<div class="page-wrapper">
 
-  <footer>
-    <p>Σημειώσεις Μαθηματικών Πληροφορικής — ΕΚΠΑ</p>
-  </footer>
+  <!-- ── Sidebar TOC ── -->
+  <aside class="sidebar-toc" aria-label="Περιεχόμενα σελίδας">
+    <button class="toc-toggle" aria-expanded="true">&#128203; Περιεχόμενα &#9662;</button>
+    <div class="sidebar-toc__title">Περιεχόμενα</div>
+    <ol class="sidebar-toc__list">
+      <li class="toc-h2"><a href="#sec-tldr">TL;DR</a></li>
+      <li class="toc-h2"><a href="#sec-hypothesis">1. Υπόθεση, Εικασία, Θεώρημα</a></li>
+      <li class="toc-h2"><a href="#sec-golden">2. Η Χρυσή Τομή &#966;</a>
+        <ol>
+          <li class="toc-h3"><a href="#sec-phi-props">Ιδιότητες του &#966;</a></li>
+          <li class="toc-h3"><a href="#sec-beatty">Θεώρημα Beatty</a></li>
+        </ol>
+      </li>
+      <li class="toc-h2"><a href="#sec-counterexample">3. Κατάρριψη — Αντιπαράδειγμα</a></li>
+      <li class="toc-h2"><a href="#sec-famous">4. Διάσημες Εικασίες</a></li>
+      <li class="toc-h2"><a href="#sec-pvsnp">5. P vs NP</a>
+        <ol>
+          <li class="toc-h3"><a href="#sec-sat">SAT και NP</a></li>
+          <li class="toc-h3"><a href="#sec-npcomplete">NP-πληρότητα</a></li>
+          <li class="toc-h3"><a href="#sec-reduction">Αναγωγές</a></li>
+        </ol>
+      </li>
+      <li class="toc-h2"><a href="#sec-exam">Ερωτήσεις Εξετάσεων</a></li>
+    </ol>
+  </aside>
+
+  <!-- ── Main Content ── -->
+  <main class="main-content" id="main-content">
+
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <div class="breadcrumbs__item"><a href="../index.html">Αρχική</a></div>
+      <div class="breadcrumbs__item"><a href="../index.html#lecture-cards">Διαλέξεις</a></div>
+      <div class="breadcrumbs__item">
+        <span class="breadcrumbs__current">Διάλεξη 1</span>
+      </div>
+    </nav>
+
+    <h1>Διάλεξη 1 &mdash; Υποθέσεις, Εικασίες, Θεωρήματα</h1>
+
+    <!-- ────────────────────────────────────────
+         TL;DR
+    ──────────────────────────────────────── -->
+    <section id="sec-tldr" aria-label="Σύνοψη">
+      <div class="callout callout-tldr">
+        <div class="callout-title">TL;DR</div>
+        <ul>
+          <li>Η μαθηματική γνώση χτίζεται ιεραρχικά: αξιώματα &rarr; ορισμοί &rarr; λήμματα &rarr; θεωρήματα.</li>
+          <li>Μια υπόθεση γίνεται <strong>θεώρημα</strong> μόνο με απόδειξη&middot;
+              χωρίς αυτήν παραμένει <strong>εικασία</strong> — ακόμα κι αν επαληθεύεται σε εκατομμύρια περιπτώσεις.</li>
+          <li><strong>Αρκεί ένα αντιπαράδειγμα</strong> για να καταρρίψει μια υπόθεση.</li>
+          <li>Το <strong>Θεώρημα Beatty</strong>: οι ακολουθίες \(\lfloor k\varphi \rfloor\) και
+              \(\lfloor k\varphi^2 \rfloor\) διαμερίζουν τους θετικούς ακεραίους.</li>
+          <li>Το <strong>P vs NP</strong> παραμένει το κορυφαίο ανοιχτό πρόβλημα Πληροφορικής&middot;
+              \(\text{SAT}\) είναι NP-πλήρες (Cook-Levin).</li>
+        </ul>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ────────────────────────────────────────
+         SECTION 1: Υπόθεση, Εικασία, Θεώρημα
+    ──────────────────────────────────────── -->
+    <section id="sec-hypothesis">
+      <h2 id="h-hypothesis">1. Υπόθεση, Εικασία, Θεώρημα</h2>
+
+      <p>Πριν μιλήσουμε για αποδείξεις, χρειαζόμαστε ένα κοινό λεξιλόγιο.
+         Τα μαθηματικά λειτουργούν σαν ένα οικοδόμημα: χτίζουμε νέες αλήθειες
+         πάνω σε παλιές, ακολουθώντας αυστηρή ιεραρχία.</p>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμός — Αξίωμα</div>
+        <p>Ένα <strong>αξίωμα</strong> (axiom) είναι μια πρόταση που δεχόμαστε ως αληθής
+           χωρίς απόδειξη. Αποτελεί τη θεμέλιο λίθο κάθε μαθηματικής θεωρίας.</p>
+        <p><em>Παράδειγμα (Ευκλείδης):</em> «Από δύο σημεία διέρχεται ακριβώς μία ευθεία.»</p>
+      </div>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμός — Ορισμός, Λήμμα, Θεώρημα, Πόρισμα</div>
+        <ul>
+          <li><strong>Ορισμός</strong> (definition): Δίνει ακριβές νόημα σε μια μαθηματική έννοια.</li>
+          <li><strong>Λήμμα</strong> (lemma): Βοηθητικό αποτέλεσμα που χρησιμοποιείται
+              για να αποδείξουμε κάτι μεγαλύτερο.</li>
+          <li><strong>Θεώρημα</strong> (theorem): Σημαντική πρόταση που έχει <em>αποδειχθεί</em>.</li>
+          <li><strong>Πόρισμα</strong> (corollary): Αποτέλεσμα που προκύπτει άμεσα από θεώρημα.</li>
+        </ul>
+      </div>
+
+      <p>Η ροή της μαθηματικής έρευνας είναι συνήθως:</p>
+
+      <div class="mermaid">
+flowchart LR
+    A["🔭 Παρατήρηση<br/>σε παραδείγματα"] --> B["💡 Υπόθεση<br/>(conjecture)"]
+    B --> C{"Απόδειξη;<br/>Αντιπαράδειγμα;"}
+    C -- "Βρέθηκε απόδειξη" --> D["✅ Θεώρημα"]
+    C -- "Βρέθηκε<br/>αντιπαράδειγμα" --> E["❌ Λανθασμένη<br/>υπόθεση"]
+    C -- "Ούτε το ένα<br/>ούτε το άλλο" --> F["❓ Εικασία<br/>(open problem)"]
+      </div>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμός — Εικασία</div>
+        <p>Μια <strong>εικασία</strong> (conjecture) είναι μια πρόταση για την οποία:</p>
+        <ul>
+          <li>υπάρχει ισχυρή αριθμητική ή άλλη ένδειξη ότι ισχύει,</li>
+          <li>αλλά <em>δεν έχει αποδειχθεί ούτε έχει βρεθεί αντιπαράδειγμα</em>.</li>
+        </ul>
+        <p>Αρκεί <strong>ένα μόνο αντιπαράδειγμα</strong> για να τη διαψεύσουμε.
+           Αντίθετα, δεν αρκεί πεπερασμένο πλήθος επαληθεύσεων για να τη «αποδείξουμε».</p>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Προσοχή</div>
+        <p>Το γεγονός ότι μια πρόταση ισχύει για τις πρώτες 10, 1000 ή
+           \(10^{100}\) περιπτώσεις <strong>δεν αποτελεί απόδειξη</strong>.
+           Θα δούμε παρακάτω ότι το \(n^2 + n + 41\) είναι πρώτος για τα
+           πρώτα 40 θετικά ακέραια — αλλά όχι για το 41ο.</p>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ────────────────────────────────────────
+         SECTION 2: Χρυσή Τομή
+    ──────────────────────────────────────── -->
+    <section id="sec-golden">
+      <h2 id="h-golden">2. Η Χρυσή Τομή \(\varphi\)</h2>
+
+      <p>Η χρυσή τομή εμφανίζεται σε γεωμετρία, τέχνη, φυσική και — ενδιαφέρον για εμάς —
+         σε αριθμοθεωρητικές κατανομές των φυσικών αριθμών.</p>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμός — Χρυσή Τομή</div>
+        <p>Η <strong>χρυσή τομή</strong> ορίζεται ως η θετική λύση της εξίσωσης
+           \(x^2 = x + 1\):</p>
+        \[
+          \varphi = \frac{1 + \sqrt{5}}{2} \approx 1{,}6180339\ldots
+        \]
+      </div>
+
+      <section id="sec-phi-props">
+        <h3 id="h-phi-props">2.1 Βασικές Ιδιότητες του \(\varphi\)</h3>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα — Ιδιότητες Χρυσής Τομής</div>
+          <ol>
+            <li>\(\varphi^2 = \varphi + 1\)</li>
+            <li>\(\dfrac{1}{\varphi} = \varphi - 1 = \dfrac{\sqrt{5}-1}{2} \approx 0{,}618\)</li>
+            <li>\(\dfrac{1}{\varphi} + \dfrac{1}{\varphi^2} = 1\)</li>
+          </ol>
+        </div>
+
+        <div class="callout callout-proof">
+          <details>
+            <summary>Απόδειξη ιδιοτήτων</summary>
+            <div class="proof-body">
+              <p><strong>(1)</strong> Άμεση επαλήθευση:</p>
+              \[
+                \varphi^2 = \left(\frac{1+\sqrt{5}}{2}\right)^2
+                          = \frac{1 + 2\sqrt{5} + 5}{4}
+                          = \frac{6 + 2\sqrt{5}}{4}
+                          = \frac{3 + \sqrt{5}}{2}
+                          = \frac{1 + \sqrt{5}}{2} + 1
+                          = \varphi + 1.
+              \]
+              <p><strong>(2)</strong> Από \(\varphi^2 = \varphi + 1\) διαιρούμε δι' \(\varphi\):
+                 \(\varphi = 1 + 1/\varphi\), άρα \(1/\varphi = \varphi - 1 = (\sqrt{5}-1)/2\).</p>
+              <p><strong>(3)</strong>
+              \[
+                \frac{1}{\varphi} + \frac{1}{\varphi^2}
+                = \frac{\varphi + 1}{\varphi^2}
+                = \frac{\varphi^2}{\varphi^2} = 1,
+              \]
+              χρησιμοποιώντας \(\varphi + 1 = \varphi^2\) από (1). \(\qquad\square\)
+              </p>
+              <span class="qed"></span>
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Παράδειγμα — Πρώτες τιμές</div>
+          <p>Υπολογίζουμε τα \(\lfloor k\varphi \rfloor\) και \(\lfloor k\varphi^2 \rfloor\)
+             για \(k = 1, 2, \ldots, 8\):</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>\(k\)</th>
+                  <th>\(k\varphi\)</th>
+                  <th>\(\lfloor k\varphi \rfloor\)</th>
+                  <th>\(k\varphi^2\)</th>
+                  <th>\(\lfloor k\varphi^2 \rfloor\)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>1,618</td><td><strong>1</strong></td><td>2,618</td><td><strong>2</strong></td></tr>
+                <tr><td>2</td><td>3,236</td><td><strong>3</strong></td><td>5,236</td><td><strong>5</strong></td></tr>
+                <tr><td>3</td><td>4,854</td><td><strong>4</strong></td><td>7,854</td><td><strong>7</strong></td></tr>
+                <tr><td>4</td><td>6,472</td><td><strong>6</strong></td><td>10,472</td><td><strong>10</strong></td></tr>
+                <tr><td>5</td><td>8,090</td><td><strong>8</strong></td><td>13,090</td><td><strong>13</strong></td></tr>
+                <tr><td>6</td><td>9,708</td><td><strong>9</strong></td><td>15,708</td><td><strong>15</strong></td></tr>
+                <tr><td>7</td><td>11,326</td><td><strong>11</strong></td><td>18,326</td><td><strong>18</strong></td></tr>
+                <tr><td>8</td><td>12,944</td><td><strong>12</strong></td><td>20,944</td><td><strong>20</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Οι τιμές \(\{1,3,4,6,8,9,11,12,\ldots\}\) και \(\{2,5,7,10,13,15,18,20,\ldots\}\)
+             είναι ξένες μεταξύ τους και καλύπτουν μαζί τους \(\mathbb{N}^+\).
+             Αυτό είναι το Θεώρημα Beatty.</p>
+        </div>
+      </section>
+
+      <section id="sec-beatty">
+        <h3 id="h-beatty">2.2 Θεώρημα Beatty</h3>
+
+        <p>Το θεώρημα Beatty γενικεύει την παρατήρηση για \(\varphi\) σε <em>οποιαδήποτε</em>
+           ζεύγη αρρήτων αριθμών με άθροισμα αντίστροφων = 1.</p>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα Beatty (1926)</div>
+          <p>Έστω \(r, s > 1\) θετικοί άρρητοι αριθμοί με
+             \[\frac{1}{r} + \frac{1}{s} = 1.\]
+             Τότε οι ακολουθίες
+             \[A = \{\lfloor r \rfloor, \lfloor 2r \rfloor, \lfloor 3r \rfloor, \ldots\}
+             \quad \text{και} \quad
+             B = \{\lfloor s \rfloor, \lfloor 2s \rfloor, \lfloor 3s \rfloor, \ldots\}\]
+             αποτελούν <strong>διαμέριση</strong> του \(\mathbb{N}^+ = \{1, 2, 3, \ldots\}\),
+             δηλαδή \(A \cap B = \emptyset\) και \(A \cup B = \mathbb{N}^+\).</p>
+          <p><em>Εφαρμογή για \(\varphi\):</em> Παίρνουμε \(r = \varphi\), \(s = \varphi^2 = \varphi + 1\),
+             και επαληθεύουμε \(1/\varphi + 1/\varphi^2 = 1\) (ιδιότητα 3 παραπάνω).</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <details>
+            <summary>Απόδειξη Θεωρήματος Beatty</summary>
+            <div class="proof-body">
+              <p>Αποδεικνύουμε τα δύο μέρη ξεχωριστά.</p>
+
+              <p><strong>Βήμα 1: \(A \cap B = \emptyset\).</strong></p>
+              <p>Έστω, για αντίφαση, \(\lfloor pr \rfloor = \lfloor qs \rfloor = m\)
+                 για κάποιους \(p, q \in \mathbb{N}^+\).
+                 Επειδή \(r\) και \(s\) είναι άρρητοι, τα \(pr\) και \(qs\)
+                 δεν είναι ακέραιοι, οπότε:</p>
+              \[ m < pr < m+1 \quad \text{και} \quad m < qs < m+1. \]
+              <p>Διαιρώντας:</p>
+              \[
+                \frac{m}{r} < p < \frac{m+1}{r}
+                \quad \text{και} \quad
+                \frac{m}{s} < q < \frac{m+1}{s}.
+              \]
+              <p>Προσθέτουμε τις ανισότητες:</p>
+              \[
+                m\!\left(\frac{1}{r}+\frac{1}{s}\right) < p+q < (m+1)\!\left(\frac{1}{r}+\frac{1}{s}\right)
+                \;\Longrightarrow\;
+                m < p + q < m + 1.
+              \]
+              <p>Άτοπο, αφού \(p+q\) είναι ακέραιος.</p>
+
+              <p><strong>Βήμα 2: \(A \cup B = \mathbb{N}^+\).</strong></p>
+              <p>Ορίζουμε \(A_n = \{a \in A : a \le n\}\) και \(B_n = \{b \in B : b \le n\}\).
+                 Θα δείξουμε \(|A_n| + |B_n| = n\).</p>
+              <p>Παρατηρούμε:</p>
+              \[
+                |A_n|
+                = \#\{k \ge 1 : \lfloor kr \rfloor \le n\}
+                = \#\{k \ge 1 : kr < n+1\}
+                = \#\{k \ge 1 : k < \tfrac{n+1}{r}\}
+                = \left\lfloor \frac{n+1}{r} \right\rfloor,
+              \]
+              <p>όπου χρησιμοποιήσαμε ότι \((n+1)/r\) είναι άρρητος (άρα ουδέποτε ακέραιος),
+                 και ομοίως \(|B_n| = \lfloor (n+1)/s \rfloor\).</p>
+              <p>Θέτουμε \(M = n+1\). Αρκεί να δείξουμε \(\lfloor M/r \rfloor + \lfloor M/s \rfloor = M-1\).
+                 Έχουμε:</p>
+              \[
+                \frac{M}{r} + \frac{M}{s} = M\!\left(\frac{1}{r}+\frac{1}{s}\right) = M.
+              \]
+              <p>Άρα
+                 \(\lfloor M/r\rfloor + \lfloor M/s\rfloor = M - \bigl(\{M/r\} + \{M/s\}\bigr)\).
+                 Το άθροισμα κλασματικών μερών πρέπει να είναι ακέραιος (η αριστερά πλευρά είναι ακέραιος).
+                 Επειδή \(r,s\) είναι άρρητοι: \(0 < \{M/r\} < 1\) και \(0 < \{M/s\} < 1\),
+                 άρα \(\{M/r\} + \{M/s\} = 1\), και:</p>
+              \[
+                |A_n| + |B_n| = \left\lfloor\frac{n+1}{r}\right\rfloor + \left\lfloor\frac{n+1}{s}\right\rfloor = (n+1) - 1 = n.
+              \]
+              <p>Εφόσον \(A_n, B_n\) ξένα, περιέχουν αριθμούς \(\le n\), και \(|A_n|+|B_n|=n\),
+                 συνάγεται \(A_n \cup B_n = \{1,\ldots,n\}\) για κάθε \(n\).</p>
+              <span class="qed"></span>
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-exam">
+          <div class="callout-title">Συχνή ερώτηση εξετάσεων</div>
+          <p>Το Θεώρημα Beatty χρησιμοποιεί <em>μόνο</em> τις ιδιότητες:</p>
+          <ol>
+            <li>\(1/r + 1/s = 1\) (αρκεί ακριβώς αυτό)</li>
+            <li>\(r\) και \(s\) είναι άρρητοι (ώστε \(\lfloor kr \rfloor\) και \(kr\) να μη συμπίπτουν)</li>
+          </ol>
+          <p>Το ότι \(r = \varphi\) δεν παίζει ειδικό ρόλο στην απόδειξη.
+             Μπορείτε να δώσετε άλλο ζεύγος; Π.χ. \(r = \sqrt{2}\), \(s = 2 + \sqrt{2}\).</p>
+        </div>
+      </section>
+    </section>
+
+    <hr>
+
+    <!-- ────────────────────────────────────────
+         SECTION 3: Αντιπαράδειγμα
+    ──────────────────────────────────────── -->
+    <section id="sec-counterexample">
+      <h2 id="h-counterexample">3. Κατάρριψη Υπόθεσης &mdash; Αντιπαράδειγμα</h2>
+
+      <p>Ένα αντιπαράδειγμα είναι μια συγκεκριμένη περίπτωση στην οποία η υπόθεση αποτυγχάνει.
+         Ένα μόνο αρκεί για να την ανατρέψει ολοκληρωτικά.</p>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Παράδειγμα 1 — n² + n + 41</div>
+        <p>Παρατηρούμε ότι η έκφραση \(f(n) = n^2 + n + 41\) δίνει πρώτο αριθμό
+           για \(n = 0, 1, 2, \ldots, 39\):</p>
+        \[
+          f(0)=41,\; f(1)=43,\; f(2)=47,\; f(3)=53,\;\ldots,\; f(39)=1601.
+        \]
+        <p>Θα μπορούσαμε να εικάσουμε: «\(f(n)\) είναι πρώτος για κάθε \(n \ge 0\).»</p>
+        <p><strong>Αντιπαράδειγμα:</strong> \(n = 40\):</p>
+        \[
+          f(40) = 40^2 + 40 + 41 = 1600 + 40 + 41 = 1681 = 41^2.
+        \]
+        <p>Σαφώς σύνθετος. Η εικασία καταρρίπτεται.</p>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Παράδειγμα 2 — Ψευδής ισότητα ακέραιων μερών</div>
+        <p><strong>Υπόθεση:</strong> Για κάθε \(n, k \in \mathbb{Z}\) ισχύει
+           \(\left\lfloor \dfrac{n+k}{2} \right\rfloor = \left\lfloor \dfrac{n}{2} \right\rfloor + \left\lfloor \dfrac{k}{2} \right\rfloor\).</p>
+        <p><strong>Αντιπαράδειγμα:</strong> \(n = k = 1\):</p>
+        \[
+          \left\lfloor \frac{1+1}{2} \right\rfloor = \lfloor 1 \rfloor = 1,
+          \quad \text{αλλά} \quad
+          \left\lfloor \frac{1}{2} \right\rfloor + \left\lfloor \frac{1}{2} \right\rfloor = 0 + 0 = 0.
+        \]
+        <p>Η ισότητα αποτυγχάνει πάντα όταν \(n\) και \(k\) είναι και οι δύο περιττοί.
+           Η σωστή ισότητα είναι:
+           \(\lfloor (n+k)/2 \rfloor = \lfloor n/2 \rfloor + \lfloor k/2 \rfloor + \lfloor (n \bmod 2 + k \bmod 2)/2 \rfloor\).</p>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Προσοχή — Ο νόμος των μεγάλων αριθμών δεν βοηθά</div>
+        <p>Σε ορισμένα προβλήματα, η υπόθεση επαληθεύεται για αδύνατα πολλές περιπτώσεις
+           πριν αποτύχει. Αυτό <em>δεν</em> αποτελεί απόδειξη.
+           Ο συνδυασμός «πολλά παραδείγματα» + «ισχυρή ευρετική επιχειρηματολογία»
+           συνιστά <em>εικασία</em>, όχι θεώρημα.</p>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ────────────────────────────────────────
+         SECTION 4: Διάσημες Εικασίες
+    ──────────────────────────────────────── -->
+    <section id="sec-famous">
+      <h2 id="h-famous">4. Διάσημες Εικασίες &mdash; από Εικασία σε Θεώρημα</h2>
+
+      <p>Η ιστορία των μαθηματικών είναι γεμάτη προτάσεις που έμειναν ανοιχτά
+         για δεκαετίες ή αιώνες. Μερικές αποδείχθηκαν, άλλες παραμένουν ανοιχτές.</p>
+
+      <div class="callout callout-theorem">
+        <div class="callout-title">Θεώρημα — Τελευταίο Θεώρημα Fermat (Wiles, 1995)</div>
+        <p><strong>Εικασία (Fermat, 1637):</strong>
+           Δεν υπάρχουν θετικοί ακέραιοι \(x,y,z,n\) με \(n > 2\) τέτοιοι ώστε:
+           \[ x^n + y^n = z^n. \]
+           Ο Fermat έγραψε στο περιθώριο του βιβλίου του: «Έχω μια θαυμαστή απόδειξη,
+           αλλά το περιθώριο είναι πολύ μικρό για να τη χωρέσει.»</p>
+        <p><strong>Απόδειξη (Andrew Wiles, 1995):</strong> 358 χρόνια αργότερα,
+           χρησιμοποιώντας βαθιά αποτελέσματα αλγεβρικής γεωμετρίας
+           (μα\-θη\-μα\-τι\-κά Galois, ελλειπτικές καμπύλες).</p>
+      </div>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Εικασία Goldbach (1742 — ακόμα ανοιχτή)</div>
+        <p>Κάθε άρτιος ακέραιος \(n > 2\) γράφεται ως άθροισμα δύο πρώτων:</p>
+        \[ n = p + q, \quad p, q \text{ πρώτοι}. \]
+        <p><em>Παράδειγμα:</em> \(4=2+2\), \(6=3+3\), \(8=3+5\), \(100=3+97=11+89\).</p>
+        <p>Επαληθεύεται υπολογιστικά για όλους τους άρτιους έως \(4 \times 10^{18}\),
+           αλλά <em>δεν έχει αποδειχθεί</em>.</p>
+      </div>
+
+      <div class="callout callout-theorem">
+        <div class="callout-title">Θεώρημα 4 Χρωμάτων (Appel &amp; Haken, 1976)</div>
+        <p>Κάθε επίπεδος χάρτης χρωματίζεται με <strong>4 χρώματα</strong>
+           ώστε γειτονικές χώρες να έχουν διαφορετικό χρώμα.</p>
+        <p>Ιστορικά αξιοσημείωτο: <em>πρώτη απόδειξη που χρησιμοποίησε υπολογιστή</em>
+           (ανάλυση ~1.936 περιπτώσεων). Η «αξιοπιστία» ηλεκτρονικής απόδειξης
+           προκάλεσε φιλοσοφική συζήτηση στα μαθηματικά.</p>
+      </div>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Εικασία Collatz / 3x+1 (ακόμα ανοιχτή)</div>
+        <p>Ορίζουμε:</p>
+        \[
+          f(n) = \begin{cases} n/2 & \text{αν } n \text{ άρτιος} \\ 3n+1 & \text{αν } n \text{ περιττός} \end{cases}
+        \]
+        <p><strong>Εικασία:</strong> Εφαρμόζοντας επανειλημμένα \(f\), κάθε θετικός ακέραιος
+           καταλήγει τελικά στο 1.</p>
+        <p><em>Παράδειγμα:</em> \(6 \to 3 \to 10 \to 5 \to 16 \to 8 \to 4 \to 2 \to 1\).</p>
+        <p>Επαληθεύεται για όλα τα \(n \le 2^{68} \approx 2{,}95 \times 10^{20}\).
+           Ο Paul Erdős σχολίασε: «Τα μαθηματικά δεν είναι ακόμα έτοιμα για τέτοια προβλήματα.»</p>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ────────────────────────────────────────
+         SECTION 5: P vs NP
+    ──────────────────────────────────────── -->
+    <section id="sec-pvsnp">
+      <h2 id="h-pvsnp">5. P vs NP</h2>
+
+      <p>Ένα από τα κεντρικά ερωτήματα της Πληροφορικής: <em>είναι εξίσου δύσκολο να
+         λύσουμε ένα πρόβλημα με το να επαληθεύσουμε μια λύση;</em></p>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμός — Κλάση P</div>
+        <p>Η κλάση <strong>P</strong> (Polynomial time) περιέχει όλα τα <em>γλωσσικά προβλήματα</em>
+           (αποφάσεις «ναι/όχι») που επιλύονται από ντετερμινιστική Μηχανή Turing
+           σε χρόνο \(\mathcal{O}(n^k)\) για κάποιο σταθερό \(k\), όπου \(n = |\text{input}|\).</p>
+        <p><em>Παραδείγματα:</em> ταξινόμηση, εύρεση συντομότερης διαδρομής (Dijkstra),
+           πολλαπλασιασμός πινάκων, primality testing (AKS, 2002).</p>
+      </div>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμός — Κλάση NP</div>
+        <p>Η κλάση <strong>NP</strong> (Nondeterministic Polynomial) περιέχει τα προβλήματα
+           για τα οποία <em>κάθε θετική απάντηση («ναι») έχει πολυωνυμικό πιστοποιητικό</em>
+           (certificate) που μπορεί να επαληθευτεί σε \(\mathcal{O}(n^k)\).</p>
+        <p>Τυπικά: \(L \in \text{NP}\) αν υπάρχει ντετερμινιστική TM \(V\) και πολυώνυμο \(p\) τ.ω.:
+           \[x \in L \iff \exists w,\; |w| \le p(|x|),\; V(x,w) = 1.\]
+           Το \(w\) λέγεται <em>μάρτυρας</em> ή <em>πιστοποιητικό</em>.</p>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Παρανόηση που πρέπει να αποφεύγετε</div>
+        <p>NP <strong>δεν</strong> σημαίνει «Non-Polynomial» (μη-πολυωνυμικό).
+           Σημαίνει «Nondeterministic Polynomial».
+           Είναι ανοιχτό αν \(\text{P} = \text{NP}\) ή \(\text{P} \subsetneq \text{NP}\).</p>
+      </div>
+
+      <!-- SAT -->
+      <section id="sec-sat">
+        <h3 id="h-sat">5.1 SAT και NP</h3>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Ορισμός — SAT (Boolean Satisfiability)</div>
+          <p>Δίνεται μια τύπος \(\varphi\) <strong>Κανονικής Συζευκτικής Μορφής</strong> (CNF):
+             \[ \varphi = C_1 \wedge C_2 \wedge \cdots \wedge C_m, \]
+             όπου κάθε <em>clause</em> \(C_i\) είναι διάζευξη literals
+             (\(x_j\) ή \(\neg x_j\)):
+             \[ C_i = \ell_{i,1} \vee \ell_{i,2} \vee \cdots \vee \ell_{i,k_i}. \]
+             Το πρόβλημα SAT ρωτά: <strong>υπάρχει ανάθεση τιμών αλήθειας που ικανοποιεί \(\varphi\);</strong>
+          </p>
+          <p><em>Παράδειγμα:</em>
+             \(\varphi = (x_1 \vee \neg x_2) \wedge (\neg x_1 \vee x_3) \wedge (x_2 \vee \neg x_3)\).</p>
+          <p>Δοκιμάζουμε \(x_1=T, x_2=T, x_3=T\):
+             \((T \vee F) \wedge (F \vee T) \wedge (T \vee F) = T\). Ικανοποιείται. ✓</p>
+        </div>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα — SAT ∈ NP</div>
+          <p>Πιστοποιητικό: μια ικανοποιητική ανάθεση τιμών.
+             Επαλήθευση: ελέγχουμε κάθε clause σε χρόνο \(\mathcal{O}(|\varphi|)\).</p>
+          <p>Άρα SAT \(\in\) NP. (Το αν SAT \(\in\) P είναι ισοδύναμο με P=NP.)</p>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Παράδειγμα — Planar 3-Coloring ∈ NP</div>
+          <p>Δίνεται επίπεδο γράφημα. Ερώτηση: χρωματίζεται με 3 χρώματα;</p>
+          <p>Πιστοποιητικό: ο ίδιος ο χρωματισμός.
+             Επαλήθευση: ελέγχουμε κάθε ακμή \((u,v)\) — χρόνος \(\mathcal{O}(|E|)\).</p>
+          <p>Άρα Planar 3-Coloring \(\in\) NP.
+             (Είναι επίσης NP-πλήρες, αλλά το 4-Coloring επίπεδων γραφημάτων ανήκει στην P
+             λόγω του Θεωρήματος 4 Χρωμάτων!)</p>
+        </div>
+      </section>
+
+      <!-- NP-πληρότητα -->
+      <section id="sec-npcomplete">
+        <h3 id="h-npcomplete">5.2 NP-πληρότητα</h3>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Ορισμός — NP-πληρότητα</div>
+          <p>Ένα πρόβλημα \(B\) είναι <strong>NP-πλήρες</strong> αν:</p>
+          <ol>
+            <li>\(B \in \text{NP}\), και</li>
+            <li>για κάθε \(A \in \text{NP}\): \(A \le_p B\)
+                (κάθε NP-πρόβλημα ανάγεται πολυωνυμικά στο \(B\)).</li>
+          </ol>
+          <p>Διαισθητικά: τα NP-πλήρη προβλήματα είναι τα «πιο δύσκολα» στην NP.</p>
+        </div>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα Cook-Levin (1971/1973)</div>
+          <p>Το SAT είναι <strong>NP-πλήρες</strong>:</p>
+          <ul>
+            <li>SAT \(\in\) NP (αποδείχθηκε παραπάνω).</li>
+            <li>Κάθε \(A \in\) NP ανάγεται σε SAT: κατασκευάζουμε από την TM επαλήθευσης
+                ένα κύκλωμα boolean που προσομοιώνει κάθε βήμα της,
+                και μετατρέπουμε σε CNF.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Αναγωγές -->
+      <section id="sec-reduction">
+        <h3 id="h-reduction">5.3 Αναγωγές (Cook Reductions)</h3>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Ορισμός — Πολυωνυμική Αναγωγή</div>
+          <p>Λέμε ότι το πρόβλημα \(A\) <strong>ανάγεται πολυωνυμικά</strong> στο \(B\)
+             (γράφουμε \(A \le_p B\)) αν υπάρχει συνάρτηση \(f\) με:</p>
+          <ul>
+            <li>\(f\) υπολογίσιμη σε πολυωνυμικό χρόνο,</li>
+            <li>\(x \in A \iff f(x) \in B\).</li>
+          </ul>
+          <p>Σημασία: αν \(B \in \text{P}\), τότε και \(A \in \text{P}\)
+             (αντιθετοαντίστροφη: αν \(A \notin \text{P}\) τότε \(B \notin \text{P}\)).</p>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Παράδειγμα — SAT ≤<sub>p</sub> Integer Programming</div>
+          <p>Δίνεται CNF τύπος \(\varphi\) με μεταβλητές \(x_1, \ldots, x_n\).
+             Κατασκευάζουμε ακέραιο πρόγραμμα:</p>
+          <ul>
+            <li>Για κάθε μεταβλητή \(x_i\): εισάγουμε \(y_i \in \{0, 1\}\)
+                (\(y_i = 1 \Leftrightarrow x_i = \text{True}\)).</li>
+            <li>Για κάθε clause \(C_j = (\ell_1 \vee \ell_2 \vee \ell_3)\):
+                εισάγουμε ανίσωση:
+                \[ \sum_{\ell_k = x_i} y_i \;+\; \sum_{\ell_k = \neg x_i} (1 - y_i) \;\ge\; 1. \]
+            </li>
+          </ul>
+          <p><em>Παράδειγμα:</em> για clause \((x_1 \vee \neg x_2 \vee x_3)\):</p>
+          \[ y_1 + (1 - y_2) + y_3 \ge 1. \]
+          <p>Η μετατροπή γίνεται σε πολυωνυμικό χρόνο (γραμμικό στο μέγεθος του \(\varphi\))
+             και \(\varphi\) ικανοποιείται \(\iff\) το ακέραιο πρόγραμμα έχει λύση.</p>
+        </div>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα — Συνέπειες της απάντησης στο P vs NP</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Σενάριο</th>
+                  <th>Συνέπεια</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>\(\text{P} = \text{NP}\)</td>
+                  <td>Όλα τα NP προβλήματα λύνονται αποδοτικά.
+                      Κρυπτογραφία δημόσιου κλειδιού (RSA) καταρρέει.
+                      Θεώρηση: «απίθανο».</td>
+                </tr>
+                <tr>
+                  <td>\(\text{P} \ne \text{NP}\)</td>
+                  <td>NP-πλήρη προβλήματα δεν έχουν πολυωνυμικούς αλγόριθμους.
+                      Κρυπτογραφία βασισμένη σε NP-δύσκολα προβλήματα παραμένει ασφαλής.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Παράδειγμα — Αλυσίδα NP-πλήρων αναγωγών</div>
+          <p>Κλασική αλυσίδα (Cook &rarr; Karp):</p>
+          \[
+            \text{SAT} \le_p \text{3-SAT} \le_p \text{Clique} \le_p \text{Vertex Cover} \le_p \text{Subset Sum} \le_p \cdots
+          \]
+          <p>Κάθε νέο NP-πλήρες πρόβλημα αποδεικνύεται μέσω αναγωγής από κάποιο ήδη γνωστό.</p>
+        </div>
+      </section>
+    </section>
+
+    <hr>
+
+    <!-- ────────────────────────────────────────
+         EXAM QUESTIONS
+    ──────────────────────────────────────── -->
+    <section id="sec-exam">
+      <h2 id="h-exam">Συχνές Ερωτήσεις Εξετάσεων</h2>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 1</div>
+        <p>Τι είναι εικασία και πώς διαφέρει από θεώρημα; Δώστε ένα παράδειγμα.</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Μια <strong>εικασία</strong> είναι πρόταση για την οποία υπάρχουν ενδείξεις αλήθειας
+               αλλά δεν έχει αποδειχθεί ούτε διαψευστεί. Ένα <strong>θεώρημα</strong> είναι
+               πρόταση που αποδείχθηκε με αυστηρό μαθηματικό επιχείρημα.
+               Παράδειγμα: η Εικασία Goldbach (1742) παραμένει εικασία παρά τις υπολογιστικές
+               επαληθεύσεις, ενώ το Τελευταίο Θεώρημα Fermat έγινε θεώρημα μόλις το 1995.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 2</div>
+        <p>Αποδείξτε ότι τα σύνολα \(A = \{\lfloor k\varphi \rfloor : k \ge 1\}\) και
+           \(B = \{\lfloor k\varphi^2 \rfloor : k \ge 1\}\) είναι ξένα (A ∩ B = ∅).</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Έστω \(\lfloor p\varphi \rfloor = \lfloor q\varphi^2 \rfloor = m\).
+               Επειδή \(\varphi, \varphi^2\) άρρητοι: \(m < p\varphi < m+1\) και \(m < q\varphi^2 < m+1\).
+               Προσθέτοντας τα κλάσματα: \(m/\varphi + m/\varphi^2 < p+q < (m+1)/\varphi + (m+1)/\varphi^2\),
+               άρα \(m < p+q < m+1\), αδύνατο αφού \(p+q \in \mathbb{Z}\).</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 3</div>
+        <p>Ορίστε τις κλάσεις P και NP. Πότε ένα πρόβλημα είναι NP-πλήρες;</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p><strong>P</strong>: προβλήματα επιλύσιμα σε πολυωνυμικό χρόνο (ντετερμινιστικά).
+               <strong>NP</strong>: προβλήματα με πολυωνυμικά επαληθεύσιμα πιστοποιητικά.
+               Ένα \(B\) είναι <strong>NP-πλήρες</strong> αν (i) \(B \in\) NP και
+               (ii) κάθε \(A \in\) NP ανάγεται σε \(B\) πολυωνυμικά (\(A \le_p B\)).
+               Παράδειγμα: SAT (Cook-Levin), 3-SAT, Clique, Vertex Cover.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 4</div>
+        <p>Δείξτε ότι SAT ∈ NP. Τι είναι το πιστοποιητικό;</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Πιστοποιητικό για στιγμιότυπο με \(n\) μεταβλητές:
+               ανάθεση \(w \in \{0,1\}^n\), μέγεθος \(n = \mathcal{O}(|\varphi|)\).
+               Επαλήθευση: αξιολόγηση κάθε clause — \(\mathcal{O}(|\varphi|)\).
+               Άρα SAT \(\in\) NP.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 5</div>
+        <p>Ποιες είναι οι συνέπειες αν αποδειχθεί ότι P = NP;</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Αν P = NP: όλα τα NP-πλήρη προβλήματα λύνονται σε πολυωνυμικό χρόνο.
+               Πρακτικές συνέπειες: (α) κρυπτογραφία δημόσιου κλειδιού (RSA, ECC) καταρρέει
+               — η παραγοντοποίηση ακεραίων θα γίνει αποδοτική·
+               (β) βελτιστοποίηση NP-hard προβλημάτων (TSP, scheduling) λύνεται ακριβώς·
+               (γ) θεωρητικά: ολόκληρη η ιεραρχία NP καταρρέει στην P.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ── Lecture Navigation ── -->
+    <nav class="lecture-nav" aria-label="Πλοήγηση διαλέξεων">
+      <a href="../index.html" class="lecture-nav__btn">&#8592; Αρχική</a>
+      <span class="lecture-nav__current">Διάλεξη 1 / 8</span>
+      <a href="lecture2.html" class="lecture-nav__btn">
+        Διάλεξη 2: Αποδείξεις &#8594;
+      </a>
+    </nav>
+
+  </main><!-- /.main-content -->
+</div><!-- /.page-wrapper -->
+
+<!-- ════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════ -->
+<footer class="site-footer" role="contentinfo">
+  <p>
+    Σημειώσεις Μαθηματικών Πληροφορικής &mdash; ΕΚΠΑ &nbsp;|&nbsp;
+    <a href="../index.html">Αρχική</a> &nbsp;|&nbsp;
+    Τελευταία ενημέρωση: <time datetime="2026-05-22">22 Μαΐου 2026</time>
+  </p>
+</footer>
+
 </body>
 </html>
