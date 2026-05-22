@@ -3,27 +3,567 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Βασικά Θεωρήματα — Προετοιμασία Εξετάσεων</title>
+  <meta name="description"
+        content="Κεντρικά Θεωρήματα — Όλα τα θεωρήματα του μαθήματος με διατύπωση, ιδέα απόδειξης και πλήρη απόδειξη.">
+  <title>Κεντρικά Θεωρήματα | Μαθ. Πληροφορικής ΕΚΠΑ</title>
   <link rel="stylesheet" href="../css/style.css">
   <script>
-    window.MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };
+    window.MathJax = {
+      tex: {
+        inlineMath:  [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        tags: 'ams',
+        macros: {
+          N:  '\\mathbb{N}', Z:  '\\mathbb{Z}', R:  '\\mathbb{R}',
+          floor: ['\\lfloor #1 \\rfloor', 1],
+          ceil:  ['\\lceil  #1 \\rceil',  1]
+        }
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+    };
+    (function () {
+      const t = localStorage.getItem('math-plir-theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
   <script src="../js/main.js" defer></script>
+  <style>
+    .thm-accordion { margin-bottom: 0.9rem; border: 1px solid var(--color-border, #d0d8f0); border-radius: 10px; overflow: hidden; }
+    .thm-accordion summary {
+      list-style: none;
+      padding: 0.75rem 1.1rem;
+      cursor: pointer;
+      background: var(--color-surface, #fff);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      font-size: 0.98rem;
+      gap: 0.5rem;
+    }
+    .thm-accordion summary::-webkit-details-marker { display: none; }
+    .thm-accordion summary::after { content: "▾"; font-size: 1rem; transition: transform 0.2s; flex-shrink: 0; }
+    .thm-accordion[open] summary::after { transform: rotate(-180deg); }
+    .thm-accordion summary .thm-name { flex: 1; }
+    .thm-accordion summary .thm-badge {
+      font-size: 0.73rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      background: var(--color-primary, #3b6fd4);
+      color: #fff;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .thm-accordion summary .thm-source {
+      font-size: 0.78rem;
+      color: var(--color-text-muted, #888);
+      font-weight: 400;
+    }
+    .thm-body { padding: 1rem 1.25rem; border-top: 1px solid var(--color-border, #d0d8f0); }
+    .thm-meta-row { display: flex; gap: 1.25rem; flex-wrap: wrap; margin-bottom: 0.75rem; font-size: 0.88rem; }
+    .thm-meta-row span { display: flex; align-items: center; gap: 0.3rem; }
+    .key-idea { background: var(--color-surface-alt, #f0f4ff); border-left: 4px solid var(--color-primary, #3b6fd4); border-radius: 0 6px 6px 0; padding: 0.6rem 1rem; margin: 0.75rem 0; font-size: 0.92rem; }
+    .used-in { font-size: 0.84rem; color: var(--color-text-muted, #666); margin-top: 0.6rem; }
+    .cat-header { margin: 1.75rem 0 0.75rem; padding: 0.5rem 1rem; background: var(--color-primary, #3b6fd4); color: #fff; border-radius: 6px; font-size: 1rem; font-weight: 700; }
+    [data-theme="dark"] .thm-accordion summary { background: #1a1f2e; }
+    [data-theme="dark"] .key-idea { background: #1e2a4a; }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Βασικά Θεωρήματα</h1>
-    <a href="../index.html">← Αρχική</a>
-  </header>
 
-  <main>
-    <p><em>Placeholder — περιεχόμενο θα συμπληρωθεί.</em></p>
+<header class="site-header" role="banner">
+  <div class="site-header__inner">
+    <a href="../index.html" class="site-header__title">&#8469; Μαθηματικά Πληροφορικής</a>
+    <nav class="site-nav">
+      <a href="../index.html">Αρχική</a>
+      <a href="../lectures/lecture1.html">Διαλέξεις</a>
+      <a href="../topics/induction.html">Θέματα</a>
+      <a href="../exercises/solved.html">Ασκήσεις</a>
+      <a href="formulas.html" aria-current="page">Εξεταστική</a>
+    </nav>
+    <button id="theme-toggle" class="btn-theme-toggle" aria-label="Εναλλαγή σκοτεινής λειτουργίας">&#127769; Σκοτεινό</button>
+  </div>
+</header>
+
+<div class="page-wrapper">
+  <aside class="sidebar-toc" aria-label="Κατηγορίες">
+    <button class="toc-toggle" aria-expanded="true">&#128203; Κατηγορίες &#9662;</button>
+    <div class="sidebar-toc__title">Κατηγορίες</div>
+    <ol class="sidebar-toc__list">
+      <li><a href="#cat-nt">Αριθμοθεωρία</a></li>
+      <li><a href="#cat-induction">Επαγωγή</a></li>
+      <li><a href="#cat-graphs">Γραφήματα</a></li>
+      <li><a href="#cat-ramsey">Ramsey</a></li>
+      <li><a href="#cat-matching">Hall / Dilworth</a></li>
+      <li><a href="#cat-computability">Cantor / Halting</a></li>
+    </ol>
+  </aside>
+
+  <main class="main-content" id="main-content">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <div class="breadcrumbs__item"><a href="../index.html">Αρχική</a></div>
+      <div class="breadcrumbs__item"><a href="formulas.html">Εξεταστική</a></div>
+      <div class="breadcrumbs__item"><span class="breadcrumbs__current">Κεντρικά Θεωρήματα</span></div>
+    </nav>
+
+    <h1 class="lecture-title">Κεντρικά Θεωρήματα</h1>
+    <p class="lecture-subtitle">Κλικάρετε σε κάθε θεώρημα για πλήρη διατύπωση, ιδέα και απόδειξη.</p>
+
+    <!-- ══ ΑΡΙΘΜΟΘΕΩΡΙΑ ══ -->
+    <div class="cat-header" id="cat-nt">Αριθμοθεωρία</div>
+
+    <details class="thm-accordion">
+      <summary>
+        <span class="thm-name">Λήμμα Bézout</span>
+        <span class="thm-source">Δ2 §6</span>
+        <span class="thm-badge">Αριθμοθεωρία</span>
+      </summary>
+      <div class="thm-body">
+        <div class="callout callout-theorem">
+          <div class="callout-title">Διατύπωση</div>
+          <p>Για κάθε \(a,b\in\Z\) με \(\gcd(a,b)=d\):
+            \[\exists x,y\in\Z:\; ax + by = d.\]
+            Επίσης \(d = \min\{ax+by : ax+by>0,\; x,y\in\Z\}\).
+          </p>
+        </div>
+        <div class="key-idea">&#128161; <strong>Ιδέα:</strong> Ο ExtGCD αλγόριθμος επιστρέφει \((d,x,y)\) αναδρομικά:
+          βάση \(\gcd(a,0)=(a,1,0)\), βήμα χρησιμοποιεί \(\gcd(a,b)=\gcd(b,a\bmod b)\) και back-substitution.
+        </div>
+        <details class="callout callout-proof">
+          <summary class="callout-title">&#9656; Πλήρης Απόδειξη</summary>
+          <p>Ορίζουμε \(S = \{ax+by : x,y\in\Z\} \cap \N^+\). Το \(S\) είναι μη-κενό (\(a^2+b^2\in S\))
+            και έχει ελάχιστο στοιχείο \(d_0 = ax_0+by_0\).
+          </p>
+          <p>Δείχνουμε \(d_0 \mid a\): διαίρεση \(a = q d_0 + r\), \(0\le r < d_0\).
+            Τότε \(r = a - qd_0 = a(1-qx_0) + b(-qy_0) \in S \cup \{0\}\).
+            Ελαχιστότητα του \(d_0\): \(r=0\), άρα \(d_0\mid a\). Ομοίως \(d_0\mid b\).
+          </p>
+          <p>Άρα \(d_0\mid\gcd(a,b)\). Αλλά \(\gcd(a,b)\mid a, \gcd(a,b)\mid b \Rightarrow \gcd(a,b)\mid d_0\).
+            Άρα \(d_0 = \gcd(a,b)\). \(\square\)
+          </p>
+        </details>
+        <div class="thm-meta-row">
+          <span>&#128279; <a href="../lectures/lecture2.html#sec-nt">Δ2 §6</a></span>
+        </div>
+        <p class="used-in"><strong>Χρησιμοποιείται:</strong> Αντιστρόφως του διωνυμικού, RSA, πολυπλοκότητα αλγορίθμων.</p>
+      </div>
+    </details>
+
+    <details class="thm-accordion">
+      <summary>
+        <span class="thm-name">Θεμελιώδες Θεώρημα Αριθμητικής (ΘΘΑ)</span>
+        <span class="thm-source">Δ2 §6</span>
+        <span class="thm-badge">Αριθμοθεωρία</span>
+      </summary>
+      <div class="thm-body">
+        <div class="callout callout-theorem">
+          <div class="callout-title">Διατύπωση</div>
+          <p>Κάθε \(n \ge 2\) γράφεται κατά μοναδικό τρόπο ως γινόμενο πρώτων:
+            \(n = p_1^{a_1}\cdots p_k^{a_k}\), \(p_1 < \cdots < p_k\) πρώτοι, \(a_i \ge 1\).
+          </p>
+        </div>
+        <div class="key-idea">&#128161; <strong>Ιδέα ύπαρξης:</strong> Ισχυρή επαγωγή — αν \(n\) σύνθετος, σπάει σε μικρότερα.
+          <br><strong>Μοναδικότητα:</strong> Χρησιμοποιεί Λήμμα Euclid: αν \(p\mid ab\) τότε \(p\mid a\) ή \(p\mid b\).
+        </div>
+        <div class="thm-meta-row">
+          <span>&#128279; <a href="../lectures/lecture2.html#sec-nt">Δ2 §6</a></span>
+        </div>
+      </div>
+    </details>
+
+    <!-- ══ ΕΠΑΓΩΓΗ ══ -->
+    <div class="cat-header" id="cat-induction">Επαγωγή &amp; Ανισότητες</div>
+
+    <details class="thm-accordion">
+      <summary>
+        <span class="thm-name">Αρμονικοί Αριθμοί: \(H_n \ge \frac{\ln(n+1)}{2}\)</span>
+        <span class="thm-source">Δ2 §4</span>
+        <span class="thm-badge">Επαγωγή</span>
+      </summary>
+      <div class="thm-body">
+        <div class="callout callout-theorem">
+          <div class="callout-title">Διατύπωση</div>
+          <p>\(H_n = \displaystyle\sum_{i=1}^n \frac{1}{i} \ge \frac{\ln(n+1)}{2}\) για κάθε \(n \ge 1\).</p>
+        </div>
+        <div class="key-idea">&#128161; <strong>Ιδέα:</strong> Ισχυροποίηση \(Q(n): H_{2^n} \ge \frac{n}{2}\).
+          Κάθε διπλασιασμός προσθέτει τουλάχιστον \(\frac{1}{2}\).
+        </div>
+        <details class="callout callout-proof">
+          <summary class="callout-title">&#9656; Απόδειξη \(Q(n): H_{2^n}\ge n/2\)</summary>
+          <p>Βάση \(n=0\): \(H_1=1\ge0\). ✓ Βήμα:
+            \[H_{2^{n+1}} = H_{2^n} + \sum_{i=2^n+1}^{2^{n+1}}\frac{1}{i} \ge \frac{n}{2} + 2^n\cdot\frac{1}{2^{n+1}} = \frac{n}{2}+\frac{1}{2} = \frac{n+1}{2}. \quad\square\]
+          </p>
+        </details>
+        <div class="thm-meta-row">
+          <span>&#128279; <a href="../lectures/lecture2.html#sec-induction">Δ2 §4</a></span>
+        </div>
+      </div>
+    </details>
+
+    <details class="thm-accordion">
+      <summary>
+        <span class="thm-name">Fibonacci Doubling Theorem</span>
+        <span class="thm-source">Δ2 §5</span>
+        <span class="thm-badge">Επαγωγή</span>
+      </summary>
+      <div class="thm-body">
+        <div class="callout callout-theorem">
+          <div class="callout-title">Διατύπωση</div>
+          <p>Για κάθε \(n,m\ge1\):
+            \[F_{n+m} = F_n F_{m+1} + F_{n-1}F_m.\]
+            Ειδική περίπτωση (\(m=n\)):
+            \[F_{2n} = F_n(2F_{n+1}-F_n),\quad F_{2n+1} = F_n^2+F_{n+1}^2.\]
+          </p>
+        </div>
+        <div class="key-idea">&#128161; <strong>Ιδέα:</strong> Ισχυρή επαγωγή στο \(m\). Βάσεις \(m=1,2\), βήμα χρησιμοποιεί \(F_{n+m} = F_{n+m-1}+F_{n+m-2}\) και Ε.Υ.
+        </div>
+        <div class="thm-meta-row">
+          <span>&#128279; <a href="../lectures/lecture2.html#sec-fibonacci">Δ2 §5</a></span>
+        </div>
+        <p class="used-in"><strong>Χρησιμοποιείται:</strong> Υπολογισμός \(F_n\) σε \(O(\log n)\) βήματα.</p>
+      </div>
+    </details>
+
+    <!-- ══ ΓΡΑΦΗΜΑΤΑ ══ -->
+    <div class="cat-header" id="cat-graphs">Γραφήματα</div>
+
+    <details class="thm-accordion">
+      <summary>
+        <span class="thm-name">Θεώρημα Δέντρων (5 ισοδύναμα)</span>
+        <span class="thm-source">Δ6 §Β</span>
+        <span class="thm-badge">Γραφήματα</span>
+      </summary>
+      <div class="thm-body">
+        <div class="callout callout-theorem">
+          <div class="callout-title">Διατύπωση</div>
+          <p>Για συνεκτικό \(G=(V,E)\) με \(n=|V|\), ισοδυναμούν:<br>
+            (1) \(G\) ακυκλικός &nbsp; (2) \(|E|=n-1\) &nbsp; (3) Μοναδικά μονοπάτια<br>
+            (4) Κάθε ακμή γέφυρα &nbsp; (5) Προσθήκη ακμής → κύκλος.
+          </p>
+        </div>
+        <div class="key-idea">&#128161; <strong>Ιδέα:</strong> Κυκλική απόδειξη (1)→(2)→(3)→(1), (1)→(4)→(1), (1)→(5)→(1).
+          Κλειδί: κάθε δέντρο έχει φύλλο (αφαίρεση φύλλου + Ε.Υ.).
+        </div>
+        <div class="thm-meta-row">
+          <span>&#128279; <a href="../lectures/lecture6.html#sec-trees">Δ6 §Β</a></span>
+        </div>
+      </div>
+    </details>
+
+    <details class="thm-accordion">
+      <summary>
+        <span class="thm-name">Θεώρημα Euler (Euler Κύκλος)</span>
+        <span class="thm-source">Δ6 §Γ</span>
+        <span class="thm-badge">Γραφήματα</span>
+      </summary>
+      <div class="thm-body">
+        <div class="callout callout-theorem">
+          <div class="callout-title">Διατύπωση</div>
+          <p>Συνεκτικός \(G\) έχει Euler κύκλο \(\iff\) κάθε κόμβος έχει ζυγό βαθμό.</p>
+        </div>
+        <div class="key-idea">&#128161; <strong>Αναγκαία (\(\Rightarrow\)):</strong> Ο κύκλος εισέρχεται και εξέρχεται ισάριθμα → ζυγός βαθμός.<br>
+          <strong>Ικανή (\(\Leftarrow\)):</strong> Πάρε μέγιστο κλειστό trail \(T\). Αν \(T\) δεν είναι Euler,
+          υπάρχει κόμβος \(v\in T\) με ακμές εκτός \(T\). Κατασκεύασε νέο κύκλο και συγχώνευσε — αντίφαση με μεγιστικότητα.
+        </div>
+        <details class="callout callout-proof">
+          <summary class="callout-title">&#9656; Αναλυτική Απόδειξη (\(\Leftarrow\))</summary>
+          <p>Πάρε μέγιστο κλειστό trail \(T\) (ξεκινά/τελειώνει στον ίδιο κόμβο).
+            Αν \(E(T) \ne E\), υπάρχει κόμβος \(v \in V(T)\) με γείτονα \(u\) εκτός \(T\)
+            (λόγω συνεκτικότητας). Ξεκινά trail \(T'\) από \(v\) σε ακμές εκτός \(T\).
+            Λόγω ζυγού βαθμού και μεγιστικότητας, \(T'\) πρέπει να επιστρέφει στο \(v\).
+            Ενώνω \(T\) και \(T'\) σε μεγαλύτερο trail — αντίφαση. \(\square\)
+          </p>
+        </details>
+        <div class="thm-meta-row">
+          <span>&#128279; <a href="../lectures/lecture6.html#sec-euler">Δ6 §Γ</a></span>
+        </div>
+      </div>
+    </details>
+
+    <details class="thm-accordion">
+      <summary>
+        <span class="thm-name">Τύπος Euler &amp; Αραιότητα Επίπεδων Γράφων</span>
+        <span class="thm-source">Δ6 §Δ</span>
+        <span class="thm-badge">Γραφήματα</span>
+      </summary>
+      <div class="thm-body">
+        <div class="callout callout-theorem">
+          <div class="callout-title">Διατύπωση</div>
+          <p>Συνεκτικός επίπεδος \(G\): \(n - m + f = 2\) (&nbsp;\(f\) = πρόσωπα&nbsp;).<br>
+            Αραιότητα: \(n\ge3 \Rightarrow m\le3n-6\). Διμερής: \(m\le2n-4\).
+          </p>
+        </div>
+        <div class="key-idea">&#128161; <strong>Ιδέα Euler:</strong> Επαγωγή στο \(m\).
+          Αφαιρούμε ακμή: αν γέφυρα (\(f\) σταθερό, \(n,m\) μειώνονται), αν μη-γέφυρα (\(f\) μειώνεται, \(n\) σταθερό).
+          <br><strong>Ιδέα αραιότητας:</strong> Κάθε πρόσωπο \(\ge 3\) ακμές, κάθε ακμή σε \(\le 2\) πρόσωπα → \(3f \le 2m\) → αντικατάσταση σε Euler.
+        </div>
+        <div class="thm-meta-row">
+          <span>&#128279; <a href="../lectures/lecture6.html#sec-planar">Δ6 §Δ</a></span>
+        </div>
+        <p class="used-in"><strong>Χρησιμοποιείται:</strong> Μη-επιπεδότητα \(K_5, K_{3,3}\), 6-χρωματισμός επίπεδων.</p>
+      </div>
+    </details>
+
+    <details class="thm-accordion">
+      <summary>
+        <span class="thm-name">Θεώρημα Kuratowski</span>
+        <span class="thm-source">Δ6 §Δ</span>
+        <span class="thm-badge">Γραφήματα</span>
+      </summary>
+      <div class="thm-body">
+        <div class="callout callout-theorem">
+          <div class="callout-title">Διατύπωση</div>
+          <p>\(G\) είναι επίπεδος \(\iff\) δεν περιέχει subdivision του \(K_5\) ή \(K_{3,3}\).
+            (Ισοδύναμα Wagner: δεν περιέχει \(K_5\) ή \(K_{3,3}\) ως minor.)
+          </p>
+        </div>
+        <div class="key-idea">&#128161; <strong>Ιδέα:</strong> Η αναγκαία κατεύθυνση (\(\Rightarrow\)) ακολουθεί από ορισμό.
+          Η ικανή (\(\Leftarrow\)) είναι βαθύ θεώρημα (non-trivial).
+          Χρήσιμα για εξεταστική: αρκεί να βρείτε subdivision \(K_5\) ή \(K_{3,3}\) για μη-επιπεδότητα.
+        </div>
+        <div class="thm-meta-row">
+          <span>&#128279; <a href="../lectures/lecture6.html#sec-planar">Δ6 §Δ</a></span>
+        </div>
+      </div>
+    </details>
+
+    <!-- ══ RAMSEY ══ -->
+    <div class="cat-header" id="cat-ramsey">Ramsey &amp; Πιθανοτική</div>
+
+    <details class="thm-accordion">
+      <summary>
+        <span class="thm-name">Ramsey Upper Bound: \(R(k,m)\le R(k{-}1,m)+R(k,m{-}1)\)</span>
+        <span class="thm-source">Δ2 §3 / Δ6 §Α</span>
+        <span class="thm-badge">Ramsey</span>
+      </summary>
+      <div class="thm-body">
+        <div class="callout callout-theorem">
+          <div class="callout-title">Διατύπωση</div>
+          <p>\(R(k,m) \le R(k-1,m) + R(k,m-1)\). Άρα \(R(k,k) \le \dbinom{2k-2}{k-1} < 4^k\).</p>
+        </div>
+        <div class="key-idea">&#128161; <strong>Ιδέα:</strong> Στο \(K_N\) (\(N=R(k-1,m)+R(k,m-1)\)), έχε κόμβο \(v\).
+          Έστω \(R\) = κόκκινοι γείτονες, \(B\) = μπλε. Τουλάχιστον ένα από \(|R|\ge R(k-1,m)\) ή \(|B|\ge R(k,m-1)\) ισχύει.
+          Επαγωγή: στην \(R\) υπάρχει κόκκινο \(K_{k-1}\) ή μπλε \(K_m\).
+          Προσθήκη \(v\): κόκκινο \(K_k\) ή μπλε \(K_m\).
+        </div>
+        <div class="thm-meta-row">
+          <span>&#128279; <a href="../lectures/lecture6.html#sec-ramsey">Δ6 §Α</a></span>
+        </div>
+      </div>
+    </details>
+
+    <details class="thm-accordion">
+      <summary>
+        <span class="thm-name">Erdős Lower Bound: \(R(t,t)>2^{t/2}\)</span>
+        <span class="thm-source">Δ4 §4</span>
+        <span class="thm-badge">Πιθανοτική</span>
+      </summary>
+      <div class="thm-body">
+        <div class="callout callout-theorem">
+          <div class="callout-title">Διατύπωση</div>
+          <p>Για \(N = 2^{t/2}\): υπάρχει 2-χρωματισμός του \(K_N\) χωρίς μονόχρωμο \(K_t\).</p>
+        </div>
+        <div class="key-idea">&#128161; <strong>Ιδέα (Union Bound):</strong>
+          Τυχαίος 2-χρωματισμός. Για κάθε \(K_t\): \(\Pr[\text{mono}] = 2^{1-\binom{t}{2}}\).
+          Σύνολο \(K_t\)-υποσύνολα: \(\binom{N}{t}\).
+          \[\Pr[\exists\text{mono}] \le \binom{N}{t}\cdot 2^{1-\binom{t}{2}} < 1 \text{ για } N=2^{t/2}.\]
+          Άρα με θετική πιθανότητα δεν υπάρχει μονόχρωμο \(K_t\). \(\square\)
+        </div>
+        <div class="thm-meta-row">
+          <span>&#128279; <a href="../lectures/lecture4.html#sec-ramsey-lower">Δ4 §4</a></span>
+        </div>
+      </div>
+    </details>
+
+    <!-- ══ HALL / DILWORTH ══ -->
+    <div class="cat-header" id="cat-matching">Hall, Dilworth, Mirsky, Sperner</div>
+
+    <details class="thm-accordion">
+      <summary>
+        <span class="thm-name">Θεώρημα Hall</span>
+        <span class="thm-source">Δ7 §4</span>
+        <span class="thm-badge">Ταιριάσματα</span>
+      </summary>
+      <div class="thm-body">
+        <div class="callout callout-theorem">
+          <div class="callout-title">Διατύπωση</div>
+          <p>Διμερής \(G=(L\cup R,E)\) έχει τέλειο ταίριασμα του \(L\)
+            \(\iff \forall S\subseteq L: |N(S)|\ge|S|\).
+          </p>
+        </div>
+        <div class="key-idea">&#128161; <strong>Αναγκαία (⟹):</strong> Κάθε \(S\) ταιριάζεται σε \(N(S)\).<br>
+          <strong>Ικανή (⟸) Επαγωγή στο \(|L|\):</strong>
+          Βάση: τετριμμένο. Βήμα — δύο περιπτώσεις:
+          (α) Loose Hall (\(|N(S)|\ge|S|+1\) για κάθε \(S\subsetneq L\)): ταίριαξε αυθαίρετα \(\ell\to r\), εφάρμοσε Ε.Υ. στο \(G-\ell-r\).
+          (β) Tight Hall (\(\exists T:|N(T)|=|T|\)): εφάρμοσε Ε.Υ. σε \(T\), μετά σε \(L\setminus T\) (επαλήθευσε Hall condition).
+        </div>
+        <div class="thm-meta-row">
+          <span>&#128279; <a href="../lectures/lecture7.html#sec-hall">Δ7 §4</a></span>
+        </div>
+        <p class="used-in"><strong>Χρησιμοποιείται:</strong> SDR, Latin squares, μοντελοποίηση ανάθεσης, Dilworth.</p>
+      </div>
+    </details>
+
+    <details class="thm-accordion">
+      <summary>
+        <span class="thm-name">Θεώρημα Berge</span>
+        <span class="thm-source">Δ7 §3</span>
+        <span class="thm-badge">Ταιριάσματα</span>
+      </summary>
+      <div class="thm-body">
+        <div class="callout callout-theorem">
+          <div class="callout-title">Διατύπωση</div>
+          <p>Ταίριασμα \(M\) είναι μέγιστο \(\iff\) δεν υπάρχει \(M\)-αυξητικό μονοπάτι.</p>
+        </div>
+        <div class="key-idea">&#128161; <strong>(\(\Rightarrow\)):</strong> Αν υπάρχει αυξητικό, το XOR δίνει μεγαλύτερο ταίριασμα.
+          <br><strong>(\(\Leftarrow\)):</strong> Αν \(M\) μη-μέγιστο, τότε στο \(M'\triangle M\) υπάρχει component που είναι αυξητικό μονοπάτι.
+        </div>
+        <div class="thm-meta-row">
+          <span>&#128279; <a href="../lectures/lecture7.html#sec-augmenting">Δ7 §3</a></span>
+        </div>
+      </div>
+    </details>
+
+    <details class="thm-accordion">
+      <summary>
+        <span class="thm-name">Θεώρημα Dilworth</span>
+        <span class="thm-source">Δ8 §7</span>
+        <span class="thm-badge">Posets</span>
+      </summary>
+      <div class="thm-body">
+        <div class="callout callout-theorem">
+          <div class="callout-title">Διατύπωση</div>
+          <p>Σε κάθε πεπερασμένο poset: \(c(P) = \alpha(P)\).</p>
+        </div>
+        <div class="key-idea">&#128161; <strong>Ιδέα:</strong> Κατασκευή διμερούς \(H=(P^-\cup P^+,E)\) με \(x^-y^+\iff x\prec y\).
+          Ταίριασμα μεγέθους \(k\) → κάλυψη \(n-k\) αλυσίδων. Από König: max matching = min vertex cover.
+          Κάθε vertex cover αντιστοιχεί σε σύμπλεγμα που αφήνει αντιαλυσίδα μεγέθους \(\le \alpha\).
+        </div>
+        <div class="thm-meta-row">
+          <span>&#128279; <a href="../lectures/lecture8.html#sec-dilworth">Δ8 §7</a></span>
+        </div>
+        <p class="used-in"><strong>Εφαρμογές:</strong> Hall (ειδική περίπτωση), Erdős–Szekeres, minimum path cover σε DAG.</p>
+      </div>
+    </details>
+
+    <details class="thm-accordion">
+      <summary>
+        <span class="thm-name">Θεώρημα Mirsky</span>
+        <span class="thm-source">Δ8 §8</span>
+        <span class="thm-badge">Posets</span>
+      </summary>
+      <div class="thm-body">
+        <div class="callout callout-theorem">
+          <div class="callout-title">Διατύπωση</div>
+          <p>Ελάχιστη κάλυψη αντιαλυσίδων = \(\omega(P)\) (μέγεθος μέγιστης αλυσίδας).</p>
+        </div>
+        <div class="key-idea">&#128161; <strong>Ιδέα:</strong> Ορίζουμε βαθμίδες: \(M_i\) = μεγιστικά στοιχεία αφαιρώντας \(M_1,\ldots,M_{i-1}\).
+          Κάθε \(M_i\) αντιαλυσίδα, αριθμός βαθμίδων = \(\omega\).
+        </div>
+        <div class="thm-meta-row">
+          <span>&#128279; <a href="../lectures/lecture8.html#sec-mirsky">Δ8 §8</a></span>
+        </div>
+      </div>
+    </details>
+
+    <details class="thm-accordion">
+      <summary>
+        <span class="thm-name">Θεώρημα Sperner</span>
+        <span class="thm-source">Δ8 §11</span>
+        <span class="thm-badge">Posets</span>
+      </summary>
+      <div class="thm-body">
+        <div class="callout callout-theorem">
+          <div class="callout-title">Διατύπωση</div>
+          <p>Αντιαλυσίδα \(\mathcal{A}\subseteq 2^{[n]}\): \(|\mathcal{A}|\le\dbinom{n}{\lfloor n/2\rfloor}\).</p>
+        </div>
+        <div class="key-idea">&#128161; <strong>Ιδέα (μεταθέσεις):</strong>
+          Κάθε μετάθεση \(\sigma\) αντιστοιχεί σε \(\le 1\) σύνολο \(A\in\mathcal{A}\)
+          (ανταγωνιστικότητα αντιαλυσίδας). Μετράμε: \(\sum_A |A|!(n-|A|)!\le n!\),
+          άρα \(\sum_A 1/\binom{n}{|A|}\le1\). Εφαρμόστε \(\binom{n}{|A|}\le\binom{n}{\lfloor n/2\rfloor}\).
+        </div>
+        <div class="thm-meta-row">
+          <span>&#128279; <a href="../lectures/lecture8.html#sec-sperner">Δ8 §11</a></span>
+        </div>
+      </div>
+    </details>
+
+    <!-- ══ CANTOR / HALTING ══ -->
+    <div class="cat-header" id="cat-computability">Cantor &amp; Halting Problem</div>
+
+    <details class="thm-accordion">
+      <summary>
+        <span class="thm-name">Θεώρημα Cantor: \(\R\) μη-απαριθμήσιμο</span>
+        <span class="thm-source">Δ5 §4</span>
+        <span class="thm-badge">Υπολογισιμότητα</span>
+      </summary>
+      <div class="thm-body">
+        <div class="callout callout-theorem">
+          <div class="callout-title">Διατύπωση</div>
+          <p>Δεν υπάρχει επί συνάρτηση \(\N \to \R\). Άρα \(\R\) μη-απαριθμήσιμο.</p>
+        </div>
+        <div class="key-idea">&#128161; <strong>Ιδέα (Διαγωνοποίηση):</strong>
+          Δοθείσης λίστας \(r_1,r_2,\ldots\), κατασκευάζουμε \(d\) με \(d_i \ne (r_i)_i\)
+          (αποφεύγουμε ψηφία 0 και 9 για μοναδική δεκαδική αναπαράσταση).
+          Τότε \(d\ne r_i\) για κάθε \(i\) — αντίφαση. \(\square\)
+        </div>
+        <div class="thm-meta-row">
+          <span>&#128279; <a href="../lectures/lecture5.html#sec-cantor">Δ5 §4</a></span>
+        </div>
+        <p class="used-in"><strong>Εφαρμογές:</strong> Γλώσσες μη-αναγνωρίσιμες, Halting Problem.</p>
+      </div>
+    </details>
+
+    <details class="thm-accordion">
+      <summary>
+        <span class="thm-name">Halting Problem: Μη-αποφασιστότητα</span>
+        <span class="thm-source">Δ5 §5</span>
+        <span class="thm-badge">Υπολογισιμότητα</span>
+      </summary>
+      <div class="thm-body">
+        <div class="callout callout-theorem">
+          <div class="callout-title">Διατύπωση</div>
+          <p>Δεν υπάρχει πρόγραμμα \(H\) που αποφασίζει για κάθε \((P,x)\) αν \(P(x)\) τερματίζει.</p>
+        </div>
+        <div class="key-idea">&#128161; <strong>Ιδέα:</strong>
+          Κατασκεύασε \(D\) που: «τρέξε \(H\) πάνω στον εαυτό σου. Αν τερματίζεις → μη-τερμάτισε. Αν μη → τερμάτισε.»
+          Τότε \(D(D)\) τερματίζει \(\iff\) \(D(D)\) δεν τερματίζει. Αντίφαση. \(\square\)
+        </div>
+        <details class="callout callout-proof">
+          <summary class="callout-title">&#9656; Αναλυτική Απόδειξη</summary>
+          <p>Έστω υπάρχει \(H\) με \(H(P, \langle P\rangle) = 1 \iff P(\langle P\rangle)\) τερματίζει.</p>
+          <p>Ορίζουμε \(D(\langle P\rangle)\):
+            <br>· αν \(H(P,\langle P\rangle)=1\): τρέξε ατέρμονο βρόχο
+            <br>· αν \(H(P,\langle P\rangle)=0\): τερμάτισε.
+          </p>
+          <p>Ας εξετάσουμε \(D(\langle D\rangle)\):
+            <br>· αν τερματίζει: τότε \(H(D,\langle D\rangle)=1\) → \(D(\langle D\rangle)\) δεν τερματίζει. Αντίφαση.
+            <br>· αν δεν τερματίζει: τότε \(H(D,\langle D\rangle)=0\) → \(D(\langle D\rangle)\) τερματίζει. Αντίφαση.
+            <br>Άρα το \(H\) δεν μπορεί να υπάρχει. \(\square\)
+          </p>
+        </details>
+        <div class="thm-meta-row">
+          <span>&#128279; <a href="../lectures/lecture5.html#sec-halting">Δ5 §5</a></span>
+        </div>
+      </div>
+    </details>
+
+    <nav class="lecture-nav" aria-label="Πλοήγηση εξεταστικής">
+      <a href="formulas.html" class="lecture-nav__btn">← Formula Sheet</a>
+      <span class="lecture-nav__current">Κεντρικά Θεωρήματα</span>
+      <a href="tips.html" class="lecture-nav__btn">Στρατηγικές Εξέτασης →</a>
+    </nav>
   </main>
+</div>
 
-  <footer>
-    <p>Σημειώσεις Μαθηματικών Πληροφορικής — ΕΚΠΑ</p>
-  </footer>
+<footer class="site-footer">
+  <p>Μαθηματικά Πληροφορικής · ΕΚΠΑ · Τμήμα Πληροφορικής &amp; Τηλεπικοινωνιών</p>
+  <p>
+    <a href="../index.html">Αρχική</a> ·
+    <a href="formulas.html">Formula Sheet</a> ·
+    <a href="tips.html">Στρατηγικές</a>
+  </p>
+</footer>
 </body>
 </html>

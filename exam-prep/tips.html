@@ -3,27 +3,427 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Συμβουλές — Προετοιμασία Εξετάσεων</title>
+  <meta name="description"
+        content="Στρατηγικές Εξέτασης — 7ήμερο πρόγραμμα μελέτης, τεχνικές αναγνώρισης ασκήσεων, παγίδες, παρουσίαση απόδειξης.">
+  <title>Στρατηγικές Εξέτασης | Μαθ. Πληροφορικής ΕΚΠΑ</title>
   <link rel="stylesheet" href="../css/style.css">
   <script>
-    window.MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };
+    (function () {
+      const t = localStorage.getItem('math-plir-theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
   <script src="../js/main.js" defer></script>
+  <style>
+    .study-plan {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+    @media (max-width: 700px) {
+      .study-plan { grid-template-columns: repeat(3, 1fr); }
+    }
+    .day-card {
+      border: 1px solid var(--color-border, #d0d8f0);
+      border-radius: 8px;
+      padding: 0.65rem 0.5rem;
+      text-align: center;
+      font-size: 0.82rem;
+      background: var(--color-surface, #fff);
+    }
+    .day-card .day-label {
+      font-weight: 700;
+      color: var(--color-primary, #3b6fd4);
+      font-size: 0.85rem;
+      margin-bottom: 0.3rem;
+    }
+    .day-card.today { border-color: var(--color-primary, #3b6fd4); border-width: 2px; }
+    .pattern-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      background: var(--color-surface-alt, #f8f9ff);
+      border-left: 4px solid var(--color-primary, #3b6fd4);
+      margin-bottom: 0.65rem;
+    }
+    .pattern-row .trigger {
+      background: var(--color-primary, #3b6fd4);
+      color: #fff;
+      border-radius: 6px;
+      padding: 0.2rem 0.7rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .pattern-row .method { font-size: 0.9rem; }
+    .trap-card {
+      border-left: 4px solid #e53935;
+      background: #fff5f5;
+      border-radius: 0 8px 8px 0;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.65rem;
+    }
+    [data-theme="dark"] .trap-card { background: #3a1212; }
+    [data-theme="dark"] .day-card { background: #1a1f2e; }
+    [data-theme="dark"] .pattern-row { background: #1e2a4a; }
+    .proof-step {
+      counter-increment: proof-step;
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+      padding: 0.6rem 0.75rem;
+      border-radius: 6px;
+      background: var(--color-surface-alt, #f8f9ff);
+      margin-bottom: 0.5rem;
+    }
+    .proof-step .step-num {
+      background: var(--color-primary, #3b6fd4);
+      color: #fff;
+      border-radius: 50%;
+      width: 1.5rem;
+      height: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+    [data-theme="dark"] .proof-step { background: #1e2a4a; }
+  </style>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']] },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+    };
+  </script>
 </head>
 <body>
-  <header>
-    <h1>Συμβουλές για τις Εξετάσεις</h1>
-    <a href="../index.html">← Αρχική</a>
-  </header>
 
-  <main>
-    <p><em>Placeholder — περιεχόμενο θα συμπληρωθεί.</em></p>
+<header class="site-header" role="banner">
+  <div class="site-header__inner">
+    <a href="../index.html" class="site-header__title">&#8469; Μαθηματικά Πληροφορικής</a>
+    <nav class="site-nav">
+      <a href="../index.html">Αρχική</a>
+      <a href="../lectures/lecture1.html">Διαλέξεις</a>
+      <a href="../topics/induction.html">Θέματα</a>
+      <a href="../exercises/solved.html">Ασκήσεις</a>
+      <a href="formulas.html" aria-current="page">Εξεταστική</a>
+    </nav>
+    <button id="theme-toggle" class="btn-theme-toggle" aria-label="Εναλλαγή σκοτεινής λειτουργίας">&#127769; Σκοτεινό</button>
+  </div>
+</header>
+
+<div class="page-wrapper">
+  <aside class="sidebar-toc" aria-label="Περιεχόμενα">
+    <button class="toc-toggle" aria-expanded="true">&#128203; Περιεχόμενα &#9662;</button>
+    <div class="sidebar-toc__title">Περιεχόμενα</div>
+    <ol class="sidebar-toc__list">
+      <li><a href="#sec-before">1. Πριν την Εξέταση</a></li>
+      <li><a href="#sec-during">2. Κατά τη Διάρκεια</a></li>
+      <li><a href="#sec-recognition">3. Αναγνώριση Τύπου</a></li>
+      <li><a href="#sec-traps">4. Συνηθισμένες Παγίδες</a></li>
+      <li><a href="#sec-presentation">5. Παρουσίαση Απόδειξης</a></li>
+      <li><a href="#sec-memorize">6. Τι να Αποστηθίσεις</a></li>
+    </ol>
+  </aside>
+
+  <main class="main-content" id="main-content">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <div class="breadcrumbs__item"><a href="../index.html">Αρχική</a></div>
+      <div class="breadcrumbs__item"><a href="formulas.html">Εξεταστική</a></div>
+      <div class="breadcrumbs__item"><span class="breadcrumbs__current">Στρατηγικές</span></div>
+    </nav>
+
+    <h1 class="lecture-title">Στρατηγικές Εξέτασης</h1>
+    <p class="lecture-subtitle">Πρόγραμμα μελέτης, αναγνώριση ασκήσεων, παγίδες, παρουσίαση.</p>
+
+    <!-- §1 Πριν -->
+    <section id="sec-before">
+      <h2>1. Πριν την Εξέταση</h2>
+
+      <h3>7ήμερο Πρόγραμμα Μελέτης</h3>
+      <div class="study-plan">
+        <div class="day-card">
+          <div class="day-label">Ημ. 1</div>
+          <div>Δ1–Δ2<br>Αποδείξεις<br>Επαγωγή</div>
+        </div>
+        <div class="day-card">
+          <div class="day-label">Ημ. 2</div>
+          <div>Δ3<br>Δομική<br>Επαγωγή</div>
+        </div>
+        <div class="day-card">
+          <div class="day-label">Ημ. 3</div>
+          <div>Δ4<br>Ύπαρξη<br>Περιστ/νας</div>
+        </div>
+        <div class="day-card">
+          <div class="day-label">Ημ. 4</div>
+          <div>Δ5<br>Cantor<br>Halting</div>
+        </div>
+        <div class="day-card">
+          <div class="day-label">Ημ. 5</div>
+          <div>Δ6<br>Γραφήματα<br>Euler</div>
+        </div>
+        <div class="day-card">
+          <div class="day-label">Ημ. 6</div>
+          <div>Δ7–Δ8<br>Hall<br>Dilworth</div>
+        </div>
+        <div class="day-card today">
+          <div class="day-label">Ημ. 7 &#127941;</div>
+          <div>Λυμένες<br>Ασκήσεις<br>+ Revision</div>
+        </div>
+      </div>
+
+      <h3>Τι να Κατανοήσεις (key ideas)</h3>
+      <div class="callout callout-definition">
+        <div class="callout-title">Must-Understand</div>
+        <ul>
+          <li><strong>Γιατί λειτουργεί η Επαγωγή</strong> — η σύνδεση βάσης και βήματος.</li>
+          <li><strong>Γιατί Hall ↔ τέλειο ταίριασμα</strong> — ιδέα loose/tight cases.</li>
+          <li><strong>Γιατί Dilworth = Hall</strong> — μέσω διμερούς γράφου.</li>
+          <li><strong>Γιατί Diagonal argument λειτουργεί</strong> — κλειδί: η κατασκευή διαφέρει από κάθε στοιχείο.</li>
+          <li><strong>Γιατί Union Bound για Ramsey</strong> — σχέση \(\binom{N}{t}\cdot 2^{1-\binom{t}{2}} &lt; 1\).</li>
+          <li><strong>Euler formula</strong> — επαγωγή στο \(m\), δύο περιπτώσεις.</li>
+        </ul>
+      </div>
+
+      <h3>Τι να Αποστηθίσεις (διατυπώσεις)</h3>
+      <div class="callout callout-tldr">
+        <div class="callout-title">&#9889; Ακριβείς Διατυπώσεις</div>
+        <ul>
+          <li>Hall: «\(\forall S\subseteq L: |N(S)|\ge|S|\)»</li>
+          <li>Dilworth: «\(c(P)=\alpha(P)\)»</li>
+          <li>Euler formula: «\(n-m+f=2\)»</li>
+          <li>Sperner: «\(|\mathcal{A}|\le\binom{n}{\lfloor n/2\rfloor}\)»</li>
+          <li>Ramsey bound: «\(R(k,m)\le R(k-1,m)+R(k,m-1)\)»</li>
+          <li>Λήμμα χειραψίας: «\(\sum\deg(v)=2|E|\)»</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- §2 Κατά -->
+    <section id="sec-during">
+      <h2>2. Κατά τη Διάρκεια της Εξέτασης</h2>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">&#9200; Time Management</div>
+        <ul>
+          <li><strong>Πρώτα 5 λεπτά:</strong> Διαβάστε ΟΛΑ τα θέματα. Βαθμολογείτε δυσκολία.</li>
+          <li><strong>Ξεκινήστε από το πιο εύκολο</strong> — χτίστε εμπιστοσύνη και εξασφαλίστε βαθμούς.</li>
+          <li><strong>~25–30 λεπτά/θέμα</strong> αν η εξέταση διαρκεί 2,5 ώρες για 5 θέματα.</li>
+          <li><strong>Αν κολλήσετε:</strong> Προχωρήστε, επιστρέψτε αργότερα. Μη χάνετε χρόνο σε ένα σημείο.</li>
+          <li><strong>Τελευταία 10 λεπτά:</strong> Ελέγξτε βάσεις επαγωγής, ποσοδείκτες, «\(\square\)».</li>
+        </ul>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Στρατηγική για Αδύνατη Άσκηση</div>
+        <ol>
+          <li>Γράψτε <em>τι θέλετε να δείξετε</em> ρητά.</li>
+          <li>Δοκιμάστε μικρές περιπτώσεις (\(n=1,2,3\)) για να βρείτε pattern.</li>
+          <li>Σκεφτείτε ποια τεχνική ταιριάζει (βλ. §3).</li>
+          <li>Αν αποδεικνύετε «\(A\iff B\)»: αποδείξτε κάθε κατεύθυνση χωριστά.</li>
+          <li>Αν ζητείτε παράδειγμα: δοκιμάστε \(K_n\), \(C_n\), \(K_{m,n}\), \(\{1,2,\ldots\}\).</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- §3 Αναγνώριση -->
+    <section id="sec-recognition">
+      <h2>3. Αναγνώριση Τύπου Άσκησης</h2>
+
+      <div class="pattern-row">
+        <span class="trigger">«για κάθε \(n\)»</span>
+        <span class="method"><strong>Επαγωγή</strong> (απλή αν εξαρτάται από \(n\), ισχυρή αν από πολλά \(k&lt;n\))</span>
+      </div>
+      <div class="pattern-row">
+        <span class="trigger">«δείξτε ότι υπάρχει»</span>
+        <span class="method"><strong>Κατασκευαστική</strong>, ή <strong>Περιστερεώνας</strong>, ή <strong>Πιθανοτική</strong>, ή <strong>Ramsey</strong></span>
+      </div>
+      <div class="pattern-row">
+        <span class="trigger">«καταρρίψτε»</span>
+        <span class="method"><strong>Αντιπαράδειγμα</strong> — ένα μόνο αρκεί</span>
+      </div>
+      <div class="pattern-row">
+        <span class="trigger">«πόσο μεγάλο/μικρό»</span>
+        <span class="method"><strong>Φράγμα</strong> (άνω + κάτω) + παράδειγμα που επιτυγχάνει το φράγμα</span>
+      </div>
+      <div class="pattern-row">
+        <span class="trigger">«Euler κύκλος;»</span>
+        <span class="method">Μετρήστε βαθμούς — <strong>0 περιττοί</strong> = Euler κύκλος, <strong>2 περιττοί</strong> = Euler μονοπάτι</span>
+      </div>
+      <div class="pattern-row">
+        <span class="trigger">«επίπεδος γράφος;»</span>
+        <span class="method">Ελέγξτε \(m\le3n-6\). Ή βρείτε \(K_5\)/\(K_{3,3}\) subdivision.</span>
+      </div>
+      <div class="pattern-row">
+        <span class="trigger">«τέλειο ταίριασμα;»</span>
+        <span class="method"><strong>Hall condition</strong>: ελέγξτε \(|N(S)|\ge|S|\) ή βρείτε Hall violation</span>
+      </div>
+      <div class="pattern-row">
+        <span class="trigger">«ελάχιστη κάλυψη» ή «μέγιστη αντιαλυσίδα»</span>
+        <span class="method"><strong>Dilworth</strong>: κατασκεύασε \(H\) και βρες max matching</span>
+      </div>
+      <div class="pattern-row">
+        <span class="trigger">«αριθμήσιμο / μη-αριθμήσιμο»</span>
+        <span class="method"><strong>Cantor diagonal</strong> ή <strong>surjection από \(\N\)</strong></span>
+      </div>
+      <div class="pattern-row">
+        <span class="trigger">«σε ομάδα από \(n\) αντικείμενα, υπάρχουν δύο …»</span>
+        <span class="method"><strong>Αρχή Περιστερεώνα</strong> — ορίστε κλάσεις</span>
+      </div>
+    </section>
+
+    <!-- §4 Παγίδες -->
+    <section id="sec-traps">
+      <h2>4. Συνηθισμένες Παγίδες</h2>
+
+      <div class="trap-card">
+        <strong>&#10060; Επαγωγή χωρίς έλεγχο βάσης</strong><br>
+        Το «φαίνεται προφανές» δεν αρκεί. Πάντα γράφετε «Βάση \(n=k_0\): [επαλήθευση]». ✓
+      </div>
+      <div class="trap-card">
+        <strong>&#10060; Λάθος ποσοδείκτες</strong><br>
+        Μπερδεύετε το «για συγκεκριμένο \(n\)» (Ε.Υ.) με «για κάθε \(n\)» (συμπέρασμα).
+        Γράφτε ρητά «έστω \(n\ge n_0\) αυθαίρετο» στην αρχή κάθε βήματος.
+      </div>
+      <div class="trap-card">
+        <strong>&#10060; Χρήση συμπεράσματος ως υπόθεση (κυκλικότητα)</strong><br>
+        «Υποθέτω \(P(n+1)\) για να αποδείξω \(P(n+1)\)» — αυτό δεν λειτουργεί.
+        Η Ε.Υ. αναφέρεται ΠΑΝΤΑ σε μικρότερο \(n\).
+      </div>
+      <div class="trap-card">
+        <strong>&#10060; Παράλειψη «και αντίστροφα» σε ισοδυναμίες</strong><br>
+        Για «\(A\iff B\)» πρέπει να αποδείξετε ΚΑΙ «\(A\Rightarrow B\)» ΚΑΙ «\(B\Rightarrow A\)».
+      </div>
+      <div class="trap-card">
+        <strong>&#10060; Αδύνατη ισχυρή επαγωγή που εφαρμόζεται σε τιμές &lt; βάσης</strong><br>
+        Αν η βάση είναι \(n_0=2\) και στο βήμα χρησιμοποιείτε Ε.Υ. για \(n=1\), το επιχείρημα καταρρέει.
+        Ελέγξτε ότι όλες οι τιμές της Ε.Υ. \(\ge n_0\).
+      </div>
+      <div class="trap-card">
+        <strong>&#10060; Hall violation χωρίς εξακρίβωση</strong><br>
+        Αν λέτε «δεν υπάρχει ταίριασμα», πρέπει να δώσετε ρητά \(S\) με \(|N(S)|&lt;|S|\).
+      </div>
+      <div class="trap-card">
+        <strong>&#10060; Επίπεδος γράφος: αρκεί η σχεδίαση;</strong><br>
+        Για επίπεδο: η σχεδίαση χωρίς τομές αποδεικνύει επιπεδότητα ✓.
+        Για μη-επίπεδο: πρέπει να χρησιμοποιήσετε Euler ή Kuratowski — η «αδυναμία σχεδίασης» δεν αρκεί.
+      </div>
+      <div class="trap-card">
+        <strong>&#10060; «Υπάρχει» χωρίς κατασκευή/πιθανοτική</strong><br>
+        Για ύπαρξη πρέπει είτε να κατασκευάσετε, είτε να χρησιμοποιήσετε περιστερεώνα/πιθανοτική.
+        Το «φαίνεται ότι υπάρχει» δεν αρκεί.
+      </div>
+    </section>
+
+    <!-- §5 Παρουσίαση -->
+    <section id="sec-presentation">
+      <h2>5. Παρουσίαση Απόδειξης</h2>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Δομή Καλής Απόδειξης</div>
+
+        <div class="proof-step">
+          <div class="step-num">1</div>
+          <div><strong>Δηλώστε τι θα αποδείξετε</strong><br>
+            «Αποδεικνύουμε ότι \(P(n)\) ισχύει για κάθε \(n\ge1\), όπου \(P(n)\): [...]»
+          </div>
+        </div>
+        <div class="proof-step">
+          <div class="step-num">2</div>
+          <div><strong>Δηλώστε ποια μέθοδο χρησιμοποιείτε</strong><br>
+            «Απόδειξη με [μαθηματική επαγωγή / ισχυρή επαγωγή / δομική / άτοπο / αντιθετοαντίστροφη].»
+          </div>
+        </div>
+        <div class="proof-step">
+          <div class="step-num">3</div>
+          <div><strong>Βάση</strong> (αν επαγωγή): «\(n=k_0\): [επαλήθευση]. ✓»</div>
+        </div>
+        <div class="proof-step">
+          <div class="step-num">4</div>
+          <div><strong>Ε.Υ.</strong>: «Έστω \(n\ge k_0\) αυθαίρετο. Υποθέτουμε ότι \(P(n)\) ισχύει [/για κάθε \(m&lt;n\)]»</div>
+        </div>
+        <div class="proof-step">
+          <div class="step-num">5</div>
+          <div><strong>Δείχνουμε</strong>: «Θέλουμε να δείξουμε \(P(n+1)\): [...]»<br>
+            [Κύρια απόδειξη — χρησιμοποιείτε Ε.Υ. ρητά]
+          </div>
+        </div>
+        <div class="proof-step">
+          <div class="step-num">6</div>
+          <div><strong>Συμπέρασμα</strong>: «Από την αρχή της μαθηματικής επαγωγής, \(P(n)\) ισχύει για κάθε \(n\ge k_0\). \(\square\)»</div>
+        </div>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Χρήσιμες Φράσεις</div>
+        <table class="math-table">
+          <thead><tr><th>Στόχος</th><th>Φράση</th></tr></thead>
+          <tbody>
+            <tr><td>Εισαγωγή υπόθεσης</td><td>«Έστω \(n\ge n_0\) αυθαίρετο και σταθερό.»</td></tr>
+            <tr><td>Εφαρμογή Ε.Υ.</td><td>«Από επαγωγική υπόθεση, \(P(n)\): [...]»</td></tr>
+            <tr><td>Αλγεβρικός μετ.</td><td>«Τότε: \[\cdots = \cdots\]»</td></tr>
+            <tr><td>Ισοδυναμία</td><td>«Αποδεικνύουμε (\(\Rightarrow\)) και (\(\Leftarrow\)) χωριστά.»</td></tr>
+            <tr><td>Αντιφατική υπόθεση</td><td>«Υποθέτουμε \(\neg P\) και οδηγούμαστε σε αντίφαση.»</td></tr>
+            <tr><td>Τέλος απόδειξης</td><td>«Άρα \(P(n+1)\) ισχύει. Από επαγωγή: \(P(n)\) για κάθε \(n\ge n_0\). \(\square\)»</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- §6 Αποστήθιση -->
+    <section id="sec-memorize">
+      <h2>6. Τι να Αποστηθίσεις</h2>
+
+      <div class="callout callout-tldr">
+        <div class="callout-title">&#9889; Must-Memorize (Ακριβείς Τύποι)</div>
+        <ul>
+          <li>\(\varphi^2 = \varphi+1\), \(\;1/\varphi = \varphi-1\)</li>
+          <li>\(\sum_{i=1}^n i = n(n+1)/2\), \(\;\sum i^2 = n(n+1)(2n+1)/6\)</li>
+          <li>\(\gcd(a,b)=\gcd(b,a\bmod b)\)</li>
+          <li>Λήμμα χειραψίας: \(\sum\deg=2|E|\)</li>
+          <li>Euler: \(n-m+f=2\)</li>
+          <li>Αραιότητα: \(m\le3n-6\) και \(m\le2n-4\) (διμερής)</li>
+          <li>Hall: \(\forall S:|N(S)|\ge|S|\)</li>
+          <li>Dilworth: \(c(P)=\alpha(P)\)</li>
+          <li>Sperner: \(|\mathcal{A}|\le\binom{n}{\lfloor n/2\rfloor}\)</li>
+          <li>Ramsey upper: \(R(k,m)\le R(k-1,m)+R(k,m-1)\)</li>
+          <li>Ramsey lower: \(R(t,t)>2^{t/2}\)</li>
+        </ul>
+      </div>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Βασικά Αντιπαραδείγματα που πρέπει να θυμάστε</div>
+        <ul>
+          <li>\(K_5\) μη-επίπεδο (\(m=10>3\cdot5-6=9\))</li>
+          <li>\(K_{3,3}\) μη-επίπεδο (\(m=9>2\cdot6-4=8\))</li>
+          <li>\(K_6\) ελάχιστος \(K_n\) με \(R(3,3)=6\) (κάθε 2-χρωμ. έχει μονόχρωμο τρίγωνο)</li>
+          <li>Ελαχιστικό ≠ ελάχιστο: poset \(\{2,3,6\}\) με \(|\) έχει δύο ελαχιστικά</li>
+        </ul>
+      </div>
+    </section>
+
+    <nav class="lecture-nav" aria-label="Πλοήγηση εξεταστικής">
+      <a href="key-theorems.html" class="lecture-nav__btn">← Κεντρικά Θεωρήματα</a>
+      <span class="lecture-nav__current">Στρατηγικές Εξέτασης</span>
+      <a href="../index.html" class="lecture-nav__btn">Αρχική →</a>
+    </nav>
   </main>
+</div>
 
-  <footer>
-    <p>Σημειώσεις Μαθηματικών Πληροφορικής — ΕΚΠΑ</p>
-  </footer>
+<footer class="site-footer">
+  <p>Μαθηματικά Πληροφορικής · ΕΚΠΑ · Τμήμα Πληροφορικής &amp; Τηλεπικοινωνιών</p>
+  <p>
+    <a href="../index.html">Αρχική</a> ·
+    <a href="formulas.html">Formula Sheet</a> ·
+    <a href="key-theorems.html">Θεωρήματα</a>
+  </p>
+</footer>
 </body>
 </html>

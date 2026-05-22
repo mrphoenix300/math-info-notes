@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mrphoenix300.github.io/math-info-notes/sitemap.xml

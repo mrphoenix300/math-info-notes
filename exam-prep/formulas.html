@@ -3,27 +3,405 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Τύποι — Προετοιμασία Εξετάσεων</title>
+  <meta name="description"
+        content="Formula Sheet — Όλοι οι τύποι του μαθήματος Μαθηματικά Πληροφορικής σε ένα cheat sheet.">
+  <title>Formula Sheet | Μαθ. Πληροφορικής ΕΚΠΑ</title>
   <link rel="stylesheet" href="../css/style.css">
   <script>
-    window.MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };
+    window.MathJax = {
+      tex: {
+        inlineMath:  [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        macros: {
+          N:  '\\mathbb{N}',
+          Z:  '\\mathbb{Z}',
+          R:  '\\mathbb{R}',
+          Q:  '\\mathbb{Q}',
+          floor: ['\\lfloor #1 \\rfloor', 1],
+          ceil:  ['\\lceil  #1 \\rceil',  1]
+        }
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+    };
+    (function () {
+      const t = localStorage.getItem('math-plir-theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
   <script src="../js/main.js" defer></script>
+  <style>
+    /* ── Grid layout ── */
+    .formula-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    @media (max-width: 680px) {
+      .formula-grid { grid-template-columns: 1fr; }
+    }
+    .formula-card {
+      border: 1px solid var(--color-border, #d0d8f0);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--color-surface, #fff);
+    }
+    .formula-card__head {
+      background: var(--color-primary, #3b6fd4);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.55rem 1rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .formula-card__body {
+      padding: 0.75rem 1rem;
+    }
+    .formula-card__body dl {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      column-gap: 0.75rem;
+      row-gap: 0.45rem;
+      margin: 0;
+      align-items: baseline;
+    }
+    .formula-card__body dt {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--color-text-muted, #666);
+      white-space: nowrap;
+    }
+    .formula-card__body dd {
+      margin: 0;
+      font-size: 0.92rem;
+    }
+    .formula-card__body .sep {
+      grid-column: 1 / -1;
+      border: none;
+      border-top: 1px dashed var(--color-border, #d0d8f0);
+      margin: 0.3rem 0;
+    }
+    .formula-card--wide { grid-column: 1 / -1; }
+    .print-btn {
+      display: inline-block;
+      margin: 0.5rem 0 1.25rem;
+      padding: 0.5rem 1.2rem;
+      border: 2px solid var(--color-primary, #3b6fd4);
+      border-radius: 6px;
+      font-weight: 600;
+      color: var(--color-primary, #3b6fd4);
+      cursor: pointer;
+      background: transparent;
+      font-size: 0.92rem;
+    }
+    .print-btn:hover { background: var(--color-primary, #3b6fd4); color: #fff; }
+    @media print {
+      .site-header, .site-footer, .sidebar-toc, .print-btn, .breadcrumbs { display: none !important; }
+      .page-wrapper { display: block; }
+      .main-content { padding: 0; }
+      .formula-grid { grid-template-columns: 1fr 1fr; }
+      .formula-card { break-inside: avoid; }
+    }
+    [data-theme="dark"] .formula-card { background: #1a1f2e; }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Τύποι</h1>
-    <a href="../index.html">← Αρχική</a>
-  </header>
 
-  <main>
-    <p><em>Placeholder — περιεχόμενο θα συμπληρωθεί.</em></p>
+<header class="site-header" role="banner">
+  <div class="site-header__inner">
+    <a href="../index.html" class="site-header__title">&#8469; Μαθηματικά Πληροφορικής</a>
+    <nav class="site-nav" aria-label="Κύρια πλοήγηση">
+      <a href="../index.html">Αρχική</a>
+      <a href="../lectures/lecture1.html">Διαλέξεις</a>
+      <a href="../topics/induction.html">Θέματα</a>
+      <a href="../exercises/solved.html">Ασκήσεις</a>
+      <a href="formulas.html" aria-current="page">Εξεταστική</a>
+    </nav>
+    <button id="theme-toggle" class="btn-theme-toggle"
+            aria-label="Εναλλαγή σκοτεινής λειτουργίας">&#127769; Σκοτεινό</button>
+  </div>
+</header>
+
+<div class="page-wrapper">
+  <aside class="sidebar-toc" aria-label="Κατηγορίες">
+    <button class="toc-toggle" aria-expanded="true">&#128203; Κατηγορίες &#9662;</button>
+    <div class="sidebar-toc__title">Κατηγορίες</div>
+    <ol class="sidebar-toc__list">
+      <li><a href="#golden">Χρυσή Τομή</a></li>
+      <li><a href="#fibonacci">Fibonacci</a></li>
+      <li><a href="#nt">Αριθμοθεωρία</a></li>
+      <li><a href="#counting">Απαρίθμηση</a></li>
+      <li><a href="#graphs">Γραφήματα</a></li>
+      <li><a href="#ramsey">Ramsey</a></li>
+      <li><a href="#hall">Hall / Dilworth</a></li>
+      <li><a href="#computability">Υπολογισιμότητα</a></li>
+      <li><a href="#induction">Επαγωγή</a></li>
+    </ol>
+  </aside>
+
+  <main class="main-content" id="main-content">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <div class="breadcrumbs__item"><a href="../index.html">Αρχική</a></div>
+      <div class="breadcrumbs__item"><span class="breadcrumbs__current">Formula Sheet</span></div>
+    </nav>
+
+    <h1 class="lecture-title">Formula Sheet</h1>
+    <p class="lecture-subtitle">
+      Όλοι οι κεντρικοί τύποι σε grid 2 στηλών. Χρήσιμο για γρήγορη επανάληψη.
+    </p>
+
+    <button class="print-btn" onclick="window.print()">&#128438; Εκτύπωση / PDF</button>
+
+    <div class="formula-grid">
+
+      <!-- Χρυσή Τομή -->
+      <div class="formula-card" id="golden">
+        <div class="formula-card__head">&#10024; Χρυσή Τομή</div>
+        <div class="formula-card__body">
+          <dl>
+            <dt>Ορισμός</dt>
+            <dd>\(\varphi = \dfrac{1+\sqrt{5}}{2} \approx 1.618\)</dd>
+            <hr class="sep">
+            <dt>Χαρακτ/κή</dt>
+            <dd>\(\varphi^2 = \varphi + 1\)</dd>
+            <dt>Συζυγής</dt>
+            <dd>\(\hat{\varphi} = \dfrac{1-\sqrt{5}}{2} \approx -0.618\)</dd>
+            <dt>Αντίστροφο</dt>
+            <dd>\(\dfrac{1}{\varphi} = \varphi - 1\)</dd>
+            <dt>Ταυτότητα</dt>
+            <dd>\(\dfrac{1}{\varphi} + \dfrac{1}{\varphi^2} = 1\)</dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Fibonacci -->
+      <div class="formula-card" id="fibonacci">
+        <div class="formula-card__head">&#128049; Fibonacci</div>
+        <div class="formula-card__body">
+          <dl>
+            <dt>Αναδρ/κή</dt>
+            <dd>\(F_n = F_{n-1} + F_{n-2}\), \(F_1=F_2=1\)</dd>
+            <hr class="sep">
+            <dt>Κλειστός</dt>
+            <dd>\(F_n = \dfrac{\varphi^n - \hat\varphi^n}{\sqrt{5}}\) (Binet)</dd>
+            <dt>Φράγμα</dt>
+            <dd>\(\tfrac{1}{2}\varphi^{n-1} \le F_n \le \varphi^{n-1}\)</dd>
+            <dt>Doubling</dt>
+            <dd>\(F_{2n} = F_n(2F_{n+1}-F_n)\)</dd>
+            <dt>Doubling</dt>
+            <dd>\(F_{2n+1} = F_n^2 + F_{n+1}^2\)</dd>
+            <dt>Addition</dt>
+            <dd>\(F_{n+m} = F_nF_{m+1} + F_{n-1}F_m\)</dd>
+            <dt>GCD</dt>
+            <dd>\(\gcd(F_m, F_n) = F_{\gcd(m,n)}\)</dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Αριθμοθεωρία -->
+      <div class="formula-card" id="nt">
+        <div class="formula-card__head">&#128290; Αριθμοθεωρία</div>
+        <div class="formula-card__body">
+          <dl>
+            <dt>Ευκλείδης</dt>
+            <dd>\(\gcd(a,b) = \gcd(b,\, a \bmod b)\)</dd>
+            <dt>Βάση</dt>
+            <dd>\(\gcd(a,0) = a\)</dd>
+            <hr class="sep">
+            <dt>Bézout</dt>
+            <dd>\(\gcd(a,b) = \min\{ax+by : ax+by>0,\; x,y\in\Z\}\)</dd>
+            <dt>Bézout</dt>
+            <dd>\(\exists x,y\in\Z: ax+by = \gcd(a,b)\)</dd>
+            <hr class="sep">
+            <dt>Πολυπλ/τα</dt>
+            <dd>Ευκλείδης: \(\le 2\lfloor\log a\rfloor\) βήματα</dd>
+            <dt>Fibonacci</dt>
+            <dd>Χειρότερη περίπτωση: \(a=F_{n+1}, b=F_n\)</dd>
+            <hr class="sep">
+            <dt>ΘΘΑ</dt>
+            <dd>\(a \mid bc \land \gcd(a,b)=1 \Rightarrow a \mid c\)</dd>
+            <dt>Πρώτοι</dt>
+            <dd>Άπειροι (Ευκλείδης: Υποθέτω πεπερασμένο, πολ/σμός+1)</dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Απαρίθμηση -->
+      <div class="formula-card" id="counting">
+        <div class="formula-card__head">&#127922; Απαρίθμηση &amp; Περιστερεώνας</div>
+        <div class="formula-card__body">
+          <dl>
+            <dt>Pigeonhole</dt>
+            <dd>\(n+1\) αντικείμενα σε \(n\) κλάσεις \(\Rightarrow\) κάποια κλάση \(\ge 2\)</dd>
+            <dt>Γενικ/μένο</dt>
+            <dd>\(m\) αντικ. σε \(n\) κλάσεις \(\Rightarrow\) κλάση \(\ge \lceil m/n \rceil\)</dd>
+            <hr class="sep">
+            <dt>Διωνυμικό</dt>
+            <dd>\(\dbinom{n}{k} = \dfrac{n!}{k!(n-k)!}\)</dd>
+            <dt>Συμμετρία</dt>
+            <dd>\(\dbinom{n}{k} = \dbinom{n}{n-k}\)</dd>
+            <dt>Άθροισμα</dt>
+            <dd>\(\displaystyle\sum_{k=0}^n\binom{n}{k} = 2^n\)</dd>
+            <dt>Dirichlet</dt>
+            <dd>\(\exists p/q: \left|\theta - p/q\right| < 1/(mq),\; 1\le q\le m\)</dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Γραφήματα -->
+      <div class="formula-card" id="graphs">
+        <div class="formula-card__head">&#127981; Γραφήματα</div>
+        <div class="formula-card__body">
+          <dl>
+            <dt>Χειραψία</dt>
+            <dd>\(\displaystyle\sum_{v\in V}\deg(v) = 2|E|\)</dd>
+            <dt>Δέντρο</dt>
+            <dd>\(|E| = |V| - 1\) (συνεκτικός ακυκλικός)</dd>
+            <dt>Δάσος</dt>
+            <dd>\(k\) συν/νιστώσες: \(|E| = |V| - k\)</dd>
+            <hr class="sep">
+            <dt>Euler κύκλος</dt>
+            <dd>Κάθε κόμβος ζυγού βαθμού</dd>
+            <dt>Euler μονοπάτι</dt>
+            <dd>Ακριβώς δύο κόμβοι περιττού βαθμού</dd>
+            <hr class="sep">
+            <dt>Euler \(n{-}m{+}f\)</dt>
+            <dd>\(n - m + f = 2\) (συνεκτικός επίπεδος)</dd>
+            <dt>Αραιότητα</dt>
+            <dd>\(m \le 3n - 6\) (\(n \ge 3\))</dd>
+            <dt>Αραιότητα</dt>
+            <dd>\(m \le 2n - 4\) (διμερής, \(n \ge 3\))</dd>
+            <dt>Kuratowski</dt>
+            <dd>Επίπεδος \(\iff\) χωρίς \(K_5\) ή \(K_{3,3}\) subdivision</dd>
+            <hr class="sep">
+            <dt>Χρωματ.</dt>
+            <dd>\(\chi(G) \ge \omega(G)\), διμερής \(\Rightarrow \chi \le 2\)</dd>
+            <dt>Επίπεδος</dt>
+            <dd>\(\chi(G) \le 6\) (εύκολο), \(\le 4\) (Θ. 4 Χρωμάτων)</dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Ramsey -->
+      <div class="formula-card" id="ramsey">
+        <div class="formula-card__head">&#127950; Ramsey</div>
+        <div class="formula-card__body">
+          <dl>
+            <dt>Αναδρ/κή</dt>
+            <dd>\(R(k,m) \le R(k{-}1,m) + R(k,m{-}1)\)</dd>
+            <dt>Κλειστός</dt>
+            <dd>\(R(k,m) \le \dbinom{k+m-2}{k-1}\)</dd>
+            <hr class="sep">
+            <dt>Άνω φράγμα</dt>
+            <dd>\(R(k,k) \le \dbinom{2k-2}{k-1} < 4^k\)</dd>
+            <dt>Κάτω φράγμα</dt>
+            <dd>\(R(t,t) > 2^{t/2}\) (Erdős 1947, πιθανοτική)</dd>
+            <hr class="sep">
+            <dt>Βάσεις</dt>
+            <dd>\(R(1,m)=1,\; R(2,m)=m,\; R(3,3)=6\)</dd>
+            <dt>Ορισμός</dt>
+            <dd>Ελάχιστο \(N\) ώστε κάθε 2-χρωμ. \(K_N\) περιέχει \(K_k\) ή \(K_m\) μονόχρωμο</dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Hall / Dilworth / Sperner -->
+      <div class="formula-card" id="hall">
+        <div class="formula-card__head">&#9877; Hall, Dilworth, Mirsky, Sperner</div>
+        <div class="formula-card__body">
+          <dl>
+            <dt>Hall</dt>
+            <dd>Τέλ. ταίρ. \(\iff \forall S\subseteq L: |N(S)|\ge|S|\)</dd>
+            <dt>Defect</dt>
+            <dd>\(\max_M |M| = |L| - \delta(G)\), \(\delta=\max_{S}(|S|-|N(S)|)\)</dd>
+            <dt>Berge</dt>
+            <dd>\(M\) μέγιστο \(\iff\) δεν υπάρχει \(M\)-αυξητικό μονοπάτι</dd>
+            <hr class="sep">
+            <dt>König</dt>
+            <dd>\(\nu(G) = \tau(G)\) (διμερής: max matching = min vertex cover)</dd>
+            <hr class="sep">
+            <dt>Dilworth</dt>
+            <dd>\(c(P) = \alpha(P)\) (ελ. κάλυψη αλυσίδων = μέγ. αντιαλυσίδα)</dd>
+            <dt>Mirsky</dt>
+            <dd>Ελ. κάλυψη αντιαλυσίδων = \(\omega(P)\) (μέγ. αλυσίδα)</dd>
+            <hr class="sep">
+            <dt>Sperner</dt>
+            <dd>\(|\mathcal{A}| \le \dbinom{n}{\lfloor n/2\rfloor}\) για αντιαλ. \(\mathcal{A}\subseteq 2^{[n]}\)</dd>
+            <dt>Intersect.</dt>
+            <dd>Τεμνόμενη οικογένεια: \(|\mathcal{F}| \le 2^{n-1}\)</dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Υπολογισιμότητα -->
+      <div class="formula-card" id="computability">
+        <div class="formula-card__head">&#8734; Υπολογισιμότητα &amp; Σύνολα</div>
+        <div class="formula-card__body">
+          <dl>
+            <dt>Cantor</dt>
+            <dd>\(\R\) μη-απαριθμήσιμο (διαγωνοποίηση)</dd>
+            <dt>Cantor</dt>
+            <dd>\(|2^S| > |S|\) για κάθε \(S\)</dd>
+            <dt>Απαρ/σιμα</dt>
+            <dd>\(\N, \Z, \Q, \Sigma^*\) είναι απαριθμήσιμα</dd>
+            <dt>Γλώσσες</dt>
+            <dd>\(\mathcal{L} = 2^{\{0,1\}^*}\) μη-απαριθμήσιμο</dd>
+            <hr class="sep">
+            <dt>Halting</dt>
+            <dd>Πρόβλημα \(\text{HALT}\) μη-αποφάσιστο</dd>
+            <dt>Ιδέα</dt>
+            <dd>Πρόγρ. \(D\): «τρέχω εαυτό, αντιστρέφω» → αντίφαση</dd>
+            <hr class="sep">
+            <dt>Rice</dt>
+            <dd>Κάθε μη-τετριμμένη σημασιολογική ιδ/τα ΜΤΜ μη-αποφάσιστη</dd>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Επαγωγή -->
+      <div class="formula-card formula-card--wide" id="induction">
+        <div class="formula-card__head">&#8734; Κλασικά Αθροίσματα &amp; Ανισότητες</div>
+        <div class="formula-card__body">
+          <dl>
+            <dt>\(\sum i\)</dt>
+            <dd>\(\displaystyle\sum_{i=1}^n i = \dfrac{n(n+1)}{2}\)</dd>
+            <dt>\(\sum i^2\)</dt>
+            <dd>\(\displaystyle\sum_{i=1}^n i^2 = \dfrac{n(n+1)(2n+1)}{6}\)</dd>
+            <dt>\(\sum i^3\)</dt>
+            <dd>\(\displaystyle\sum_{i=1}^n i^3 = \left(\dfrac{n(n+1)}{2}\right)^2\)</dd>
+            <dt>\(\sum 2^i\)</dt>
+            <dd>\(\displaystyle\sum_{i=0}^n 2^i = 2^{n+1}-1\)</dd>
+            <dt>\(H_n\)</dt>
+            <dd>\(\displaystyle H_n = \sum_{i=1}^n \frac{1}{i} \ge \frac{\ln(n+1)}{2}\)</dd>
+            <dt>AM-GM</dt>
+            <dd>\(\dfrac{a+b}{2} \ge \sqrt{ab}\) για \(a,b \ge 0\)</dd>
+            <dt>\(n!\) vs \(2^n\)</dt>
+            <dd>\(n! > 2^n\) για \(n \ge 4\); \(\; n! > n^{n/2}\) για \(n\ge 3\)</dd>
+            <dt>Bernoulli</dt>
+            <dd>\((1+x)^n \ge 1+nx\) για \(x \ge -1, n\in\N\)</dd>
+          </dl>
+        </div>
+      </div>
+
+    </div><!-- /.formula-grid -->
+
+    <nav class="lecture-nav" aria-label="Πλοήγηση εξεταστικής">
+      <a href="../exercises/solved.html" class="lecture-nav__btn">← Λυμένες Ασκήσεις</a>
+      <span class="lecture-nav__current">Formula Sheet</span>
+      <a href="key-theorems.html" class="lecture-nav__btn">Κεντρικά Θεωρήματα →</a>
+    </nav>
   </main>
+</div>
 
-  <footer>
-    <p>Σημειώσεις Μαθηματικών Πληροφορικής — ΕΚΠΑ</p>
-  </footer>
+<footer class="site-footer">
+  <p>Μαθηματικά Πληροφορικής · ΕΚΠΑ · Τμήμα Πληροφορικής &amp; Τηλεπικοινωνιών</p>
+  <p>
+    <a href="../index.html">Αρχική</a> ·
+    <a href="key-theorems.html">Θεωρήματα</a> ·
+    <a href="tips.html">Στρατηγικές</a>
+  </p>
+</footer>
 </body>
 </html>

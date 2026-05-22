@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Αρχική -->
+  <url>
+    <loc>https://mrphoenix300.github.io/math-info-notes/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Διαλέξεις -->
+  <url>
+    <loc>https://mrphoenix300.github.io/math-info-notes/lectures/lecture1.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://mrphoenix300.github.io/math-info-notes/lectures/lecture2.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://mrphoenix300.github.io/math-info-notes/lectures/lecture3.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://mrphoenix300.github.io/math-info-notes/lectures/lecture4.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://mrphoenix300.github.io/math-info-notes/lectures/lecture5.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://mrphoenix300.github.io/math-info-notes/lectures/lecture6.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://mrphoenix300.github.io/math-info-notes/lectures/lecture7.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://mrphoenix300.github.io/math-info-notes/lectures/lecture8.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Topics -->
+  <url>
+    <loc>https://mrphoenix300.github.io/math-info-notes/topics/induction.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mrphoenix300.github.io/math-info-notes/topics/graphs.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mrphoenix300.github.io/math-info-notes/topics/proofs-cheatsheet.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Exercises -->
+  <url>
+    <loc>https://mrphoenix300.github.io/math-info-notes/exercises/solved.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Exam Prep -->
+  <url>
+    <loc>https://mrphoenix300.github.io/math-info-notes/exam-prep/formulas.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mrphoenix300.github.io/math-info-notes/exam-prep/key-theorems.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://mrphoenix300.github.io/math-info-notes/exam-prep/tips.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+</urlset>

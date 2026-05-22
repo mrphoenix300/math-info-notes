@@ -27,6 +27,53 @@ function init() {
   initTOC();
   initMobileTOC();
   initAnchorLinks();
+  initBackToTop();
+}
+
+/* ------------------------------------------------------------------
+   Back-to-Top Button
+------------------------------------------------------------------ */
+function initBackToTop() {
+  const btn = document.createElement('button');
+  btn.id = 'back-to-top';
+  btn.setAttribute('aria-label', 'Επιστροφή στην κορυφή');
+  btn.setAttribute('title', 'Επιστροφή στην κορυφή');
+  btn.innerHTML = '&#8679;';
+  btn.style.cssText = [
+    'position:fixed',
+    'bottom:1.5rem',
+    'right:1.5rem',
+    'width:2.6rem',
+    'height:2.6rem',
+    'border-radius:50%',
+    'border:none',
+    'background:var(--color-primary,#3b6fd4)',
+    'color:#fff',
+    'font-size:1.4rem',
+    'line-height:1',
+    'cursor:pointer',
+    'opacity:0',
+    'transform:translateY(8px)',
+    'transition:opacity 0.25s,transform 0.25s',
+    'z-index:999',
+    'box-shadow:0 2px 8px rgba(0,0,0,0.25)',
+    'display:flex',
+    'align-items:center',
+    'justify-content:center'
+  ].join(';');
+
+  document.body.appendChild(btn);
+
+  const toggle = () => {
+    const visible = window.scrollY > 400;
+    btn.style.opacity = visible ? '1' : '0';
+    btn.style.transform = visible ? 'translateY(0)' : 'translateY(8px)';
+    btn.style.pointerEvents = visible ? 'auto' : 'none';
+  };
+
+  window.addEventListener('scroll', toggle, { passive: true });
+  btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  toggle();
 }
 
 /* ------------------------------------------------------------------

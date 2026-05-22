@@ -3,27 +3,149 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>404 — Σελίδα δεν βρέθηκε</title>
+  <meta name="description" content="404 — Η σελίδα δεν βρέθηκε. Μαθηματικά Πληροφορικής ΕΚΠΑ.">
+  <title>404 — Σελίδα Δεν Βρέθηκε | Μαθ. Πληροφορικής ΕΚΠΑ</title>
   <link rel="stylesheet" href="./css/style.css">
   <script>
-    window.MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };
+    (function () {
+      const t = localStorage.getItem('math-plir-theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
   <script src="./js/main.js" defer></script>
+  <style>
+    .error-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 60vh;
+      padding: 3rem 1rem;
+    }
+    .error-code {
+      font-size: clamp(5rem, 15vw, 9rem);
+      font-weight: 900;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--color-primary, #3b6fd4) 0%, #6b21a8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.25rem;
+    }
+    .error-math {
+      font-size: 1.1rem;
+      color: var(--color-text-muted, #666);
+      margin: 0.75rem 0 1.5rem;
+      font-style: italic;
+    }
+    .error-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+    .error-desc {
+      max-width: 480px;
+      color: var(--color-text-secondary, #555);
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+    .error-links {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .error-links a {
+      padding: 0.55rem 1.25rem;
+      border-radius: 6px;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: background 0.15s, color 0.15s;
+    }
+    .error-links .btn-primary {
+      background: var(--color-primary, #3b6fd4);
+      color: #fff;
+    }
+    .error-links .btn-primary:hover { background: #2a5abc; }
+    .error-links .btn-outline {
+      border: 2px solid var(--color-primary, #3b6fd4);
+      color: var(--color-primary, #3b6fd4);
+    }
+    .error-links .btn-outline:hover { background: var(--color-primary, #3b6fd4); color: #fff; }
+    .math-joke {
+      margin-top: 2.5rem;
+      padding: 1rem 1.5rem;
+      background: var(--color-surface-alt, #f0f4ff);
+      border-radius: 10px;
+      max-width: 520px;
+      font-size: 0.92rem;
+      color: var(--color-text-secondary, #555);
+      border-left: 4px solid var(--color-primary, #3b6fd4);
+    }
+    .math-joke strong { display: block; margin-bottom: 0.35rem; color: var(--color-primary, #3b6fd4); }
+    [data-theme="dark"] .math-joke { background: #1e2a4a; }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>404 — Σελίδα δεν βρέθηκε</h1>
-  </header>
 
-  <main>
-    <p>Η σελίδα που ζητήσατε δεν υπάρχει.</p>
-    <a href="./index.html">← Επιστροφή στην Αρχική</a>
-  </main>
+<header class="site-header" role="banner">
+  <div class="site-header__inner">
+    <a href="./index.html" class="site-header__title">&#8469; Μαθηματικά Πληροφορικής</a>
+    <nav class="site-nav" aria-label="Κύρια πλοήγηση">
+      <a href="./index.html">Αρχική</a>
+      <a href="./lectures/lecture1.html">Διαλέξεις</a>
+      <a href="./topics/induction.html">Θέματα</a>
+      <a href="./exercises/solved.html">Ασκήσεις</a>
+      <a href="./exam-prep/formulas.html">Εξεταστική</a>
+    </nav>
+    <button id="theme-toggle" class="btn-theme-toggle"
+            aria-label="Εναλλαγή σκοτεινής λειτουργίας">&#127769; Σκοτεινό</button>
+  </div>
+</header>
 
-  <footer>
-    <p>Σημειώσεις Μαθηματικών Πληροφορικής — ΕΚΠΑ</p>
-  </footer>
+<main>
+  <div class="error-page">
+    <div class="error-code">404</div>
+    <p class="error-math">
+      \(\{x \in \text{ιστότοπος} : x = \text{αυτή η σελίδα}\} = \emptyset\)
+    </p>
+    <h1 class="error-title">Η Σελίδα Δεν Βρέθηκε</h1>
+    <p class="error-desc">
+      Φαίνεται ότι ζητήσατε στοιχείο από ένα <strong>μη-απαριθμήσιμο σύνολο</strong> σελίδων που δεν υπάρχουν.
+      Από το Θεώρημα Cantor, αυτό είναι αναπόφευκτο.
+    </p>
+    <div class="error-links">
+      <a href="./index.html" class="btn-primary">&#127968; Αρχική Σελίδα</a>
+      <a href="./lectures/lecture1.html" class="btn-outline">&#128218; Διαλέξεις</a>
+      <a href="./exercises/solved.html" class="btn-outline">&#9998; Ασκήσεις</a>
+    </div>
+
+    <div class="math-joke">
+      <strong>&#128516; Μαθηματικό αστείο της ημέρας</strong>
+      Ένας μαθηματικός ζητά: «Δείξε μου έναν κλώνο σε 10 λεπτά.»
+      Ο βοηθός φέρνει 5 λεπτά νωρίτερα. Ο μαθηματικός λέει:
+      «Αυτό το αποτέλεσμα είναι <em>τυχαίο</em>».
+      <br><br>
+      <em>— ή —</em>
+      <br><br>
+      Η σελίδα που ζητήσατε ανήκει στο σύνολο
+      \(\mathcal{L} = \{S \subseteq \text{URL}^* : S \notin \text{αρχεία ιστότοπου}\}\),
+      το οποίο, σύμφωνα με Cantor, είναι μη-απαριθμήσιμο.
+      Άρα η αδυναμία εύρεσής της είναι θεωρητικά αναπόφευκτη. \(\square\)
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <p>Μαθηματικά Πληροφορικής · ΕΚΠΑ · Τμήμα Πληροφορικής &amp; Τηλεπικοινωνιών</p>
+  <p>
+    <a href="./index.html">Αρχική</a> ·
+    <a href="./lectures/lecture1.html">Διαλέξη 1</a> ·
+    <a href="./exam-prep/formulas.html">Formula Sheet</a>
+  </p>
+</footer>
 </body>
 </html>
