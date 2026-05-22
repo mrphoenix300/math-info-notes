@@ -3,35 +3,1052 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Διάλεξη 2 — Αποδείξεις</title>
+  <meta name="description"
+        content="Διάλεξη 2 — Αποδείξεις. Vertex Cover, Ramsey, Μαθηματική Επαγωγή, Fibonacci, Αριθμοθεωρία, Ισχυροποίηση Πρότασης.">
+  <title>Διάλεξη 2 — Αποδείξεις | Μαθ. Πληροφορικής ΕΚΠΑ</title>
   <link rel="stylesheet" href="../css/style.css">
   <script>
-    window.MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };
+    window.MathJax = {
+      tex: {
+        inlineMath:  [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        tags: 'ams',
+        macros: {
+          floor: ['\\lfloor #1 \\rfloor', 1],
+          N:  '\\mathbb{N}',
+          Z:  '\\mathbb{Z}',
+          vp: '\\varphi'
+        }
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+    };
+    (function () {
+      const t = localStorage.getItem('math-plir-theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <script src="../js/main.js" defer></script>
 </head>
 <body>
-  <header>
-    <h1>Διάλεξη 2 — Αποδείξεις</h1>
-    <a href="../index.html">← Αρχική</a>
-  </header>
 
-  <nav>
-    <a href="lecture1.html">← Προηγούμενη</a>
-    <span>|</span>
-    <a href="../index.html">Αρχική</a>
-    <span>|</span>
-    <a href="lecture3.html">Επόμενη →</a>
-  </nav>
+<header class="site-header" role="banner">
+  <div class="site-header__inner">
+    <a href="../index.html" class="site-header__title">&#8469; Μαθηματικά Πληροφορικής</a>
+    <nav class="site-nav" aria-label="Κύρια πλοήγηση">
+      <a href="../index.html">Αρχική</a>
+      <a href="lecture1.html" aria-current="page">Διαλέξεις</a>
+      <a href="../topics/induction.html">Θέματα</a>
+      <a href="../exercises/solved.html">Ασκήσεις</a>
+      <a href="../exam-prep/formulas.html">Εξεταστική</a>
+    </nav>
+    <button id="theme-toggle" class="btn-theme-toggle"
+            aria-label="Εναλλαγή σκοτεινής λειτουργίας">&#127769; Σκοτεινό</button>
+  </div>
+</header>
 
-  <main>
-    <p><em>Placeholder — περιεχόμενο θα συμπληρωθεί.</em></p>
+<div class="page-wrapper">
+
+  <!-- ── Sidebar TOC ── -->
+  <aside class="sidebar-toc" aria-label="Περιεχόμενα σελίδας">
+    <button class="toc-toggle" aria-expanded="true">&#128203; Περιεχόμενα &#9662;</button>
+    <div class="sidebar-toc__title">Περιεχόμενα</div>
+    <ol class="sidebar-toc__list">
+      <li class="toc-h2"><a href="#sec-tldr">TL;DR</a></li>
+      <li class="toc-h2"><a href="#sec-kinds">1. Είδη Αποδείξεων</a></li>
+      <li class="toc-h2"><a href="#sec-exhaustive">2. Εξαντλητική Μέθοδος</a>
+        <ol>
+          <li class="toc-h3"><a href="#sec-vc-def">Vertex Cover</a></li>
+          <li class="toc-h3"><a href="#sec-vc-kernel">Kernelization</a></li>
+          <li class="toc-h3"><a href="#sec-vc-rec">VC_Rec</a></li>
+        </ol>
+      </li>
+      <li class="toc-h2"><a href="#sec-ramsey">3. Αριθμοί Ramsey</a></li>
+      <li class="toc-h2"><a href="#sec-induction">4. Μαθηματική Επαγωγή</a>
+        <ol>
+          <li class="toc-h3"><a href="#sec-harmonic">Αρμονικός Αριθμός</a></li>
+          <li class="toc-h3"><a href="#sec-strong">Ισχυρή Επαγωγή</a></li>
+        </ol>
+      </li>
+      <li class="toc-h2"><a href="#sec-fib">5. Αριθμοί Fibonacci</a>
+        <ol>
+          <li class="toc-h3"><a href="#sec-fib-bounds">Φράγματα</a></li>
+          <li class="toc-h3"><a href="#sec-fib-double">Θεώρημα Διπλασιασμού</a></li>
+          <li class="toc-h3"><a href="#sec-fib-stairs">Σκαλιά</a></li>
+        </ol>
+      </li>
+      <li class="toc-h2"><a href="#sec-nt">6. Στοιχειώδης Αριθμοθεωρία</a>
+        <ol>
+          <li class="toc-h3"><a href="#sec-primes">Πρώτοι &amp; Παραγοντοποίηση</a></li>
+          <li class="toc-h3"><a href="#sec-gcd">ΜΚΔ &amp; Αλγόριθμος Ευκλείδη</a></li>
+          <li class="toc-h3"><a href="#sec-bezout">Λήμμα Bézout</a></li>
+          <li class="toc-h3"><a href="#sec-fta">Θεμελιώδες Θεώρημα</a></li>
+        </ol>
+      </li>
+      <li class="toc-h2"><a href="#sec-strengthen">7. Ισχυροποίηση Πρότασης</a></li>
+      <li class="toc-h2"><a href="#sec-exam">Ερωτήσεις Εξετάσεων</a></li>
+    </ol>
+  </aside>
+
+  <!-- ── Main Content ── -->
+  <main class="main-content" id="main-content">
+
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <div class="breadcrumbs__item"><a href="../index.html">Αρχική</a></div>
+      <div class="breadcrumbs__item"><a href="../index.html#lecture-cards">Διαλέξεις</a></div>
+      <div class="breadcrumbs__item"><span class="breadcrumbs__current">Διάλεξη 2</span></div>
+    </nav>
+
+    <h1>Διάλεξη 2 &mdash; Αποδείξεις</h1>
+
+    <!-- TL;DR -->
+    <section id="sec-tldr">
+      <div class="callout callout-tldr">
+        <div class="callout-title">TL;DR</div>
+        <ul>
+          <li>Υπάρχουν πολλές τεχνικές απόδειξης&middot; η επιλογή εξαρτάται από τη δομή του προβλήματος.</li>
+          <li><strong>Vertex Cover</strong>: το kernelization μειώνει το πρόβλημα σε πυρήνα \(\le 2k^2\) κορυφών, ανεξάρτητα του \(n\).</li>
+          <li><strong>Επαγωγή</strong>: αν η αφελής πρόταση δεν αποδεικνύεται, συχνά αρκεί να <em>ισχυροποιήσουμε</em> την πρόταση.</li>
+          <li><strong>Fibonacci</strong>: \(F_n \le \varphi^n\) και οι τύποι διπλασιασμού αποδεικνύονται με ισχυρή επαγωγή.</li>
+          <li><strong>Αλγόριθμος Ευκλείδη</strong>: \(\gcd(a,b) = \gcd(b,\, a \bmod b)\), τερματίζει σε \(\le 2\lfloor\log a\rfloor\) βήματα.</li>
+          <li><strong>Θεμελιώδες Θεώρημα Αριθμοθεωρίας</strong>: μοναδική παραγοντοποίηση σε πρώτους&middot; η μοναδικότητα αποδεικνύεται με ελάχιστο αντιπαράδειγμα.</li>
+        </ul>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ════════════════════════════════════
+         §1  ΕΊΔΗ ΑΠΟΔΕΙΞΕΩΝ
+    ════════════════════════════════════ -->
+    <section id="sec-kinds">
+      <h2 id="h-kinds">1. Είδη Αποδείξεων — Επισκόπηση</h2>
+
+      <p>Δεν υπάρχει μία «σωστή» μέθοδος απόδειξης. Διαφορετικά προβλήματα καλούν
+         διαφορετικές τεχνικές. Ακολουθεί χάρτης των κυριότερων:</p>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμός — Κατάλογος Μεθόδων</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Μέθοδος</th><th>Πότε χρησιμοποιείται</th><th>Παράδειγμα σήμερα</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Εξαντλητική / Case analysis</strong></td>
+                <td>Πεπερασμένο (ή ανάγωγο σε πεπερασμένο) σύνολο περιπτώσεων</td>
+                <td>Vertex Cover, Ramsey</td>
+              </tr>
+              <tr>
+                <td><strong>Μαθηματική επαγωγή</strong></td>
+                <td>Πρότασεις για κάθε \(n \in \mathbb{N}\)</td>
+                <td>Αρμονικός, Fibonacci</td>
+              </tr>
+              <tr>
+                <td><strong>Ισχυρή επαγωγή</strong></td>
+                <td>Βήμα χρειάζεται περισσότερες από μία προηγούμενες περιπτώσεις</td>
+                <td>\(F_n \le \varphi^n\), παραγοντοποίηση</td>
+              </tr>
+              <tr>
+                <td><strong>Δομική επαγωγή</strong></td>
+                <td>Επαναδρομικές δομές (δέντρα, γραμματικές)</td>
+                <td>Διάλεξη 3</td>
+              </tr>
+              <tr>
+                <td><strong>Κατασκευαστική ύπαρξης</strong></td>
+                <td>«Υπάρχει \(x\) τ.ω. ...» — παράγουμε ρητά το \(x\)</td>
+                <td>Αλγόριθμος Ευκλείδη → Bézout</td>
+              </tr>
+              <tr>
+                <td><strong>Μη-κατασκευαστική ύπαρξης</strong></td>
+                <td>Αποδεικνύουμε ύπαρξη χωρίς να κατασκευάσουμε</td>
+                <td>Περιστερεώνας (Διάλ. 4), πιθανοτική, διαγωνοποίηση (Διάλ. 5)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ════════════════════════════════════
+         §2  ΕΞΑΝΤΛΗΤΙΚΗ — VERTEX COVER
+    ════════════════════════════════════ -->
+    <section id="sec-exhaustive">
+      <h2 id="h-exhaustive">2. Εξαντλητική Μέθοδος</h2>
+
+      <p>Η εξαντλητική μέθοδος ελέγχει <em>όλες</em> τις δυνατές περιπτώσεις.
+         Είναι πάντα ορθή, αλλά συχνά πολύ αργή. Το κλειδί είναι να μειώσουμε
+         τον αριθμό των περιπτώσεων που πρέπει πραγματικά να εξεταστούν.</p>
+
+      <!-- Vertex Cover Definition -->
+      <section id="sec-vc-def">
+        <h3 id="h-vc-def">2.1 Πρόβλημα Vertex Cover</h3>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Ορισμός — Vertex Cover</div>
+          <p>Έστω \(G = (V, E)\) αδύναμο γράφημα. Ένα <strong>vertex cover</strong>
+             είναι ένα σύνολο \(S \subseteq V\) τέτοιο ώστε για κάθε ακμή
+             \(\{u,v\} \in E\): \(u \in S\) ή \(v \in S\) (ή και τα δύο).</p>
+          <p><strong>Πρόβλημα \(k\)-Vertex Cover</strong>: Δίνονται \(G\) και \(k \in \mathbb{N}\).
+             Υπάρχει vertex cover μεγέθους \(\le k\);</p>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Παράδειγμα</div>
+          <p>Γράφημα \(G\) με κορυφές \(\{1,2,3,4,5\}\) και ακμές
+             \(\{\{1,2\}, \{1,3\}, \{2,4\}, \{3,4\}, \{4,5\}\}\).
+             Το σύνολο \(S = \{1,4\}\) (χρωματισμένο σκούρο) είναι vertex cover μεγέθους 2:</p>
+          <div class="mermaid">
+graph LR
+    1(("1")) --- 2(("2"))
+    1(("1")) --- 3(("3"))
+    2(("2")) --- 4(("4"))
+    3(("3")) --- 4(("4"))
+    4(("4")) --- 5(("5"))
+    style 1 fill:#1a3a6e,color:#fff,stroke:#1a3a6e
+    style 4 fill:#1a3a6e,color:#fff,stroke:#1a3a6e
+          </div>
+          <p>Κάθε ακμή αγγίζει τουλάχιστον μία από τις κορυφές \(\{1, 4\}\). ✓</p>
+        </div>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Αλγόριθμος 1 — Brute Force</div>
+          <pre><code>BruteVC(G, k):
+  for each S ⊆ V with |S| = k:
+    if S is a vertex cover:
+      return true
+  return false</code></pre>
+          <p><strong>Πολυπλοκότητα:</strong> \(\binom{n}{k}\) υποσύνολα, κάθε έλεγχος
+             \(\mathcal{O}(m)\). Συνολικά \(\mathcal{O}\!\left(\binom{n}{k} \cdot m\right)\).</p>
+          <p>Για \(n=100, k=10\): \(\binom{100}{10} \approx 1.7 \times 10^{13}\) — αδύνατο.</p>
+        </div>
+      </section>
+
+      <!-- Kernelization -->
+      <section id="sec-vc-kernel">
+        <h3 id="h-vc-kernel">2.2 Kernelization</h3>
+
+        <p><strong>Κεντρική ιδέα:</strong> Αν μια κορυφή \(v\) έχει βαθμό
+           \(\deg(v) > k\), τότε <em>οποιοδήποτε</em> vertex cover μεγέθους \(\le k\)
+           πρέπει να περιέχει τον \(v\). (Αν όχι, οι \(\deg(v) > k\) ακμές του πρέπει
+           να καλυφθούν από τις υπόλοιπες \(k\) κορυφές — αδύνατο.)</p>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα — Kernelization</div>
+          <p>Μετά την αφαίρεση όλων των κορυφών βαθμού \(> k\) (και των ακμών τους),
+             αν το υπολειπόμενο γράφημα έχει \(> k^2\) ακμές, τότε δεν υπάρχει
+             vertex cover μεγέθους \(\le k\). Αλλιώς, έχει \(\le 2k^2\) κορυφές.</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <details>
+            <summary>Απόδειξη</summary>
+            <div class="proof-body">
+              <p>Μετά την αφαίρεση, κάθε εναπομείνασα κορυφή έχει βαθμό \(\le k\).
+                 Ένα vertex cover μεγέθους \(\le k\) καλύπτει το πολύ
+                 \(k \cdot k = k^2\) ακμές. Άρα αν \(|E'| > k^2\): αδύνατο. ✓</p>
+              <p>Αν \(|E'| \le k^2\): κάθε ακμή συνδέει 2 κορυφές, άρα
+                 \(|V'| \le 2|E'| \le 2k^2\). ✓</p>
+              <span class="qed"></span>
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Αλγόριθμος 2 — Kernelization</div>
+          <pre><code>KernelVC(G, k):
+  S ← ∅
+  while ∃ v ∈ V with deg(v) > k:
+    S ← S ∪ {v}
+    G ← G − v          // αφαίρεση v και των ακμών του
+    k ← k − 1
+    if k &lt; 0: return false
+  if |E| > k²: return false
+  // Brute force στον πυρήνα ≤ 2k² κορυφών
+  for each T ⊆ V(G) with |T| = k:
+    if S ∪ T is a vertex cover of G_original:
+      return true
+  return false</code></pre>
+          <p><strong>Πολυπλοκότητα:</strong> \(\mathcal{O}(n)\) preprocessing +
+             \(\mathcal{O}\!\left(\binom{2k^2}{k}\right)\) brute force στον πυρήνα.</p>
+          <p>Το \(\binom{2k^2}{k}\) εξαρτάται <strong>μόνο από \(k\)</strong> — ανεξάρτητο του \(n\)!</p>
+        </div>
+
+        <div class="callout callout-exam">
+          <div class="callout-title">Συχνή ερώτηση εξετάσεων</div>
+          <p>Γιατί η κορυφή βαθμού \(> k\) πρέπει να είναι στο cover;
+             Ποιο είναι το όριο μεγέθους του πυρήνα; Τι είναι FPT αλγόριθμος;</p>
+        </div>
+      </section>
+
+      <!-- VC_Rec -->
+      <section id="sec-vc-rec">
+        <h3 id="h-vc-rec">2.3 Αναδρομικός Αλγόριθμος VC_Rec</h3>
+
+        <p>Μια πιο κομψή προσέγγιση: για οποιαδήποτε ακμή \(\{u,v\}\), τουλάχιστον
+           ο ένας από τους δύο ανήκει σε κάθε vertex cover. Διακλαδίζουμε και
+           δοκιμάζουμε και τις δύο επιλογές.</p>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Αλγόριθμος 3 — VC_Rec</div>
+          <pre><code>VC_Rec(G, k):
+  if k &lt; 0 and E ≠ ∅: return false   // υπέρβηκα το budget
+  if E = ∅:           return true    // όλες οι ακμές καλύφθηκαν
+  pick any edge {u, v} ∈ E
+  // Υποχρεωτικά ο u ή ο v ανήκει στο cover:
+  return VC_Rec(G − u, k − 1)
+      OR VC_Rec(G − v, k − 1)</code></pre>
+        </div>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα — Ανάλυση VC_Rec</div>
+          <p>Ο αλγόριθμος είναι ορθός και τερματίζει σε \(\mathcal{O}(2^k \cdot (n+m))\) χρόνο.</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <details>
+            <summary>Απόδειξη</summary>
+            <div class="proof-body">
+              <p><strong>Ορθότητα:</strong> Αν υπάρχει cover \(S\) με \(|S| \le k\),
+                 τότε για κάθε ακμή \(\{u,v\}\): \(u \in S\) ή \(v \in S\).
+                 Η αντίστοιχη αναδρομική κλήση θα βρει cover στο \(G - u\) ή \(G - v\). ✓</p>
+              <p><strong>Πολυπλοκότητα:</strong> Το δέντρο αναδρομής έχει βάθος \(\le k\)
+                 (κάθε κλήση μειώνει το \(k\) κατά 1) και κάθε κόμβος έχει 2 παιδιά.
+                 Άρα το πολύ \(2^k\) φύλλα, και \(\mathcal{O}(2^k)\) κλήσεις συνολικά.
+                 Κάθε κλήση εκτελεί \(\mathcal{O}(n+m)\) εργασία.</p>
+              <span class="qed"></span>
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Σύγκριση Αλγορίθμων</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Αλγόριθμος</th><th>Χρόνος</th><th>Για \(n=1000, k=20\)</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Brute Force</td>
+                  <td>\(\binom{n}{k} \cdot m\)</td>
+                  <td>\(\approx 3.4 \times 10^{41}\) — αδύνατο</td>
+                </tr>
+                <tr>
+                  <td>Kernelization</td>
+                  <td>\(\mathcal{O}(n) + \binom{2k^2}{k}\)</td>
+                  <td>\(\binom{800}{20} \approx 10^{37}\) — ακόμα δύσκολο</td>
+                </tr>
+                <tr>
+                  <td>VC_Rec</td>
+                  <td>\(\mathcal{O}(2^k \cdot n)\)</td>
+                  <td>\(2^{20} \cdot 1000 \approx 10^9\) — εφικτό!</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">Όρια Εξαντλητικής</div>
+          <p>Ακόμα και ο VC_Rec κλιμακώνεται εκθετικά στο \(k\). Για \(k = 100\):
+             \(2^{100} \approx 10^{30}\) — πρακτικά αδύνατο. Χρησιμοποιούμε
+             εξαντλητικές μεθόδους μόνο για <em>μικρές παραμέτρους</em>.</p>
+        </div>
+      </section>
+    </section>
+
+    <hr>
+
+    <!-- ════════════════════════════════════
+         §3  ΑΡΙΘΜΟΙ RAMSEY
+    ════════════════════════════════════ -->
+    <section id="sec-ramsey">
+      <h2 id="h-ramsey">3. Αριθμοί Ramsey</h2>
+
+      <p>Οι αριθμοί Ramsey ποσοτικοποιούν την ιδέα ότι <em>αρκετά μεγάλες δομές
+         αναπόφευκτα περιέχουν διατεταγμένα υπο-σύνολα</em>.</p>
+
+      <div class="callout callout-theorem">
+        <div class="callout-title">Θεώρημα — \(R(3,3) \le 6\)</div>
+        <p>Μεταξύ οποιωνδήποτε 6 ατόμων, είτε υπάρχουν 3 που γνωρίζονται μεταξύ τους,
+           είτε υπάρχουν 3 που είναι όλοι άγνωστοι μεταξύ τους.</p>
+      </div>
+
+      <div class="callout callout-proof">
+        <details>
+          <summary>Απόδειξη με Αρχή Περιστερεώνα</summary>
+          <div class="proof-body">
+            <p>Επιλέγουμε οποιοδήποτε άτομο \(v\). Ο \(v\) έχει σχέση (γνωστός/άγνωστος)
+               με τα υπόλοιπα 5 άτομα.</p>
+            <p>Από την Αρχή Περιστερεώνα (5 άτομα, 2 κατηγορίες):
+               τουλάχιστον \(\lceil 5/2 \rceil = 3\) ανήκουν στην ίδια κατηγορία.
+               Έστω (χωρίς βλάβη γενικότητας) ότι \(v\) γνωρίζει \(a, b, c\).</p>
+            <ul>
+              <li><strong>Αν δύο από τους \(a,b,c\) γνωρίζονται</strong> (π.χ. \(a\) και \(b\)):
+                  τότε \(\{v, a, b\}\) = 3 γνωστοί. ✓</li>
+              <li><strong>Αν κανείς από τους \(a,b,c\) δεν γνωρίζει τον άλλον</strong>:
+                  τότε \(\{a, b, c\}\) = 3 άγνωστοι. ✓</li>
+            </ul>
+            <span class="qed"></span>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Αντιπαράδειγμα για \(n = 5\): το κυκλικό τραπέζι</div>
+        <p>Τοποθετούμε 5 άτομα σε κύκλο. «Γνωρίζονται» μόνο οι γειτονικοί
+           (ακμές κύκλου \(C_5\)):</p>
+        <div class="mermaid">
+graph TB
+    A(("Α")) --- B(("Β"))
+    B(("Β")) --- C(("Γ"))
+    C(("Γ")) --- D(("Δ"))
+    D(("Δ")) --- E(("Ε"))
+    E(("Ε")) --- A(("Α"))
+        </div>
+        <ul>
+          <li><strong>Δεν υπάρχουν 3 αμοιβαίοι γνωστοί</strong>: ο \(C_5\) δεν έχει τρίγωνο.</li>
+          <li><strong>Δεν υπάρχουν 3 αμοιβαίοι άγνωστοι</strong>: το μέγιστο ανεξάρτητο
+              σύνολο στον \(C_5\) έχει μέγεθος 2.</li>
+        </ul>
+        <p>Άρα \(R(3,3) > 5\), οπότε \(R(3,3) = 6\).</p>
+      </div>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμός — Αριθμός Ramsey \(R(k,m)\)</div>
+        <p>Ο \(R(k,m)\) είναι ο ελάχιστος \(n\) τέτοιος ώστε κάθε 2-χρωματισμός
+           των ακμών του \(K_n\) περιέχει είτε κόκκινο \(K_k\) είτε μπλε \(K_m\).</p>
+        <p>Γνωστές τιμές: \(R(3,3)=6\), \(R(4,4)=18\), \(R(5,5) \in [43, 48]\)
+           (ακόμα άγνωστη ακριβής τιμή).</p>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ════════════════════════════════════
+         §4  ΜΑΘΗΜΑΤΙΚΗ ΕΠΑΓΩΓΗ
+    ════════════════════════════════════ -->
+    <section id="sec-induction">
+      <h2 id="h-induction">4. Μαθηματική Επαγωγή</h2>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Σχήμα Μαθηματικής Επαγωγής</div>
+        <p>Για να αποδείξουμε \(P(n)\) για κάθε \(n \ge n_0\):</p>
+        <ol>
+          <li><strong>Βάση</strong>: Αποδεικνύουμε \(P(n_0)\).</li>
+          <li><strong>Επαγωγικό βήμα</strong>: Υποθέτουμε \(P(n)\) (επαγωγική υπόθεση)
+              και αποδεικνύουμε \(P(n+1)\).</li>
+        </ol>
+        <p>Τότε \(P(n)\) ισχύει για κάθε \(n \ge n_0\).</p>
+      </div>
+
+      <section id="sec-harmonic">
+        <h3 id="h-harmonic">4.1 Αρμονικοί Αριθμοί</h3>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Ορισμός — Αρμονικός Αριθμός</div>
+          \[ H_k = \sum_{j=1}^{k} \frac{1}{j} = 1 + \frac{1}{2} + \frac{1}{3} + \cdots + \frac{1}{k}. \]
+        </div>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Λήμμα — Άνω Φράγμα Αρμονικών</div>
+          <p>Για κάθε \(n \ge 0\):</p>
+          \[ H_{2^n} \le 1 + n. \]
+        </div>
+
+        <div class="callout callout-proof">
+          <details>
+            <summary>Απόδειξη με επαγωγή στο \(n\)</summary>
+            <div class="proof-body">
+              <p><strong>Βάση</strong> \((n=0)\):
+                 \(H_{2^0} = H_1 = 1 \le 1 + 0 = 1\). ✓</p>
+              <p><strong>Επαγωγικό βήμα</strong>: Υποθέτουμε \(H_{2^n} \le 1 + n\).
+                 Θέλουμε \(H_{2^{n+1}} \le 1 + (n+1) = 2 + n\).</p>
+              <p>Διαχωρίζουμε:</p>
+              \[
+                H_{2^{n+1}}
+                = H_{2^n} + \sum_{k=2^n+1}^{2^{n+1}} \frac{1}{k}.
+              \]
+              <p>Το άθροισμα έχει \(2^{n+1} - 2^n = 2^n\) όρους.
+                 Κάθε όρος ικανοποιεί \(k > 2^n\), άρα \(1/k < 1/2^n\):</p>
+              \[
+                \sum_{k=2^n+1}^{2^{n+1}} \frac{1}{k}
+                < 2^n \cdot \frac{1}{2^n} = 1.
+              \]
+              <p>Άρα: \(H_{2^{n+1}} < (1+n) + 1 = 2 + n = 1 + (n+1)\). ✓</p>
+              <span class="qed"></span>
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-title">Σημείωση — Αποκλίνουσα σειρά</div>
+          <p>Το λήμμα δείχνει ότι \(H_{2^n} \le 1 + n \to \infty\), άρα
+             \(H_k \to \infty\) (η αρμονική σειρά <strong>αποκλίνει</strong>).
+             Ο ρυθμός είναι \(H_k = \ln k + O(1)\).</p>
+        </div>
+      </section>
+
+      <section id="sec-strong">
+        <h3 id="h-strong">4.2 Ισχυρή Επαγωγή</h3>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Σχήμα Ισχυρής Επαγωγής</div>
+          <p>Για να αποδείξουμε \(P(n)\) για κάθε \(n \ge n_0\):</p>
+          <ol>
+            <li><strong>Βάση</strong>: \(P(n_0)\) (ίσως και \(P(n_0+1)\) αν χρειάζεται).</li>
+            <li><strong>Επαγωγικό βήμα</strong>: Υποθέτουμε \(P(n_0), P(n_0+1), \ldots, P(n-1)\)
+                (για <em>όλα</em> τα μικρότερα) και αποδεικνύουμε \(P(n)\).</li>
+          </ol>
+          <p>Χρησιμοποιείται όταν το βήμα από \(n\) σε \(n+1\) χρειάζεται και το \(P(n-1)\)
+             (ή ακόμα παλαιότερες τιμές).</p>
+        </div>
+      </section>
+    </section>
+
+    <hr>
+
+    <!-- ════════════════════════════════════
+         §5  FIBONACCI
+    ════════════════════════════════════ -->
+    <section id="sec-fib">
+      <h2 id="h-fib">5. Αριθμοί Fibonacci</h2>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμός — Ακολουθία Fibonacci</div>
+        \[
+          F_0 = 1,\quad F_1 = 1,\quad F_n = F_{n-1} + F_{n-2} \;\text{ για } n \ge 2.
+        \]
+        <p>Πρώτοι όροι: \(1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, \ldots\)</p>
+      </div>
+
+      <section id="sec-fib-bounds">
+        <h3 id="h-fib-bounds">5.1 Φράγματα Fibonacci</h3>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Λήμμα — Άνω Φράγμα</div>
+          <p>Για κάθε \(n \ge 0\): \(F_n \le \varphi^n\), όπου \(\varphi = (1+\sqrt{5})/2\).</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <details>
+            <summary>Απόδειξη με ισχυρή επαγωγή</summary>
+            <div class="proof-body">
+              <p><strong>Βάσεις</strong>:
+                 \(F_0 = 1 = \varphi^0\) ✓ και
+                 \(F_1 = 1 < \varphi^1 \approx 1{,}618\) ✓.</p>
+              <p><strong>Βήμα</strong>: Έστω \(n \ge 2\). Υποθέτουμε
+                 \(F_k \le \varphi^k\) για κάθε \(k < n\). Τότε:</p>
+              \[
+                F_n = F_{n-1} + F_{n-2}
+                \le \varphi^{n-1} + \varphi^{n-2}
+                = \varphi^{n-2}(\varphi + 1)
+                = \varphi^{n-2} \cdot \varphi^2
+                = \varphi^n,
+              \]
+              <p>όπου χρησιμοποιήσαμε \(\varphi + 1 = \varphi^2\). ✓</p>
+              <span class="qed"></span>
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα — Διπλό Φράγμα</div>
+          <p>Για κάθε \(n \ge 1\):</p>
+          \[ \frac{1}{2}\,\varphi^n \;\le\; F_n \;\le\; \varphi^n. \]
+        </div>
+
+        <div class="callout callout-proof">
+          <details>
+            <summary>Σκίτσο απόδειξης κάτω φράγματος</summary>
+            <div class="proof-body">
+              <p>Από τον κλειστό τύπο \(F_n = \dfrac{\varphi^{n+1} - \psi^{n+1}}{\sqrt{5}}\)
+                 όπου \(\psi = (1-\sqrt{5})/2 \approx -0{,}618\),
+                 και \(|\psi| < 1\), για μεγάλα \(n\):</p>
+              \[
+                F_n \ge \frac{\varphi^{n+1} - |\psi|^{n+1}}{\sqrt{5}}
+                     \ge \frac{\varphi^{n+1}}{2\sqrt{5}}
+                     = \frac{\varphi}{\sqrt{5}} \cdot \frac{\varphi^n}{2}
+                     > \frac{\varphi^n}{2},
+              \]
+              <p>αφού \(\varphi/\sqrt{5} \approx 0{,}724 > 1/2\).
+                 Για μικρά \(n\) επαληθεύεται άμεσα.</p>
+              <span class="qed"></span>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="sec-fib-double">
+        <h3 id="h-fib-double">5.2 Θεώρημα Διπλασιασμού</h3>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα — Γενική Ταυτότητα Πρόσθεσης</div>
+          <p>Για κάθε \(n \ge 1\) και \(m \ge 0\):</p>
+          \[ F_{n+m} = F_n F_m + F_{n-1} F_{m-1}, \]
+          <p>με σύμβαση \(F_{-1} = 0\).</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <details>
+            <summary>Απόδειξη με ισχυρή επαγωγή στο \(m\)</summary>
+            <div class="proof-body">
+              <p><strong>Βάσεις</strong>:</p>
+              <ul>
+                <li>\(m=0\): \(F_n = F_n \cdot 1 + F_{n-1} \cdot 0 = F_n F_0 + F_{n-1} F_{-1}\). ✓</li>
+                <li>\(m=1\): \(F_{n+1} = F_n \cdot 1 + F_{n-1} \cdot 1 = F_n F_1 + F_{n-1} F_0\). ✓</li>
+              </ul>
+              <p><strong>Βήμα</strong>: Έστω \(m \ge 2\). Υποθέτουμε τον τύπο για \(m-1\) και \(m-2\).</p>
+              \begin{align}
+                F_{n+m} &= F_{n+m-1} + F_{n+m-2} \\
+                        &= (F_n F_{m-1} + F_{n-1} F_{m-2}) + (F_n F_{m-2} + F_{n-1} F_{m-3}) \\
+                        &= F_n(F_{m-1} + F_{m-2}) + F_{n-1}(F_{m-2} + F_{m-3}) \\
+                        &= F_n F_m + F_{n-1} F_{m-1}. \quad\checkmark
+              \end{align}
+              <span class="qed"></span>
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα — Τύποι Διπλασιασμού</div>
+          <p>Θέτοντας \(m = n\) και \(m = n+1\) στη γενική ταυτότητα:</p>
+          \[
+            F_{2k} = F_k^2 + F_{k-1}^2,
+            \qquad
+            F_{2k+1} = F_k^2 + 2F_k F_{k-1}.
+          \]
+        </div>
+
+        <div class="callout callout-proof">
+          <details>
+            <summary>Εξαγωγή από γενική ταυτότητα</summary>
+            <div class="proof-body">
+              <p><strong>Τύπος 1</strong> (θέτω \(n = m = k\)):
+                 \(F_{2k} = F_k F_k + F_{k-1} F_{k-1} = F_k^2 + F_{k-1}^2\). ✓</p>
+              <p><strong>Τύπος 2</strong> (θέτω \(n = k, m = k+1\)):
+                 \(F_{2k+1} = F_k F_{k+1} + F_{k-1} F_k = F_k(F_{k+1} + F_{k-1})\).</p>
+              <p>Παρατηρούμε: \(F_{k+1} + F_{k-1} = (F_k + F_{k-1}) + F_{k-1} = F_k + 2F_{k-1}\).
+                 Άρα \(F_{2k+1} = F_k(F_k + 2F_{k-1}) = F_k^2 + 2F_k F_{k-1}\). ✓</p>
+              <span class="qed"></span>
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Παράδειγμα — Γρήγορος Υπολογισμός \(F_{10}\)</div>
+          <p>Ξεκινώντας από \(F_1 = F_0 = 1\):</p>
+          <ul>
+            <li>\(F_2 = F_1^2 + F_0^2 = 1 + 1 = 2\)</li>
+            <li>\(F_3 = F_1^2 + 2F_1 F_0 = 1 + 2 = 3\)</li>
+            <li>\(F_4 = F_2^2 + F_1^2 = 4 + 1 = 5\) (χρησιμοποιώ \(k=2\))</li>
+            <li>\(F_5 = F_2^2 + 2F_2 F_1 = 4 + 4 = 8\)</li>
+            <li>\(F_{10} = F_5^2 + F_4^2 = 64 + 25 = 89\) ✓</li>
+          </ul>
+          <p>Ο αλγόριθμος αυτός υπολογίζει \(F_n\) σε \(\mathcal{O}(\log n)\) βήματα!</p>
+        </div>
+      </section>
+
+      <section id="sec-fib-stairs">
+        <h3 id="h-fib-stairs">5.3 Συνδυαστική Ερμηνεία — Σκαλιά</h3>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα — Fibonacci και Σκαλιά</div>
+          <p>Ο αριθμός \(J_n\) των τρόπων να ανέβεις \(n\) σκαλιά με βήματα μεγέθους
+             1 ή 2 ικανοποιεί \(J_n = F_n\) για κάθε \(n \ge 1\).</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <details>
+            <summary>Απόδειξη</summary>
+            <div class="proof-body">
+              <p><strong>Βάσεις</strong>: \(J_1 = 1\) (μόνο βήμα 1) \(= F_1\). ✓
+                 \(J_2 = 2\) (1+1 ή 2) \(= F_2\). ✓</p>
+              <p><strong>Βήμα</strong>: Για \(n \ge 3\), το τελευταίο βήμα είναι 1 ή 2:</p>
+              <ul>
+                <li>Αν τελευταίο βήμα = 1: πρέπει να ανέβουμε \(n-1\) πριν → \(J_{n-1}\) τρόποι.</li>
+                <li>Αν τελευταίο βήμα = 2: πρέπει να ανέβουμε \(n-2\) πριν → \(J_{n-2}\) τρόποι.</li>
+              </ul>
+              <p>Άρα \(J_n = J_{n-1} + J_{n-2}\) με \(J_1 = J_2 = 1\), ίδια αναδρομή με \(F_n\). ✓</p>
+              <span class="qed"></span>
+            </div>
+          </details>
+        </div>
+      </section>
+    </section>
+
+    <hr>
+
+    <!-- ════════════════════════════════════
+         §6  ΣΤΟΙΧΕΙΩΔΗΣ ΑΡΙΘΜΟΘΕΩΡΙΑ
+    ════════════════════════════════════ -->
+    <section id="sec-nt">
+      <h2 id="h-nt">6. Στοιχειώδης Αριθμοθεωρία</h2>
+
+      <section id="sec-primes">
+        <h3 id="h-primes">6.1 Πρώτοι Αριθμοί και Παραγοντοποίηση</h3>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Ορισμός — Πρώτος Αριθμός</div>
+          <p>Ένας ακέραιος \(p \ge 2\) είναι <strong>πρώτος</strong> αν οι μόνοι θετικοί
+             διαιρέτες του είναι 1 και \(p\).
+             Αν \(p \ge 2\) δεν είναι πρώτος, λέγεται <strong>σύνθετος</strong>.</p>
+        </div>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα — Ύπαρξη Παραγοντοποίησης</div>
+          <p>Κάθε \(n \ge 2\) γράφεται ως γινόμενο πρώτων αριθμών.</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <details>
+            <summary>Απόδειξη με ισχυρή επαγωγή</summary>
+            <div class="proof-body">
+              <p><strong>Βάση</strong> \((n=2)\): 2 είναι πρώτος, άρα \(2 = 2\). ✓</p>
+              <p><strong>Βήμα</strong>: Έστω \(n \ge 3\) και υποθέτουμε ότι κάθε
+                 \(k\) με \(2 \le k < n\) έχει παραγοντοποίηση.</p>
+              <ul>
+                <li>Αν \(n\) πρώτος: \(n = n\). ✓</li>
+                <li>Αν \(n\) σύνθετος: \(n = a \cdot b\) με \(2 \le a, b < n\).
+                    Από ΕΥ: \(a = p_1 \cdots p_r\) και \(b = q_1 \cdots q_s\),
+                    άρα \(n = p_1 \cdots p_r q_1 \cdots q_s\). ✓</li>
+              </ul>
+              <span class="qed"></span>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="sec-gcd">
+        <h3 id="h-gcd">6.2 ΜΚΔ και Αλγόριθμος Ευκλείδη</h3>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Ορισμός — ΜΚΔ</div>
+          <p>Ο <strong>Μέγιστος Κοινός Διαιρέτης</strong> \(\gcd(a,b)\) είναι ο μεγαλύτερος
+             ακέραιος που διαιρεί και τους δύο \(a, b\).</p>
+          <p>Σύμβαση: \(\gcd(0,b) = b\).</p>
+        </div>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα — Ορθότητα Αλγορίθμου Ευκλείδη</div>
+          <p>Για \(a \ge b \ge 0\) με \(b > 0\):</p>
+          \[ \gcd(a, b) = \gcd(b,\; a \bmod b). \]
+        </div>
+
+        <div class="callout callout-proof">
+          <details>
+            <summary>Απόδειξη</summary>
+            <div class="proof-body">
+              <p>Γράφουμε \(a = qb + r\) με \(r = a \bmod b\).</p>
+              <p>Αρκεί να δείξουμε:
+                 \(\{d : d \mid a \text{ και } d \mid b\} = \{d : d \mid b \text{ και } d \mid r\}\).</p>
+              <p>(\(\subseteq\)): Έστω \(d \mid a\) και \(d \mid b\). Τότε
+                 \(d \mid (a - qb) = r\). ✓</p>
+              <p>(\(\supseteq\)): Έστω \(d \mid b\) και \(d \mid r\). Τότε
+                 \(d \mid (qb + r) = a\). ✓</p>
+              <p>Τα δύο σύνολα κοινών διαιρετών ταυτίζονται, άρα οι μέγιστοι ταυτίζονται. ✓</p>
+              <span class="qed"></span>
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Αλγόριθμος Ευκλείδη</div>
+          <pre><code>gcd(a, b):
+  if b = 0: return a
+  return gcd(b, a mod b)</code></pre>
+        </div>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα — Πολυπλοκότητα Αλγορίθμου Ευκλείδη</div>
+          <p>Ο αριθμός των διαιρέσεων είναι \(\le 2\lfloor \log_2 a \rfloor\).</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <details>
+            <summary>Απόδειξη</summary>
+            <div class="proof-body">
+              <p>Κλειδί: κάθε δύο βήματα, το πρώτο όρισμα μειώνεται τουλάχιστον στο μισό.</p>
+              <p>Έστω \(a > b > 0\). Τότε \(r = a \bmod b < b\).
+                 Στο επόμενο βήμα: \(\gcd(b, r)\). Το \(r\) θα γίνει πρώτο όρισμα, και:</p>
+              \[ r = a \bmod b < b \le a/2 \quad\Leftarrow\quad b \le a/2 \;\lor\; (b > a/2 \Rightarrow r = a - b < a/2). \]
+              <p>Σε κάθε δύο βήματα: το πρώτο όρισμα \(< a/2\).
+                 Μετά \(2\lfloor\log_2 a\rfloor\) βήματα, φθάνει το 0. ✓</p>
+              <span class="qed"></span>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="sec-bezout">
+        <h3 id="h-bezout">6.3 Λήμμα Bézout</h3>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Λήμμα Bézout</div>
+          <p>Για θετικούς ακέραιους \(a, b\):</p>
+          \[ \gcd(a,b) = \min\bigl\{\, ax + by \;:\; x,y \in \mathbb{Z},\; ax+by > 0 \,\bigr\}. \]
+          <p>Ισοδύναμα, υπάρχουν \(x, y \in \mathbb{Z}\) με \(ax + by = \gcd(a,b)\).</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <details>
+            <summary>Πλήρης Απόδειξη</summary>
+            <div class="proof-body">
+              <p>Έστω \(S = \{ax + by : x,y \in \mathbb{Z},\; ax+by > 0\}\).
+                 Το \(S \ne \emptyset\) (π.χ. \(a = a \cdot 1 + b \cdot 0 \in S\)).
+                 Έστω \(d = \min S\), με \(d = au + bv\) για κάποια \(u, v\).</p>
+
+              <p><strong>Βήμα 1</strong>: \(d \mid a\).<br>
+                 Ευκλείδεια διαίρεση: \(a = qd + r\), \(0 \le r < d\).
+                 \(r = a - qd = a - q(au+bv) = a(1-qu) + b(-qv)\).
+                 Αν \(r > 0\), τότε \(r \in S\) και \(r < d\) — αντίφαση.
+                 Άρα \(r = 0\), οπότε \(d \mid a\). Ομοίως \(d \mid b\).</p>
+
+              <p><strong>Βήμα 2</strong>: Αν \(c \mid a\) και \(c \mid b\), τότε
+                 \(c \mid d = au + bv\). Άρα \(d\) είναι ο μεγαλύτερος κοινός
+                 διαιρέτης, δηλαδή \(d = \gcd(a,b)\). ✓</p>
+              <span class="qed"></span>
+            </div>
+          </details>
+        </div>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Λήμμα Euclid (Λήμμα 5)</div>
+          <p>Αν \(p\) πρώτος και \(p \mid ab\), τότε \(p \mid a\) ή \(p \mid b\).</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <details>
+            <summary>Απόδειξη</summary>
+            <div class="proof-body">
+              <p>Υποθέτουμε \(p \nmid a\). Επειδή \(p\) πρώτος, \(\gcd(p,a)=1\).
+                 Από Bézout: \(1 = px + ay\) για κάποια \(x,y \in \mathbb{Z}\).
+                 Πολλαπλασιάζουμε δι' \(b\):
+                 \(b = pxb + ayb\).
+                 Το \(p \mid pxb\) και \(p \mid ab\) (δεδομένο) \(\Rightarrow p \mid ayb\).
+                 Άρα \(p \mid b\). ✓</p>
+              <span class="qed"></span>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="sec-fta">
+        <h3 id="h-fta">6.4 Θεμελιώδες Θεώρημα Αριθμοθεωρίας</h3>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεμελιώδες Θεώρημα Αριθμοθεωρίας</div>
+          <p>Κάθε \(n \ge 2\) έχει <strong>μοναδική</strong> παραγοντοποίηση σε πρώτους
+             (εκτός από σειρά):</p>
+          \[ n = p_1^{e_1} p_2^{e_2} \cdots p_k^{e_k}, \quad p_1 < p_2 < \cdots < p_k \text{ πρώτοι}. \]
+        </div>
+
+        <div class="callout callout-proof">
+          <details>
+            <summary>Απόδειξη Μοναδικότητας με Ελάχιστο Αντιπαράδειγμα</summary>
+            <div class="proof-body">
+              <p>Η ύπαρξη αποδείχθηκε με ισχυρή επαγωγή (§6.1).</p>
+              <p><strong>Μοναδικότητα</strong>: Έστω \(n\) το ελάχιστο με δύο διαφορετικές
+                 παραγοντοποιήσεις:</p>
+              \[ n = p_1 p_2 \cdots p_s = q_1 q_2 \cdots q_t. \]
+              <p>Ο \(p_1\) διαιρεί \(q_1 q_2 \cdots q_t\). Από Λήμμα 5 (επανειλημμένα):
+                 \(p_1 \mid q_j\) για κάποιο \(j\). Επειδή \(q_j\) πρώτος: \(p_1 = q_j\).</p>
+              <p>ΧΒΓΕ \(j=1\): Διαιρούμε \(n/p_1 = p_2 \cdots p_s = q_2 \cdots q_t\).
+                 Αλλά \(n/p_1 < n\) και \(n\) ήταν ελάχιστο — αντίφαση!
+                 Άρα δεν υπάρχει ελάχιστο αντιπαράδειγμα. ✓</p>
+              <span class="qed"></span>
+            </div>
+          </details>
+        </div>
+      </section>
+    </section>
+
+    <hr>
+
+    <!-- ════════════════════════════════════
+         §7  ΙΣΧΥΡΟΠΟΙΗΣΗ
+    ════════════════════════════════════ -->
+    <section id="sec-strengthen">
+      <h2 id="h-strengthen">7. Ισχυροποίηση Πρότασης</h2>
+
+      <p>Μια αντιδιαισθητική τεχνική: μερικές φορές για να αποδείξουμε \(P(n)\),
+         πρέπει πρώτα να <em>ενισχύσουμε</em> την πρόταση σε \(Q(n)\) (με \(Q \Rightarrow P\)),
+         και \(Q\) αποδεικνύεται πιο εύκολα με επαγωγή.</p>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Παράδειγμα — Αποτυχία Αφελούς Επαγωγής</div>
+        <p><strong>Θέλουμε να αποδείξουμε:</strong>
+           \(\displaystyle\sum_{k=1}^n \frac{1}{k^2} \le 2\) για κάθε \(n \ge 1\).</p>
+        <p><strong>Αφελής προσπάθεια</strong>: Έστω \(P(n) : \sum_{k=1}^n 1/k^2 \le 2\).</p>
+        <p>Βάση: \(P(1): 1 \le 2\). ✓</p>
+        <p>Βήμα: Υποθέτουμε \(P(n)\). Τότε:</p>
+        \[
+          \sum_{k=1}^{n+1} \frac{1}{k^2}
+          = \underbrace{\sum_{k=1}^{n} \frac{1}{k^2}}_{\le\, 2} + \frac{1}{(n+1)^2}
+          \le 2 + \frac{1}{(n+1)^2}.
+        \]
+        <p>Χρειαζόμαστε αυτό \(\le 2\), δηλαδή \(1/(n+1)^2 \le 0\). <strong>Αδύνατο!</strong></p>
+        <p>Το πρόβλημα: η υπόθεση \(\le 2\) δεν αφήνει «περιθώριο» για τον επιπλέον όρο.</p>
+      </div>
+
+      <div class="callout callout-theorem">
+        <div class="callout-title">Θεώρημα — με Ισχυροποίηση</div>
+        <p>Για κάθε \(n \ge 1\):</p>
+        \[ \sum_{k=1}^n \frac{1}{k^2} \le 2 - \frac{1}{n}. \]
+        <p>(Η ενισχυμένη πρόταση \(Q(n)\) είναι αυστηρότερη από \(P(n)\)
+           και ταυτόχρονα πιο εύκολη να αποδείξουμε με επαγωγή!)</p>
+      </div>
+
+      <div class="callout callout-proof">
+        <details>
+          <summary>Πλήρης Απόδειξη</summary>
+          <div class="proof-body">
+            <p><strong>Βάση</strong> \((n=1)\):
+               \(\sum = 1 = 2 - 1/1 = 1\). ✓</p>
+            <p><strong>Βήμα</strong>: Υποθέτουμε \(Q(n)\): \(\sum_{k=1}^n 1/k^2 \le 2 - 1/n\).
+               Θέλουμε \(Q(n+1)\): \(\sum_{k=1}^{n+1} 1/k^2 \le 2 - 1/(n+1)\).</p>
+            \begin{align}
+              \sum_{k=1}^{n+1} \frac{1}{k^2}
+              &= \sum_{k=1}^{n} \frac{1}{k^2} + \frac{1}{(n+1)^2} \\
+              &\le \left(2 - \frac{1}{n}\right) + \frac{1}{(n+1)^2}.
+            \end{align}
+            <p>Αρκεί να δείξουμε:
+               \(\left(2 - \dfrac{1}{n}\right) + \dfrac{1}{(n+1)^2} \le 2 - \dfrac{1}{n+1}\),
+               δηλαδή:</p>
+            \[
+              \frac{1}{(n+1)^2} \le \frac{1}{n} - \frac{1}{n+1} = \frac{1}{n(n+1)}.
+            \]
+            <p>Αυτό ισοδυναμεί με \(n(n+1) \le (n+1)^2\), δηλαδή \(n \le n+1\). ✓</p>
+            <span class="qed"></span>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Γενικό Μάθημα</div>
+        <p>Αν η επαγωγή αποτυγχάνει στο βήμα, ρωτήστε: <em>«Χρειάζεται η υπόθεση
+           να ισχυροποιηθεί ώστε να παρέχει αρκετή πληροφορία για το βήμα;»</em></p>
+        <p>Το κόλπο: αντικαθιστούμε \(P(n): f(n) \le C\) με
+           \(Q(n): f(n) \le C - g(n)\) όπου \(g(n) > 0\) φθίνουσα προς 0,
+           δίνοντας «ελαστικότητα» στο επαγωγικό βήμα.</p>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- ════════════════════════════════════
+         ΕΞΕΤΑΣΤΙΚΕΣ ΕΡΩΤΗΣΕΙΣ
+    ════════════════════════════════════ -->
+    <section id="sec-exam">
+      <h2 id="h-exam">Συχνές Ερωτήσεις Εξετάσεων</h2>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 1</div>
+        <p>Περιγράψτε τον αλγόριθμο VC_Rec και αναλύστε την πολυπλοκότητά του.</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>VC_Rec(G,k): αν \(E=\emptyset\) επιστρέφει true, αν \(k&lt;0\) false.
+               Διαφορετικά, επιλέγει ακμή \(\{u,v\}\) και αναδρομικά δοκιμάζει
+               VC_Rec(G−u, k−1) ή VC_Rec(G−v, k−1).
+               Δέντρο αναδρομής: βάθος \(k\), διακλάδωση 2 → \(\mathcal{O}(2^k)\) κλήσεις.
+               Συνολικά: \(\mathcal{O}(2^k(n+m))\).</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 2</div>
+        <p>Αποδείξτε ότι \(H_{2^n} \le 1 + n\) με επαγωγή.</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Βάση \(n=0\): \(H_1=1\le1\). Βήμα: \(H_{2^{n+1}} = H_{2^n} + \sum_{k=2^n+1}^{2^{n+1}} 1/k\).
+               Ο δεύτερος άθροισμα έχει \(2^n\) όρους, κάθε \(1/k &lt; 1/2^n\),
+               άρα ο άθροισμα \(&lt; 1\).
+               Οπότε \(H_{2^{n+1}} &lt; (1+n) + 1 = 1+(n+1)\). ✓</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 3</div>
+        <p>Αποδείξτε \(F_n \le \varphi^n\) με ισχυρή επαγωγή.</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Βάσεις: \(F_0=1=\varphi^0\), \(F_1=1&lt;\varphi\). ✓
+               Βήμα (\(n\ge2\)): \(F_n = F_{n-1}+F_{n-2} \le \varphi^{n-1}+\varphi^{n-2}
+               = \varphi^{n-2}(\varphi+1) = \varphi^{n-2}\cdot\varphi^2 = \varphi^n\). ✓</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 4</div>
+        <p>Αποδείξτε τη σωστότητα του αλγορίθμου Ευκλείδη.</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Αρκεί: \(\gcd(a,b) = \gcd(b, a \bmod b)\).
+               Γράφουμε \(a=qb+r\). Αν \(d\mid a\) και \(d\mid b\), τότε \(d\mid r\).
+               Αν \(d\mid b\) και \(d\mid r\), τότε \(d\mid a\).
+               Τα σύνολα κοινών διαιρετών ταυτίζονται. ✓</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 5</div>
+        <p>Αποδείξτε το Λήμμα Euclid: αν \(p\mid ab\) και \(p\) πρώτος, τότε \(p\mid a\) ή \(p\mid b\).</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Αν \(p\nmid a\): επειδή \(p\) πρώτος, \(\gcd(p,a)=1\).
+               Bézout: \(1=px+ay\). Επί \(b\): \(b=pxb+ayb\).
+               \(p\mid pxb\) και \(p\mid ab\) → \(p\mid ayb\), άρα \(p\mid b\). ✓</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 6</div>
+        <p>Γιατί αποτυγχάνει η αφελής επαγωγή για \(\sum 1/k^2 \le 2\);
+           Πώς το διορθώνουμε;</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Αποτυγχάνει γιατί \(\sum_{k=1}^{n+1}1/k^2 \le 2 + 1/(n+1)^2 &gt; 2\).
+               Λύση: ισχυροποίηση σε \(Q(n): \sum \le 2-1/n\).
+               Τότε \(Q(n)+1/(n+1)^2 \le 2-1/n+1/(n+1)^2 \le 2-1/(n+1)\)
+               γιατί \(1/(n+1)^2 \le 1/(n(n+1))\). ✓</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ── Lecture Navigation ── -->
+    <nav class="lecture-nav" aria-label="Πλοήγηση διαλέξεων">
+      <a href="lecture1.html" class="lecture-nav__btn">&#8592; Διάλεξη 1</a>
+      <span class="lecture-nav__current">Διάλεξη 2 / 8</span>
+      <a href="lecture3.html" class="lecture-nav__btn">Διάλεξη 3: Δομική Επαγωγή &#8594;</a>
+    </nav>
+
   </main>
+</div>
 
-  <footer>
-    <p>Σημειώσεις Μαθηματικών Πληροφορικής — ΕΚΠΑ</p>
-  </footer>
+<footer class="site-footer" role="contentinfo">
+  <p>
+    Σημειώσεις Μαθηματικών Πληροφορικής &mdash; ΕΚΠΑ &nbsp;|&nbsp;
+    <a href="../index.html">Αρχική</a> &nbsp;|&nbsp;
+    Τελευταία ενημέρωση: <time datetime="2026-05-22">22 Μαΐου 2026</time>
+  </p>
+</footer>
+
 </body>
 </html>
