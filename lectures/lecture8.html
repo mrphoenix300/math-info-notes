@@ -3,33 +3,1089 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Διάλεξη 8 — Σχέσεις, Μερικές Διατάξεις, Dilworth</title>
+  <meta name="description"
+        content="Διάλεξη 8 — Σχέσεις, Μερικές Διατάξεις & Θεώρημα Dilworth. Ισοδυναμία, Hasse, Αλυσίδες, Dilworth, Mirsky, Sperner.">
+  <title>Διάλεξη 8 — Σχέσεις &amp; Dilworth | Μαθ. Πληροφορικής ΕΚΠΑ</title>
   <link rel="stylesheet" href="../css/style.css">
   <script>
-    window.MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };
+    window.MathJax = {
+      tex: {
+        inlineMath:  [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        tags: 'ams',
+        macros: {
+          floor: ['\\lfloor #1 \\rfloor', 1],
+          ceil:  ['\\lceil  #1 \\rceil',  1],
+          N:  '\\mathbb{N}',
+          Z:  '\\mathbb{Z}',
+          R:  '\\mathbb{R}',
+          Q:  '\\mathbb{Q}',
+          vp: '\\varphi'
+        }
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+    };
+    (function () {
+      const t = localStorage.getItem('math-plir-theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <script src="../js/main.js" defer></script>
 </head>
 <body>
-  <header>
-    <h1>Διάλεξη 8 — Σχέσεις, Μερικές Διατάξεις &amp; Θεώρημα Dilworth</h1>
-    <a href="../index.html">← Αρχική</a>
-  </header>
 
-  <nav>
-    <a href="lecture7.html">← Προηγούμενη</a>
-    <span>|</span>
-    <a href="../index.html">Αρχική</a>
-  </nav>
+<header class="site-header" role="banner">
+  <div class="site-header__inner">
+    <a href="../index.html" class="site-header__title">&#8469; Μαθηματικά Πληροφορικής</a>
+    <nav class="site-nav" aria-label="Κύρια πλοήγηση">
+      <a href="../index.html">Αρχική</a>
+      <a href="lecture1.html" aria-current="page">Διαλέξεις</a>
+      <a href="../topics/induction.html">Θέματα</a>
+      <a href="../exercises/solved.html">Ασκήσεις</a>
+      <a href="../exam-prep/formulas.html">Εξεταστική</a>
+    </nav>
+    <button id="theme-toggle" class="btn-theme-toggle"
+            aria-label="Εναλλαγή σκοτεινής λειτουργίας">&#127769; Σκοτεινό</button>
+  </div>
+</header>
 
-  <main>
-    <p><em>Placeholder — περιεχόμενο θα συμπληρωθεί.</em></p>
-  </main>
+<div class="page-wrapper">
 
-  <footer>
-    <p>Σημειώσεις Μαθηματικών Πληροφορικής — ΕΚΠΑ</p>
-  </footer>
+  <aside class="sidebar-toc" aria-label="Περιεχόμενα σελίδας">
+    <button class="toc-toggle" aria-expanded="true">&#128203; Περιεχόμενα &#9662;</button>
+    <div class="sidebar-toc__title">Περιεχόμενα</div>
+    <ol class="sidebar-toc__list">
+      <li class="toc-h2"><a href="#sec-tldr">TL;DR</a></li>
+      <li class="toc-h2"><a href="#sec-relations">1. Σχέσεις</a></li>
+      <li class="toc-h2"><a href="#sec-equiv">2. Σχέσεις Ισοδυναμίας</a>
+        <ol>
+          <li class="toc-h3"><a href="#sec-equiv-classes">Κλάσεις &amp; Διαμέριση</a></li>
+          <li class="toc-h3"><a href="#sec-equiv-examples">Παραδείγματα</a></li>
+        </ol>
+      </li>
+      <li class="toc-h2"><a href="#sec-partial">3. Μερικές Διατάξεις</a>
+        <ol>
+          <li class="toc-h3"><a href="#sec-hasse">Hasse Διαγράμματα</a></li>
+          <li class="toc-h3"><a href="#sec-examples-poset">Παραδείγματα poset</a></li>
+        </ol>
+      </li>
+      <li class="toc-h2"><a href="#sec-chains">4. Αλυσίδες &amp; Αντιαλυσίδες</a></li>
+      <li class="toc-h2"><a href="#sec-minmax">5. Ελαχιστικά / Μεγιστικά</a></li>
+      <li class="toc-h2"><a href="#sec-total">6. Ολική Διάταξη</a></li>
+      <li class="toc-h2"><a href="#sec-dilworth">7. Θεώρημα Dilworth</a>
+        <ol>
+          <li class="toc-h3"><a href="#sec-dilworth-proof">Πλήρης Απόδειξη</a></li>
+        </ol>
+      </li>
+      <li class="toc-h2"><a href="#sec-mirsky">8. Θεώρημα Mirsky (Δυϊκό)</a></li>
+      <li class="toc-h2"><a href="#sec-algorithm">9. Αλγόριθμος μέσω Ταιριάσματος</a></li>
+      <li class="toc-h2"><a href="#sec-applications">10. Εφαρμογές</a>
+        <ol>
+          <li class="toc-h3"><a href="#sec-hall-dilworth">Hall από Dilworth</a></li>
+          <li class="toc-h3"><a href="#sec-es-dilworth">Erdős–Szekeres από Dilworth</a></li>
+        </ol>
+      </li>
+      <li class="toc-h2"><a href="#sec-sperner">11. Θεώρημα Sperner</a></li>
+      <li class="toc-h2"><a href="#sec-exercises">Ασκήσεις</a></li>
+      <li class="toc-h2"><a href="#sec-exam">Ερωτήσεις Εξετάσεων</a></li>
+    </ol>
+  </aside>
+
+  <main class="main-content" id="main-content">
+
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <div class="breadcrumbs__item"><a href="../index.html">Αρχική</a></div>
+      <div class="breadcrumbs__item"><a href="../index.html#lecture-cards">Διαλέξεις</a></div>
+      <div class="breadcrumbs__item"><span class="breadcrumbs__current">Διάλεξη 8</span></div>
+    </nav>
+
+    <h1 class="lecture-title">
+      Διάλεξη 8 — Σχέσεις, Μερικές Διατάξεις &amp; Θεώρημα Dilworth
+    </h1>
+
+    <!-- TL;DR -->
+    <section id="sec-tldr">
+      <div class="callout callout-tldr">
+        <div class="callout-title">&#9889; TL;DR — Η Μεγάλη Εικόνα</div>
+        <p>
+          Μια <strong>σχέση</strong> \(R \subseteq A \times B\) είναι απλά ένα σύνολο ζευγών.
+          Σχέσεις ισοδυναμίας διαμερίζουν ένα σύνολο σε κλάσεις.
+          Μερικές διατάξεις ορίζουν <em>ιεραρχία</em> χωρίς κυκλικότητα.
+        </p>
+        <p>
+          Το <strong>Θεώρημα Dilworth</strong> λέει: στο οποιοδήποτε μερικώς διατεταγμένο σύνολο (poset),
+          \[\text{ελάχιστος αριθμός αλυσίδων που καλύπτουν το } P = \text{μέγεθος μέγιστης αντιαλυσίδας.}\]
+          Αποδεικνύεται κατασκευαστικά μέσω <strong>ταιριάσματος σε διμερή γράφο</strong> και
+          ισοδύναμα εξηγεί το Θεώρημα Hall (Δ7) και το Erdős–Szekeres (Δ4).
+        </p>
+        <p>
+          Το <strong>Θεώρημα Sperner</strong> (\(2^{[n]}\) ως poset): κάθε αντιαλυσίδα υποσυνόλων του \([n]\)
+          έχει μέγεθος \(\le \binom{n}{\lfloor n/2\rfloor}\).
+        </p>
+      </div>
+    </section>
+
+    <!-- §1 Σχέσεις -->
+    <section id="sec-relations">
+      <h2>1. Σχέσεις</h2>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμός — Σχέση</div>
+        <p>
+          Μια <strong>διμελής σχέση</strong> από \(A\) σε \(B\) είναι οποιοδήποτε υποσύνολο
+          \(R \subseteq A \times B\).
+          Γράφουμε \(a \mathrel{R} b\) αντί για \((a,b) \in R\).
+        </p>
+        <p>Όταν \(A = B\) μιλάμε για <strong>σχέση πάνω στο \(A\)</strong>.</p>
+      </div>
+
+      <h3>Ιδιότητες σχέσεων πάνω στο \(A\)</h3>
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμοί Ιδιοτήτων</div>
+        <table class="math-table">
+          <thead>
+            <tr><th>Ιδιότητα</th><th>Τυπικός Ορισμός</th><th>Παράδειγμα που <em>έχει</em></th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Ανακλαστικότητα</strong></td>
+              <td>\(\forall a:\; a \mathrel{R} a\)</td>
+              <td>\(\le\) στους \(\Z\)</td>
+            </tr>
+            <tr>
+              <td><strong>Συμμετρία</strong></td>
+              <td>\(a \mathrel{R} b \Rightarrow b \mathrel{R} a\)</td>
+              <td>«έχει κοινό φίλο»</td>
+            </tr>
+            <tr>
+              <td><strong>Αντισυμμετρία</strong></td>
+              <td>\(a\mathrel{R}b \land b\mathrel{R}a \Rightarrow a=b\)</td>
+              <td>\(|\) (διαιρεί) στους \(\N\)</td>
+            </tr>
+            <tr>
+              <td><strong>Μεταβατικότητα</strong></td>
+              <td>\(a\mathrel{R}b \land b\mathrel{R}c \Rightarrow a\mathrel{R}c\)</td>
+              <td>\(<\) στους \(\R\)</td>
+            </tr>
+            <tr>
+              <td><strong>Ολικότητα</strong></td>
+              <td>\(a\ne b \Rightarrow a\mathrel{R}b \lor b\mathrel{R}a\)</td>
+              <td>\(\le\) στους \(\Z\)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Παράδειγμα — Σχέση σε \(\{1,2,3,4\}\)</div>
+        <p>
+          Η σχέση «\(a\) διαιρεί \(b\)» (συμβολισμός \(a \mid b\)) στο \(\{1,2,3,4\}\):
+          \[R = \{(1,1),(1,2),(1,3),(1,4),(2,2),(2,4),(3,3),(4,4)\}.\]
+          Είναι <em>ανακλαστική</em>, <em>αντισυμμετρική</em>, <em>μεταβατική</em> — άρα μερική διάταξη.
+          <em>Δεν</em> είναι ολική (π.χ. \(2 \nmid 3\) και \(3 \nmid 2\)).
+        </p>
+      </div>
+    </section>
+
+    <!-- §2 Σχέσεις Ισοδυναμίας -->
+    <section id="sec-equiv">
+      <h2>2. Σχέσεις Ισοδυναμίας</h2>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμός — Σχέση Ισοδυναμίας</div>
+        <p>
+          Μια σχέση \(\sim\) πάνω στο \(A\) είναι <strong>σχέση ισοδυναμίας</strong> αν είναι
+          ανακλαστική, συμμετρική <em>και</em> μεταβατική.
+        </p>
+        <p>
+          Η <strong>κλάση ισοδυναμίας</strong> του \(x \in A\) ορίζεται:
+          \[[x] = \{y \in A : x \sim y\}.\]
+        </p>
+      </div>
+
+      <section id="sec-equiv-classes">
+        <h3>2.1 Κλάσεις και Διαμέριση</h3>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα — Κλάσεις = Διαμέριση</div>
+          <p>
+            Αν \(\sim\) είναι σχέση ισοδυναμίας πάνω στο \(A\), τότε οι κλάσεις ισοδυναμίας
+            σχηματίζουν <strong>διαμέριση</strong> του \(A\): τα σύνολα \([x]\) είναι
+            μη-κενά, ζεύγη-ζεύγη ξένα, και \(\bigcup_{x\in A}[x] = A\).
+          </p>
+        </div>
+
+        <details class="callout callout-proof">
+          <summary class="callout-title">&#9656; Απόδειξη</summary>
+          <p>
+            <strong>(α) Κάθε \([x]\) είναι μη-κενό:</strong>
+            Με ανακλαστικότητα \(x \sim x\), οπότε \(x \in [x]\).
+          </p>
+          <p>
+            <strong>(β) Κάθε \(a\in A\) ανήκει σε κάποια κλάση:</strong>
+            Ανήκει στην \([a]\). Άρα \(\bigcup [x] = A\).
+          </p>
+          <p>
+            <strong>(γ) Δύο κλάσεις είναι ίσες ή ξένες:</strong>
+            Έστω \([x] \cap [y] \ne \emptyset\), δηλ. υπάρχει \(z\) με \(x \sim z\) και \(y \sim z\).
+            Για οποιοδήποτε \(w \in [x]\): \(w \sim x \sim z \sim y\) (μεταβατικότητα + συμμετρία),
+            άρα \(w \in [y]\). Συνεπώς \([x] \subseteq [y]\). Συμμετρικά \([y] \subseteq [x]\).
+            Άρα \([x] = [y]\). \(\square\)
+          </p>
+        </details>
+      </section>
+
+      <section id="sec-equiv-examples">
+        <h3>2.2 Παραδείγματα</h3>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Παράδειγμα 1 — Ισοδυναμία mod 5</div>
+          <p>
+            \(a \sim b \iff 5 \mid (a - b)\). Οι κλάσεις είναι
+            \[\{0,5,10,\ldots\},\; \{1,6,11,\ldots\},\; \{2,7,12,\ldots\},\; \{3,8,13,\ldots\},\; \{4,9,14,\ldots\}.\]
+            Το \(\Z / 5\Z = \{[0],[1],[2],[3],[4]\}\) είναι το <em>πηλίκο σύνολο</em>.
+          </p>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Παράδειγμα 2 — Συνεκτικότητα Γράφου</div>
+          <p>
+            Σε γράφο \(G\), ορίζουμε \(u \sim v\) αν υπάρχει μονοπάτι από \(u\) σε \(v\).
+            Αυτή είναι σχέση ισοδυναμίας (ανακλαστική: τετριμμένο μονοπάτι μήκους 0·
+            συμμετρική: αντιστρέφουμε το μονοπάτι·
+            μεταβατική: ενώνουμε μονοπάτια).
+            Οι κλάσεις είναι οι <strong>συνδεδεμένες συνιστώσες</strong>.
+          </p>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Παράδειγμα 3 — Ορθολογικοί Αριθμοί ως Κλάσεις</div>
+          <p>
+            Ορίζουμε \((a,b) \sim (c,d)\) στο \(\Z \times \Z^*\) αν \(ad = bc\).
+            Κάθε κλάση είναι ένας ρητός αριθμός: \([(a,b)] = a/b\).
+          </p>
+        </div>
+      </section>
+    </section>
+
+    <!-- §3 Μερικές Διατάξεις -->
+    <section id="sec-partial">
+      <h2>3. Μερικές Διατάξεις (Posets)</h2>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμός — Μερική Διάταξη (poset)</div>
+        <p>
+          Μια σχέση \(\preceq\) πάνω στο \(P\) είναι <strong>μερική διάταξη</strong> αν είναι
+          ανακλαστική, αντισυμμετρική και μεταβατική.
+          Το ζεύγος \((P, \preceq)\) λέγεται <strong>μερικώς διατεταγμένο σύνολο</strong> (poset).
+        </p>
+        <p>
+          Γράφουμε \(a \prec b\) (αυστηρή διάταξη) για \(a \preceq b\) και \(a \ne b\).
+        </p>
+      </div>
+
+      <section id="sec-hasse">
+        <h3>3.1 Hasse Διαγράμματα</h3>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Ορισμός — Hasse Διάγραμμα</div>
+          <p>
+            Το <strong>Hasse διάγραμμα</strong> ενός poset \((P,\preceq)\) είναι ο κατευθυνόμενος
+            γράφος όπου σχεδιάζουμε ακμή \(a \to b\) (με \(b\) ψηλότερα) αν και μόνο αν
+            \(a \prec b\) και <em>δεν υπάρχει</em> \(c\) με \(a \prec c \prec b\)
+            (ο \(b\) «καλύπτει» τον \(a\)).
+          </p>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Hasse — Διαιρετότητα σε \(\{1,2,3,4,6,12\}\)</div>
+          <div class="mermaid">
+graph TD
+  1((1)) --> 2((2))
+  1 --> 3((3))
+  2 --> 4((4))
+  2 --> 6((6))
+  3 --> 6
+  4 --> 12((12))
+  6 --> 12
+          </div>
+          <p>
+            Ο κόμβος \(12\) είναι στην κορυφή (μέγιστος), ο \(1\) στον πάτο (ελάχιστος).
+            Παρατηρείστε: \(4\) και \(3\) δεν συγκρίνονται (ούτε \(4 \mid 3\) ούτε \(3 \mid 4\)).
+          </p>
+        </div>
+      </section>
+
+      <section id="sec-examples-poset">
+        <h3>3.2 Παραδείγματα Poset</h3>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Σημαντικά Posets</div>
+          <table class="math-table">
+            <thead>
+              <tr><th>Poset</th><th>Σύνολο \(P\)</th><th>Σχέση \(\preceq\)</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Διαιρετότητα</td>
+                <td>\(\N \setminus \{0\}\)</td>
+                <td>\(a \preceq b \iff a \mid b\)</td>
+              </tr>
+              <tr>
+                <td>Υποσύνολα</td>
+                <td>\(2^{[n]}\)</td>
+                <td>\(A \preceq B \iff A \subseteq B\)</td>
+              </tr>
+              <tr>
+                <td>Λεξικογραφική</td>
+                <td>\(\Sigma^*\)</td>
+                <td>\(u \preceq v\) αν \(u\) πρόθεμα ή \(u <_\text{lex} v\)</td>
+              </tr>
+              <tr>
+                <td>Αριθμητική</td>
+                <td>\(\Z\)</td>
+                <td>\(\le\) (αυτή είναι ολική διάταξη)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <!-- §4 Αλυσίδες και Αντιαλυσίδες -->
+    <section id="sec-chains">
+      <h2>4. Αλυσίδες και Αντιαλυσίδες</h2>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμοί</div>
+        <ul>
+          <li>
+            <strong>Αλυσίδα (chain)</strong>: υποσύνολο \(C \subseteq P\) όπου κάθε δύο στοιχεία
+            συγκρίνονται: \(\forall a,b \in C:\; a \preceq b \lor b \preceq a\).
+          </li>
+          <li>
+            <strong>Αντιαλυσίδα (antichain)</strong>: υποσύνολο \(A \subseteq P\) όπου
+            κανένα ζεύγος δεν συγκρίνεται: \(\forall a \ne b \in A:\; a \not\preceq b \land b \not\preceq a\).
+          </li>
+          <li>
+            \(\omega(P)\) = μέγεθος <strong>μέγιστης αλυσίδας</strong> (ύψος του poset).
+          </li>
+          <li>
+            \(\alpha(P)\) = μέγεθος <strong>μέγιστης αντιαλυσίδας</strong> (πλάτος του poset).
+          </li>
+          <li>
+            \(c(P)\) = ελάχιστος αριθμός αλυσίδων που <strong>καλύπτουν</strong> το \(P\)
+            (κάθε στοιχείο ανήκει σε τουλάχιστον μία αλυσίδα).
+          </li>
+        </ul>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Παράδειγμα — Poset \(\{1,2,3,4,6,12\}\) με \(|\)</div>
+        <p>
+          <strong>Αλυσίδα μεγίστου μεγέθους:</strong> \(\{1, 2, 4, 12\}\) (μήκος 4, άρα \(\omega = 4\)).
+        </p>
+        <p>
+          <strong>Αντιαλυσίδα μεγίστου μεγέθους:</strong> \(\{3, 4\}\) ή \(\{2, 3\}\)...
+          αλλά πιο προσεκτικά: \(\{4, 3\}\), \(\{4, 6\}\) — ελέγξτε \(4 \nmid 6\) αλλά \(2\mid 6\).
+          Η \(\{3, 4\}\) είναι αντιαλυσίδα μεγέθους 2.
+        </p>
+        <p>
+          <strong>Κάλυψη με αλυσίδες:</strong> \(\{1,2,4,12\}\), \(\{3,6\}\) — δύο αλυσίδες καλύπτουν όλα.
+        </p>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Παράδειγμα — \((2^{[3]}, \subseteq)\)</div>
+        <div class="mermaid">
+graph TD
+  ABC["{1,2,3}"] --> AB["{1,2}"]
+  ABC --> AC["{1,3}"]
+  ABC --> BC["{2,3}"]
+  AB --> A["{1}"]
+  AB --> B["{2}"]
+  AC --> A
+  AC --> C["{3}"]
+  BC --> B
+  BC --> C
+  A --> E["∅"]
+  B --> E
+  C --> E
+        </div>
+        <p>
+          Αντιαλυσίδα μεγίστου μεγέθους: \(\{\{1,2\},\{1,3\},\{2,3\}\}\) — μέγεθος \(3 = \binom{3}{1} = \binom{3}{2}\).
+          (Το Θεώρημα Sperner λέει ότι αυτό είναι το μέγιστο.)
+        </p>
+      </div>
+    </section>
+
+    <!-- §5 Ελαχιστικά/Μεγιστικά -->
+    <section id="sec-minmax">
+      <h2>5. Ελαχιστικά, Μεγιστικά, Ελάχιστα, Μέγιστα</h2>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμοί</div>
+        <ul>
+          <li>
+            <strong>Ελαχιστικό στοιχείο</strong> \(m\): δεν υπάρχει \(x \prec m\)
+            (δεν υπάρχει κάτι μικρότερο).
+          </li>
+          <li>
+            <strong>Ελάχιστο στοιχείο</strong> (minimum) \(m_0\): \(m_0 \preceq x\) για όλα τα \(x\).
+            Είναι μοναδικό αν υπάρχει.
+          </li>
+          <li>
+            <strong>Μεγιστικό στοιχείο</strong> \(M\): δεν υπάρχει \(x \succ M\).
+          </li>
+          <li>
+            <strong>Μέγιστο στοιχείο</strong> (maximum) \(M_0\): \(x \preceq M_0\) για όλα τα \(x\).
+          </li>
+        </ul>
+        <div class="callout callout-warning" style="margin-top:0.75rem">
+          <div class="callout-title">&#9888; Προσοχή</div>
+          <p>
+            Ένα <em>ελαχιστικό</em> δεν είναι κατ' ανάγκη <em>ελάχιστο</em>.
+            Π.χ. στο poset \(\{2, 3, 6\}\) με διαιρετότητα, τα \(2\) και \(3\) είναι <em>αμφότερα</em>
+            ελαχιστικά, αλλά δεν υπάρχει μοναδικό ελάχιστο.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- §6 Ολική Διάταξη -->
+    <section id="sec-total">
+      <h2>6. Ολική Διάταξη</h2>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμός — Ολική Διάταξη</div>
+        <p>
+          Ένα poset \((P, \preceq)\) είναι <strong>ολικά διατεταγμένο</strong> (γραμμικό)
+          αν για κάθε \(a, b \in P\): \(a \preceq b\) ή \(b \preceq a\).
+          Το Hasse διάγραμμά του είναι <em>μονοπάτι</em> (γραμμική αλυσίδα).
+        </p>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Παραδείγματα Ολικής Διάταξης</div>
+        <ul>
+          <li>\((\Z, \le)\), \((\R, \le)\), \((\Q, \le)\) — τυπικά παραδείγματα.</li>
+          <li>Λεξικογραφική σε \(\Sigma^*\) (για αλφαβητική σειρά).</li>
+          <li>Κάθε ολική διάταξη είναι ειδική μερική διάταξη — αντίστροφα δεν ισχύει.</li>
+        </ul>
+        <p>
+          <strong>Παρατήρηση:</strong> Σε ολική διάταξη, κάθε αντιαλυσίδα έχει μέγεθος \(\le 1\)
+          (κάθε δύο στοιχεία συγκρίνονται). Άρα \(\alpha(P) = 1\) και \(c(P) = 1\) (μία αλυσίδα).
+        </p>
+      </div>
+    </section>
+
+    <!-- §7 Θεώρημα Dilworth -->
+    <section id="sec-dilworth">
+      <h2>7. Θεώρημα Dilworth</h2>
+
+      <div class="callout callout-theorem">
+        <div class="callout-title">Θεώρημα Dilworth (1950)</div>
+        <p>
+          Σε κάθε πεπερασμένο poset \((P, \preceq)\):
+          \[c(P) = \alpha(P),\]
+          δηλαδή, ο ελάχιστος αριθμός αλυσίδων που καλύπτουν το \(P\) ισούται με
+          το μέγεθος της μέγιστης αντιαλυσίδας.
+        </p>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">&#9888; Εύκολη Κατεύθυνση</div>
+        <p>
+          Πάντα \(c(P) \ge \alpha(P)\): Κάθε αλυσίδα περιέχει το πολύ ένα στοιχείο
+          οποιασδήποτε αντιαλυσίδας (δύο στοιχεία αντιαλυσίδας δεν συγκρίνονται,
+          άρα δεν μπορούν να ανήκουν στην ίδια αλυσίδα).
+          Έτσι αν έχουμε κάλυψη με \(c\) αλυσίδες και αντιαλυσίδα μεγέθους \(\alpha\),
+          τότε \(c \ge \alpha\).
+        </p>
+      </div>
+
+      <section id="sec-dilworth-proof">
+        <h3>7.1 Πλήρης Απόδειξη (μέσω Ταιριάσματος)</h3>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Κατασκευή Διμερούς Γράφου \(H\)</div>
+          <p>
+            Δοθέντος ενός poset \((P, \preceq)\) με \(|P| = n\), ορίζουμε διμερή γράφο
+            \(H = (P^- \cup P^+, E)\) όπου:
+          </p>
+          <ul>
+            <li>\(P^- = \{x^- : x \in P\}\) — «αντίγραφο εξόδου» (κάθε στοιχείο ως «αρχή»).</li>
+            <li>\(P^+ = \{x^+ : x \in P\}\) — «αντίγραφο εισόδου» (κάθε στοιχείο ως «τέλος»).</li>
+            <li>
+              Ακμή \(x^- y^+\) υπάρχει αν και μόνο αν \(x \prec y\)
+              (αυστηρά \(x\) μικρότερο του \(y\) στο poset).
+            </li>
+          </ul>
+          <p>
+            Ένα ταίριασμα \(M\) στον \(H\) αντιστοιχεί σε ένα σύνολο ζευγών
+            \(\{(x,y) : x \prec y\}\) — δηλαδή «ενώνει» στοιχεία σε αλυσίδες.
+          </p>
+        </div>
+
+        <div class="callout callout-example">
+          <div class="callout-title">Διμερής Γράφος για \(\{1,2,3,4,6\}\) με \(|\)</div>
+          <div class="mermaid">
+graph LR
+  subgraph P-["P⁻ (αρχές)"]
+    1m["1⁻"]
+    2m["2⁻"]
+    3m["3⁻"]
+    4m["4⁻"]
+    6m["6⁻"]
+  end
+  subgraph P+["P⁺ (τέλη)"]
+    2p["2⁺"]
+    3p["3⁺"]
+    4p["4⁺"]
+    6p["6⁺"]
+  end
+  1m --> 2p
+  1m --> 3p
+  1m --> 4p
+  1m --> 6p
+  2m --> 4p
+  2m --> 6p
+  3m --> 6p
+          </div>
+          <p>
+            Ταίριασμα \(M = \{1^- 2^+, 2^- 4^+, 3^- 6^+\}\) (μέγεθος 3) αντιστοιχεί στις αλυσίδες
+            \(1 \prec 2 \prec 4\) και \(3 \prec 6\) — κάλυψη με 2 αλυσίδες (και ο 5^ος κόμβος \(...\) μόνος).
+          </p>
+        </div>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Λήμμα — Αντιστοιχία Ταιριάσματος–Κάλυψης</div>
+          <p>
+            Αν \(|M| = k\), τότε μπορούμε να καλύψουμε το \(P\) με \(n - k\) αλυσίδες.
+            Συνεπώς \(c(P) = n - |M_\max|\).
+          </p>
+        </div>
+
+        <details class="callout callout-proof">
+          <summary class="callout-title">&#9656; Απόδειξη Λήμματος</summary>
+          <p>
+            Κάθε ακμή \(x^- y^+ \in M\) «ενώνει» το \(x\) με το \(y\). Αφού το ταίριασμα είναι
+            σύνολο ξένων ακμών, κάθε κόμβος εμφανίζεται το πολύ μία φορά — άρα κάθε στοιχείο του \(P\)
+            έχει το πολύ έναν «διάδοχο» (από \(x^-\)) και το πολύ έναν «πρόδρομο» (από \(y^+\)).
+            Αυτό ορίζει ένα σύνολο ξένων αλυσίδων (κατευθυνόμενες διαδρομές στο Hasse διάγραμμα).
+          </p>
+          <p>
+            Ο αριθμός των αλυσίδων ισούται με τον αριθμό κόμβων μείον τον αριθμό ακμών στο ταίριασμα
+            (κάθε ακμή «συγχωνεύει» δύο κόμβους σε μία αλυσίδα):
+            \[\#\text{αλυσίδων} = n - |M|.\]
+            Μεγιστοποιώντας \(|M|\) ελαχιστοποιούμε τον αριθμό αλυσίδων: \(c(P) = n - |M_\max|\). \(\square\)
+          </p>
+        </details>
+
+        <details class="callout callout-proof">
+          <summary class="callout-title">&#9656; Απόδειξη Dilworth: \(c(P) = \alpha(P)\)</summary>
+          <p>
+            Έχουμε ήδη \(c(P) \ge \alpha(P)\) (εύκολη κατεύθυνση).
+            Αρκεί να δείξουμε \(c(P) \le \alpha(P)\), δηλ. \(n - |M_\max| \le \alpha(P)\),
+            ή ισοδύναμα:
+            \[|M_\max| \ge n - \alpha(P).\]
+          </p>
+          <p>
+            <strong>Από το Θεώρημα König:</strong>
+            Στον διμερή γράφο \(H\), το Θεώρημα König λέει:
+            \[|M_\max| = |V_\min\text{-cover}|,\]
+            όπου \(|V_\min\text{-cover}|\) είναι η ελάχιστη κάλυψη κορυφών.
+            Θα δείξουμε ότι κάθε κάλυψη κορυφών έχει μέγεθος \(\ge n - \alpha(P)\).
+          </p>
+          <p>
+            Έστω \(C \subseteq P^- \cup P^+\) κάλυψη κορυφών του \(H\).
+            Ορίζουμε:
+            \[C^- = \{x \in P : x^- \in C\}, \quad C^+ = \{x \in P : x^+ \in C\}.\]
+            Θέτουμε \(Q = P \setminus (C^- \cup C^+)\) — τα στοιχεία που δεν «καλύπτονται».
+          </p>
+          <p>
+            <strong>Ισχυρισμός:</strong> \(Q\) είναι αντιαλυσίδα.
+            Πράγματι, αν \(x, y \in Q\) με \(x \prec y\), τότε η ακμή \(x^- y^+\) υπάρχει στον \(H\).
+            Για να καλύπτεται αυτή η ακμή, χρειάζεται \(x^- \in C\) ή \(y^+ \in C\),
+            δηλ. \(x \in C^-\) ή \(y \in C^+\). Και στις δύο περιπτώσεις \(x \notin Q\) ή \(y \notin Q\)
+            — αντίφαση.
+          </p>
+          <p>
+            Άρα \(|Q| \le \alpha(P)\), συνεπώς
+            \[|C| = |C^-| + |C^+| \ge n - |Q| \ge n - \alpha(P).\]
+            Από König: \(|M_\max| = |C_\min| \ge n - \alpha(P)\), άρα \(c(P) = n - |M_\max| \le \alpha(P)\). \(\square\)
+          </p>
+        </details>
+      </section>
+    </section>
+
+    <!-- §8 Mirsky -->
+    <section id="sec-mirsky">
+      <h2>8. Θεώρημα Mirsky (Δυϊκό Dilworth)</h2>
+
+      <div class="callout callout-theorem">
+        <div class="callout-title">Θεώρημα Mirsky (1971)</div>
+        <p>
+          Σε κάθε πεπερασμένο poset \((P, \preceq)\):
+          \[\text{ελάχιστος αριθμός αντιαλυσίδων που καλύπτουν το } P = \omega(P),\]
+          δηλ. το ελάχιστο partition σε αντιαλυσίδες ισούται με το μέγεθος της μέγιστης αλυσίδας.
+        </p>
+      </div>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Κατασκευή Mirsky (Ορισμός «Βαθμίδων»)</div>
+        <p>
+          Ορίζουμε βαθμίδες επαγωγικά:
+          \[M_1 = \{x \in P : x \text{ είναι μεγιστικό}\},\]
+          \[M_i = \{x \in P \setminus (M_1 \cup \cdots \cup M_{i-1}) : x \text{ είναι μεγιστικό στο } P \setminus (M_1 \cup \cdots \cup M_{i-1})\}.\]
+          Κάθε \(M_i\) είναι αντιαλυσίδα (δύο στοιχεία της ίδιας βαθμίδας δεν συγκρίνονται).
+        </p>
+      </div>
+
+      <details class="callout callout-proof">
+        <summary class="callout-title">&#9656; Απόδειξη Mirsky</summary>
+        <p>
+          <strong>Εύκολη κατεύθυνση (\(\ge\)):</strong>
+          Κάθε αλυσίδα μεγέθους \(\omega\) πρέπει να έχει κάθε στοιχείο της σε διαφορετική αντιαλυσίδα
+          (δύο στοιχεία αλυσίδας συγκρίνονται, άρα δεν μπορούν να ανήκουν στην ίδια αντιαλυσίδα).
+          Άρα χρειαζόμαστε \(\ge \omega\) αντιαλυσίδες.
+        </p>
+        <p>
+          <strong>Δύσκολη κατεύθυνση (\(\le\)):</strong>
+          Ισχυριζόμαστε ότι η κατασκευή Mirsky δίνει ακριβώς \(\omega\) αντιαλυσίδες.
+        </p>
+        <p>
+          Κάθε στοιχείο \(x\) ανήκει στη βαθμίδα \(M_k\) όπου \(k\) = μήκος μεγιστικής αλυσίδας
+          που ξεκινά από \(x\). (Δηλαδή \(k\) = «βάθος» του \(x\) στο poset.)
+          Η μέγιστη τέτοια \(k\) είναι το \(\omega(P)\), άρα οι βαθμίδες είναι ακριβώς \(\omega(P)\). \(\square\)
+        </p>
+      </details>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Mirsky για \(\{1,2,3,4,6,12\}\) με \(|\)</div>
+        <p>
+          <ul>
+            <li>\(M_1 = \{12\}\) (μοναδικό μεγιστικό)</li>
+            <li>\(M_2 = \{4, 6\}\) (μεγιστικά αφού αφαιρεθεί το 12)</li>
+            <li>\(M_3 = \{2, 3\}\) (μεγιστικά αφού αφαιρεθούν \(M_1, M_2\))</li>
+            <li>\(M_4 = \{1\}\) (μοναδικό ελαχιστικό)</li>
+          </ul>
+          Άρα \(\omega = 4\) και partition: \(\{12\}, \{4,6\}, \{2,3\}, \{1\}\).
+        </p>
+      </div>
+    </section>
+
+    <!-- §9 Αλγόριθμος -->
+    <section id="sec-algorithm">
+      <h2>9. Αλγόριθμος Εύρεσης Ελάχιστης Κάλυψης με Αλυσίδες</h2>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Αλγόριθμος μέσω Ταιριάσματος</div>
+        <ol>
+          <li>Κατασκεύασε τον διμερή γράφο \(H = (P^- \cup P^+, E)\) με \(x^- y^+ \in E \iff x \prec y\).</li>
+          <li>Βρες μέγιστο ταίριασμα \(M_\max\) (π.χ. με Hopcroft–Karp).</li>
+          <li>
+            Κατασκεύασε αλυσίδες: ξεκίνα από κάθε \(x\) που <em>δεν</em> εμφανίζεται ως \(y^+\)
+            σε κάποια ακμή \(M\), και ακολούθα τις ακμές \(x^- \to y^+\) βήμα-βήμα.
+          </li>
+          <li>
+            Επιστρέφει \(n - |M_\max|\) αλυσίδες (η ελάχιστη δυνατή κάλυψη).
+          </li>
+        </ol>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Παράδειγμα Εκτέλεσης</div>
+        <p>
+          Poset: ακέραιοι \(1 \le i \le 9\), με \(i \prec j\) αν \(i \mid j\) και \(i \ne j\).
+        </p>
+        <p>
+          Μετά από ταίριασμα (λεπτομέρειες παραλείπονται), παίρνουμε π.χ. ταίριασμα μεγέθους 5:
+          \[\{1^-2^+,\; 2^-4^+,\; 4^-8^+,\; 3^-6^+,\; 6^-...\}\]
+          Δίνει κάλυψη με \(9 - 5 = 4\) αλυσίδες.
+          Η μέγιστη αντιαλυσίδα έχει επίσης μέγεθος 4 (π.χ. \(\{5,6,7,8\}\) — κανένα δεν διαιρεί άλλο).
+        </p>
+      </div>
+
+      <div class="callout callout-theorem">
+        <div class="callout-title">Λήμμα — \(|M| + |D_M| = n\)</div>
+        <p>
+          Κάθε ταίριασμα \(M\) στον \(H\) ορίζει κάλυψη με \(|D_M| = n - |M|\) αλυσίδες.
+          Αντίστροφα, κάθε κάλυψη σε \(k\) αλυσίδες αντιστοιχεί σε ταίριασμα μεγέθους \(n-k\).
+          Επομένως:
+          \[c(P) = n - |M_\max| = n - \nu(H),\]
+          όπου \(\nu(H)\) είναι ο αριθμός ακμών του μέγιστου ταιριάσματος.
+        </p>
+      </div>
+    </section>
+
+    <!-- §10 Εφαρμογές -->
+    <section id="sec-applications">
+      <h2>10. Εφαρμογές: Hall και Erdős–Szekeres από Dilworth</h2>
+
+      <section id="sec-hall-dilworth">
+        <h3>10.1 Θεώρημα Hall από Dilworth</h3>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Συνέπεια: Hall από Dilworth</div>
+          <p>
+            Το Θεώρημα Hall για διμερείς γράφους ακολουθεί ως ειδική περίπτωση του Dilworth.
+          </p>
+        </div>
+
+        <details class="callout callout-proof">
+          <summary class="callout-title">&#9656; Απόδειξη</summary>
+          <p>
+            Δοθέντος διμερούς \(G = (L \cup R, E)\) με \(|N(S)| \ge |S|\) για όλα τα \(S \subseteq L\),
+            θέλουμε να βρούμε τέλειο ταίριασμα του \(L\).
+          </p>
+          <p>
+            Ορίζουμε poset \((P, \preceq)\) με \(P = L \cup R\) και:
+            \(\ell \prec r\) αν \(\ell \in L, r \in R\) και \((\ell,r) \in E\),
+            ενώ δύο στοιχεία του ίδιου μέρους είναι ασύγκριτα.
+          </p>
+          <p>
+            Αντιαλυσίδα σε αυτό το poset: υποσύνολο \(A \subseteq L \cup R\) όπου κανένα
+            \(\ell \in A \cap L\) δεν συνδέεται με κανένα \(r \in A \cap R\).
+            Άρα \(|(A \cap R)| \ge |(A \cap L)|\) από Hall, άρα
+            \(|A| = |A \cap L| + |A \cap R| \le |A \cap L| + |R| \le |R|\).
+            Πιο προσεκτικά: χρησιμοποιώντας Hall, μπορεί να φανεί ότι \(\alpha(P) = |R|\)
+            και \(c(P) = |R|\), άρα η ελάχιστη κάλυψη αλυσίδων = \(|R|\) αλυσίδες,
+            κάθε μία περνά από ακριβώς ένα \(\ell\) — δίνοντας τέλειο ταίριασμα. \(\square\)
+          </p>
+        </details>
+      </section>
+
+      <section id="sec-es-dilworth">
+        <h3>10.2 Θεώρημα Erdős–Szekeres από Dilworth</h3>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Θεώρημα Erdős–Szekeres (1935) — Αναδιατύπωση</div>
+          <p>
+            Κάθε ακολουθία \(n^2 + 1\) διακριτών πραγματικών αριθμών περιέχει
+            μονότονη αύξουσα ή μονότονη φθίνουσα υπακολουθία μήκους \(\ge n+1\).
+          </p>
+        </div>
+
+        <details class="callout callout-proof">
+          <summary class="callout-title">&#9656; Απόδειξη μέσω Dilworth</summary>
+          <p>
+            Έστω \(a_1, a_2, \ldots, a_{n^2+1}\) ακολουθία διακριτών πραγματικών.
+            Ορίζουμε poset \((P, \preceq)\) με \(P = \{1, 2, \ldots, n^2+1\}\) και
+            \(i \prec j \iff i < j \land a_i < a_j\) (αύξουσα υπακολουθία).
+          </p>
+          <p>
+            <strong>Αλυσίδα</strong> = αύξουσα υπακολουθία (δείκτες αυξάνονται και τιμές αυξάνονται).
+          </p>
+          <p>
+            <strong>Αντιαλυσίδα</strong> = σύνολο δεικτών όπου οι τιμές είναι φθίνουσες
+            (αν \(i < j\) στην αντιαλυσίδα, τότε \(a_i > a_j\), άρα φθίνουσα υπακολουθία).
+          </p>
+          <p>
+            Από Dilworth: \(c(P) = \alpha(P)\). Αν \(\omega(P) \le n\) (κάθε αύξουσα υπακολουθία
+            έχει μήκος \(\le n\)), τότε από Mirsky χρειαζόμαστε \(\le n\) αντιαλυσίδες για κάλυψη.
+          </p>
+          <p>
+            Αν επίσης \(\alpha(P) \le n\), τότε \(c(P) = \alpha(P) \le n\) και η κάλυψη \(\le n\)
+            αλυσίδων μπορεί να καλύψει το πολύ \(n \cdot n = n^2\) στοιχεία — αντίφαση με \(|P| = n^2 + 1\).
+          </p>
+          <p>
+            Άρα είτε \(\omega(P) \ge n+1\) (αύξουσα υπακολουθία μήκους \(n+1\))
+            είτε \(\alpha(P) \ge n+1\) (φθίνουσα υπακολουθία μήκους \(n+1\)). \(\square\)
+          </p>
+        </details>
+      </section>
+    </section>
+
+    <!-- §11 Sperner -->
+    <section id="sec-sperner">
+      <h2>11. Θεώρημα Sperner</h2>
+
+      <div class="callout callout-theorem">
+        <div class="callout-title">Θεώρημα Sperner (1928)</div>
+        <p>
+          Σε οποιαδήποτε αντιαλυσίδα \(\mathcal{A} \subseteq 2^{[n]}\)
+          (σύστημα υποσυνόλων του \([n] = \{1,\ldots,n\}\)
+          όπου κανένα δεν περιέχει άλλο):
+          \[|\mathcal{A}| \le \binom{n}{\lfloor n/2 \rfloor}.\]
+          Η άνω φράγμα επιτυγχάνεται από το σύνολο όλων των \(\lfloor n/2 \rfloor\)-υποσυνόλων.
+        </p>
+      </div>
+
+      <details class="callout callout-proof">
+        <summary class="callout-title">&#9656; Απόδειξη μέσω μέτρησης μεταθέσεων</summary>
+        <p>
+          <strong>Ιδέα:</strong> Για κάθε μετάθεση \(\sigma\) του \([n]\) και κάθε \(A \in \mathcal{A}\),
+          λέμε ότι η \(\sigma\) «αντιστοιχεί» στο \(A\) αν
+          \(A = \{\sigma(1), \ldots, \sigma(|A|)\}\)
+          (το \(A\) εμφανίζεται ως πρώτος \(|A|\) στοιχείο της μετάθεσης).
+        </p>
+        <p>
+          Αριθμός μεταθέσεων που αντιστοιχούν στο \(A\) (με \(|A| = k\)):
+          Επιλέγουμε σειρά εντός \(A\) και σειρά εκτός \(A\): \(k! \cdot (n-k)!\).
+        </p>
+        <p>
+          <strong>Ισχυρισμός:</strong> Κάθε μετάθεση αντιστοιχεί σε <em>το πολύ ένα</em> \(A \in \mathcal{A}\).
+        </p>
+        <p>
+          Πράγματι, αν \(\sigma\) αντιστοιχούσε σε \(A, B \in \mathcal{A}\) με \(|A| \le |B|\),
+          τότε \(A = \{\sigma(1),\ldots,\sigma(|A|)\} \subseteq \{\sigma(1),\ldots,\sigma(|B|)\} = B\),
+          οπότε \(A \subseteq B\), αντίφαση (είναι αντιαλυσίδα).
+        </p>
+        <p>
+          <strong>Μέτρηση:</strong>
+          Αριθμός (μετάθεση, σύνολο) ζευγών = \(\displaystyle\sum_{A \in \mathcal{A}} |A|!(n-|A|)!\).
+          Επίσης \(\le n!\) (ο αριθμός μεταθέσεων).
+          Άρα:
+          \[\sum_{A \in \mathcal{A}} |A|!(n-|A|)! \le n!,\]
+          \[\sum_{A \in \mathcal{A}} \frac{1}{\binom{n}{|A|}} \le 1.\]
+          Αφού \(\binom{n}{|A|} \le \binom{n}{\lfloor n/2 \rfloor}\) για όλα τα \(|A|\):
+          \[\frac{|\mathcal{A}|}{\binom{n}{\lfloor n/2 \rfloor}} \le \sum_{A \in \mathcal{A}} \frac{1}{\binom{n}{|A|}} \le 1,\]
+          οπότε \(|\mathcal{A}| \le \binom{n}{\lfloor n/2 \rfloor}\). \(\square\)
+        </p>
+      </details>
+
+      <div class="callout callout-theorem">
+        <div class="callout-title">Συνέπεια — Μέγιστο Τεμνόμενο Σύστημα</div>
+        <p>
+          Ένα σύστημα \(\mathcal{F} \subseteq 2^{[n]}\) είναι <strong>τεμνόμενο (intersecting)</strong>
+          αν \(A \cap B \ne \emptyset\) για όλα τα \(A, B \in \mathcal{F}\).
+          Τότε:
+          \[|\mathcal{F}| \le 2^{n-1}.\]
+          Η άνω φράγμα επιτυγχάνεται π.χ. από το σύνολο όλων των υποσυνόλων που περιέχουν ένα σταθερό
+          στοιχείο \(x_0\).
+        </p>
+      </div>
+
+      <details class="callout callout-proof">
+        <summary class="callout-title">&#9656; Απόδειξη</summary>
+        <p>
+          Για κάθε \(A \subseteq [n]\), τουλάχιστον ένα από τα \(A, [n]\setminus A\)
+          δεν ανήκει στο \(\mathcal{F}\) (γιατί \(A \cap ([n]\setminus A) = \emptyset\)).
+          Άρα \(|\mathcal{F}| \le \frac{1}{2} \cdot 2^n = 2^{n-1}\). \(\square\)
+        </p>
+      </details>
+    </section>
+
+    <!-- Ασκήσεις -->
+    <section id="sec-exercises">
+      <h2>Ασκήσεις</h2>
+
+      <ol class="exercise-list">
+        <li>
+          <strong>Σχέση ισοδυναμίας:</strong>
+          Ορίστε \(a \sim b\) σε \(\Z\) αν \(3 \mid (a^2 - b^2)\).
+          Αποδείξτε ότι είναι σχέση ισοδυναμίας και περιγράψτε τις κλάσεις.
+        </li>
+        <li>
+          <strong>Hasse Διάγραμμα:</strong>
+          Σχεδιάστε το Hasse διάγραμμα του poset \((\{1,2,3,5,6,10,15,30\}, \mid)\).
+          Βρείτε μέγιστη αλυσίδα και μέγιστη αντιαλυσίδα.
+        </li>
+        <li>
+          <strong>Dilworth:</strong>
+          Στο poset \((\{2,3,4,6,8,9,12,18\}, \mid)\), εφαρμόστε τον αλγόριθμο
+          ταιριάσματος για να βρείτε ελάχιστη κάλυψη με αλυσίδες.
+          Επαληθεύστε ότι ισούται με το μέγεθος της μέγιστης αντιαλυσίδας.
+        </li>
+        <li>
+          <strong>Mirsky:</strong>
+          Για το ίδιο poset, εφαρμόστε τη διαδικασία Mirsky και βρείτε partition
+          σε αντιαλυσίδες ίσο με \(\omega(P)\).
+        </li>
+        <li>
+          <strong>Erdős–Szekeres:</strong>
+          Δείξτε ότι κάθε ακολουθία 10 διακριτών πραγματικών περιέχει
+          μονότονη υπακολουθία μήκους \(\ge 4\).
+          (Υποδ.: \(10 > 3^2 + 1\)? Ελέγξτε το φράγμα.)
+        </li>
+        <li>
+          <strong>Sperner:</strong>
+          Βρείτε μέγιστη αντιαλυσίδα στο \((2^{[4]}, \subseteq)\).
+          Πόσα μέλη έχει; Επαληθεύστε με τον τύπο \(\binom{4}{2}\).
+        </li>
+        <li>
+          <strong>Σχέση Hall–Dilworth:</strong>
+          Για διμερή γράφο \(G = (L \cup R, E)\) με Hall's condition, περιγράψτε
+          τον αντίστοιχο poset και εξηγείστε γιατί Dilworth δίνει τέλειο ταίριασμα.
+        </li>
+      </ol>
+    </section>
+
+    <!-- Ερωτήσεις Εξετάσεων -->
+    <section id="sec-exam">
+      <h2>Ερωτήσεις Εξετάσεων</h2>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">&#127891; Ερώτηση 1 — Σχέσεις Ισοδυναμίας</div>
+        <p>
+          Έστω \(R\) σχέση πάνω σε \(\Z\) ορισμένη ως \(aRb \iff a \equiv b \pmod{n}\).
+          (α) Αποδείξτε ότι είναι σχέση ισοδυναμίας.
+          (β) Πόσες κλάσεις ισοδυναμίας υπάρχουν;
+          (γ) Αν \(n = 6\), ποια κλάση ανήκει ο \(100\);
+        </p>
+        <details>
+          <summary>Απάντηση</summary>
+          <p>
+            (α) Ανακλαστική: \(a - a = 0 = 0 \cdot n\). Συμμετρική: αν \(n \mid (a-b)\) τότε
+            \(n \mid (b-a)\). Μεταβατική: \(n \mid (a-b)\) και \(n \mid (b-c)\) οπότε \(n \mid (a-c)\).
+          </p>
+          <p>
+            (β) \(n\) κλάσεις: \([0], [1], \ldots, [n-1]\).
+          </p>
+          <p>
+            (γ) \(100 = 16 \cdot 6 + 4\), άρα \(100 \equiv 4 \pmod 6\), ανήκει στην \([4]\).
+          </p>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">&#127891; Ερώτηση 2 — Hasse και Ιδιότητες</div>
+        <p>
+          Ορίζουμε σχέση \(\preceq\) στο \(\{0,1\}^3\) (δυαδικές τριάδες) ως
+          \(x \preceq y \iff x_i \le y_i\) για κάθε \(i = 1,2,3\) (συντεταγμένη-συντεταγμένα).
+          (α) Είναι poset; (β) Είναι ολική; (γ) Σχεδιάστε Hasse.
+          (δ) Βρείτε μέγιστη αντιαλυσίδα.
+        </p>
+        <details>
+          <summary>Απάντηση</summary>
+          <p>
+            (α) Ναι: ανακλαστική (\(x_i \le x_i\)), αντισυμμετρική, μεταβατική — είναι poset.
+          </p>
+          <p>
+            (β) Όχι: π.χ. \(100\) και \(010\) δεν συγκρίνονται (\(1 > 0\) στην 1η, \(0 < 1\) στη 2η).
+          </p>
+          <p>
+            (δ) Μέγιστη αντιαλυσίδα: \(\{100, 010, 001\}\) (μέγεθος 3).
+            Γενικά σε \(\{0,1\}^n\) το μέγεθος είναι \(\binom{n}{\lfloor n/2 \rfloor}\) (Sperner).
+          </p>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">&#127891; Ερώτηση 3 — Θεώρημα Dilworth</div>
+        <p>
+          Έστω poset \((P, \preceq)\) με \(|P| = 10\) και μέγιστη αντιαλυσίδα μεγέθους 4.
+          (α) Ποιος είναι ο ελάχιστος αριθμός αλυσίδων που καλύπτουν το \(P\);
+          (β) Τι λέει αυτό για τον μέγιστο αριθμό ακμών ταιριάσματος στον \(H\);
+        </p>
+        <details>
+          <summary>Απάντηση</summary>
+          <p>
+            (α) Από Dilworth: \(c(P) = \alpha(P) = 4\).
+          </p>
+          <p>
+            (β) Από Λήμμα: \(c(P) = n - |M_\max|\), άρα \(4 = 10 - |M_\max|\), συνεπώς \(|M_\max| = 6\).
+          </p>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">&#127891; Ερώτηση 4 — Erdős–Szekeres μέσω Dilworth</div>
+        <p>
+          Δοθείσης ακολουθίας \(a_1, \ldots, a_{17}\) διακριτών πραγματικών,
+          αποδείξτε χρησιμοποιώντας Dilworth ότι υπάρχει μονότονη υπακολουθία μήκους \(\ge 5\).
+        </p>
+        <details>
+          <summary>Απάντηση</summary>
+          <p>
+            Ορίζουμε poset \(i \prec j \iff i < j\) και \(a_i < a_j\).
+            Αλυσίδα = αύξουσα, αντιαλυσίδα = φθίνουσα.
+            Από Dilworth: \(c(P) = \alpha(P)\).
+            Αν \(\omega(P) \le 4\) (καμία αύξουσα μήκους 5) τότε από Mirsky χρειαζόμαστε \(\le 4\)
+            αντιαλυσίδες-στρώσεις. Αν επίσης \(\alpha(P) \le 4\), τότε \(c = 4\) και η κάλυψη
+            έχει \(4 \cdot 4 = 16\) στοιχεία — αντίφαση με \(|P|=17\).
+            Άρα \(\omega \ge 5\) ή \(\alpha \ge 5\). \(\square\)
+          </p>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">&#127891; Ερώτηση 5 — Θεώρημα Mirsky</div>
+        <p>
+          Στο poset \((\{1,2,\ldots,12\}, \mid)\), εφαρμόστε τη διαδικασία Mirsky.
+          Βρείτε τις βαθμίδες \(M_1, M_2, \ldots\) και επαληθεύστε ότι ο αριθμός τους ισούται
+          με \(\omega(P)\).
+        </p>
+        <details>
+          <summary>Απάντηση</summary>
+          <p>
+            \(M_1 = \{5, 7, 8, 9, 10, 11, 12\}\) (μεγιστικά — δεν διαιρούν κανένα άλλο στο σύνολο).
+            \(M_2 = \{4, 6\}\) (μεγιστικά μετά αφαίρεση \(M_1\)).
+            \(M_3 = \{2, 3\}\).
+            \(M_4 = \{1\}\).
+            Σύνολο βαθμίδων: 4 = \(\omega(P)\) (μέγιστη αλυσίδα: \(1 \mid 2 \mid 4 \mid 8\)).
+          </p>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">&#127891; Ερώτηση 6 — Θεώρημα Sperner</div>
+        <p>
+          (α) Αποδείξτε ότι \(\displaystyle\sum_{A \in \mathcal{A}} \frac{1}{\binom{n}{|A|}} \le 1\)
+          για κάθε αντιαλυσίδα \(\mathcal{A} \subseteq 2^{[n]}\).
+          (β) Χρησιμοποιώντας αυτό, αποδείξτε \(|\mathcal{A}| \le \binom{n}{\lfloor n/2 \rfloor}\).
+        </p>
+        <details>
+          <summary>Απάντηση</summary>
+          <p>
+            (α) Μεταθέσεις: κάθε μετάθεση \(\sigma\) αντιστοιχεί σε το πολύ ένα \(A\),
+            αριθμός μεταθέσεων που αντιστοιχούν στο \(A\) είναι \(|A|!(n-|A|)!\).
+            Συνολικά: \(\sum_{A} |A|!(n-|A|)! \le n!\),
+            διαιρώ δια \(n!\): \(\sum_A \frac{1}{\binom{n}{|A|}} \le 1\).
+          </p>
+          <p>
+            (β) \(\frac{1}{\binom{n}{|A|}} \ge \frac{1}{\binom{n}{\lfloor n/2\rfloor}}\) για όλα τα \(|A|\),
+            άρα \(\frac{|\mathcal{A}|}{\binom{n}{\lfloor n/2\rfloor}} \le \sum_A \frac{1}{\binom{n}{|A|}} \le 1\).
+          </p>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">&#127891; Ερώτηση 7 — Συνδυαστικό Ερώτημα</div>
+        <p>
+          Έχουμε σακούλα με 10 μπίλιες, αριθμημένες \(1, \ldots, 10\).
+          Λαμβάνουμε \(n = 6\) μπίλιες τυχαία χωρίς επανάθεση.
+          Χρησιμοποιώντας αρχή Dirichlet (κουνέλια–συρτάρια), δείξτε ότι τουλάχιστον
+          δύο επιλεγμένες μπίλιες έχουν άθροισμα 11.
+        </p>
+        <details>
+          <summary>Απάντηση</summary>
+          <p>
+            Ορίζουμε «συρτάρια» τα ζεύγη \(\{1,10\}, \{2,9\}, \{3,8\}, \{4,7\}, \{5,6\}\) — 5 συρτάρια.
+            Επιλέγουμε 6 μπίλιες από 10. Από αρχή Dirichlet, τουλάχιστον δύο ανήκουν στο ίδιο ζεύγος,
+            άρα αθροίζουν σε 11. \(\square\)
+          </p>
+        </details>
+      </div>
+    </section>
+
+    <!-- Πλοήγηση -->
+    <nav class="lecture-nav" aria-label="Πλοήγηση διαλέξεων">
+      <a href="lecture7.html" class="lecture-nav__btn">← Διάλεξη 7</a>
+      <span class="lecture-nav__current">Διάλεξη 8 / 8</span>
+      <span class="lecture-nav__btn lecture-nav__btn--disabled">Τέλος &#10003;</span>
+    </nav>
+
+  </main><!-- /.main-content -->
+</div><!-- /.page-wrapper -->
+
+<footer class="site-footer">
+  <p>Μαθηματικά Πληροφορικής · ΕΚΠΑ · Τμήμα Πληροφορικής &amp; Τηλεπικοινωνιών</p>
+  <p>
+    <a href="../index.html">Αρχική</a> ·
+    <a href="lecture1.html">Διάλεξη 1</a> ·
+    <a href="lecture7.html">Διάλεξη 7</a>
+  </p>
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+  });
+</script>
+
 </body>
 </html>

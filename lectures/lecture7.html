@@ -3,35 +3,578 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Διάλεξη 7 — Ταιριάσματα, Θεώρημα Hall</title>
+  <meta name="description"
+        content="Διάλεξη 7 — Ταιριάσματα & Θεώρημα Hall. Αυξητικά Μονοπάτια, Πλήρης Απόδειξη Hall, Defect Version, SDR.">
+  <title>Διάλεξη 7 — Ταιριάσματα &amp; Hall | Μαθ. Πληροφορικής ΕΚΠΑ</title>
   <link rel="stylesheet" href="../css/style.css">
   <script>
-    window.MathJax = { tex: { inlineMath: [['$','$'], ['\\(','\\)']] } };
+    window.MathJax = {
+      tex: {
+        inlineMath:  [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        tags: 'ams',
+        macros: {
+          floor: ['\\lfloor #1 \\rfloor', 1],
+          N:  '\\mathbb{N}',
+          Z:  '\\mathbb{Z}',
+          vp: '\\varphi'
+        }
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+    };
+    (function () {
+      const t = localStorage.getItem('math-plir-theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <script src="../js/main.js" defer></script>
 </head>
 <body>
-  <header>
-    <h1>Διάλεξη 7 — Ταιριάσματα &amp; Θεώρημα Hall</h1>
-    <a href="../index.html">← Αρχική</a>
-  </header>
 
-  <nav>
-    <a href="lecture6.html">← Προηγούμενη</a>
-    <span>|</span>
-    <a href="../index.html">Αρχική</a>
-    <span>|</span>
-    <a href="lecture8.html">Επόμενη →</a>
-  </nav>
+<header class="site-header" role="banner">
+  <div class="site-header__inner">
+    <a href="../index.html" class="site-header__title">&#8469; Μαθηματικά Πληροφορικής</a>
+    <nav class="site-nav" aria-label="Κύρια πλοήγηση">
+      <a href="../index.html">Αρχική</a>
+      <a href="lecture1.html" aria-current="page">Διαλέξεις</a>
+      <a href="../topics/induction.html">Θέματα</a>
+      <a href="../exercises/solved.html">Ασκήσεις</a>
+      <a href="../exam-prep/formulas.html">Εξεταστική</a>
+    </nav>
+    <button id="theme-toggle" class="btn-theme-toggle"
+            aria-label="Εναλλαγή σκοτεινής λειτουργίας">&#127769; Σκοτεινό</button>
+  </div>
+</header>
 
-  <main>
-    <p><em>Placeholder — περιεχόμενο θα συμπληρωθεί.</em></p>
+<div class="page-wrapper">
+
+  <aside class="sidebar-toc" aria-label="Περιεχόμενα σελίδας">
+    <button class="toc-toggle" aria-expanded="true">&#128203; Περιεχόμενα &#9662;</button>
+    <div class="sidebar-toc__title">Περιεχόμενα</div>
+    <ol class="sidebar-toc__list">
+      <li class="toc-h2"><a href="#sec-tldr">TL;DR</a></li>
+      <li class="toc-h2"><a href="#sec-defs">1. Ορισμοί Ταιριάσματος</a></li>
+      <li class="toc-h2"><a href="#sec-bipartite">2. Διμερή &amp; Ταιριάσματα</a></li>
+      <li class="toc-h2"><a href="#sec-augmenting">3. M-εναλλασσόμενα &amp; Αυξητικά</a></li>
+      <li class="toc-h2"><a href="#sec-hall">4. Θεώρημα Hall</a>
+        <ol>
+          <li class="toc-h3"><a href="#sec-hall-easy">Αναγκαία (⟹)</a></li>
+          <li class="toc-h3"><a href="#sec-hall-hard">Ικανή (⟸) με Επαγωγή</a></li>
+          <li class="toc-h3"><a href="#sec-hall-algo">Αλγόριθμος BFS</a></li>
+        </ol>
+      </li>
+      <li class="toc-h2"><a href="#sec-defect">5. Defect Version</a></li>
+      <li class="toc-h2"><a href="#sec-apps">6. Εφαρμογές</a></li>
+      <li class="toc-h2"><a href="#sec-exercises">Ασκήσεις</a></li>
+      <li class="toc-h2"><a href="#sec-exam">Ερωτήσεις Εξετάσεων</a></li>
+    </ol>
+  </aside>
+
+  <main class="main-content" id="main-content">
+
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <div class="breadcrumbs__item"><a href="../index.html">Αρχική</a></div>
+      <div class="breadcrumbs__item"><a href="../index.html#lecture-cards">Διαλέξεις</a></div>
+      <div class="breadcrumbs__item"><span class="breadcrumbs__current">Διάλεξη 7</span></div>
+    </nav>
+
+    <h1>Διάλεξη 7 &mdash; Ταιριάσματα &amp; Θεώρημα Hall</h1>
+
+    <section id="sec-tldr">
+      <div class="callout callout-tldr">
+        <div class="callout-title">TL;DR</div>
+        <ul>
+          <li><strong>Ταίριασμα</strong>: \(M \subseteq E\) χωρίς κοινές κορυφές.</li>
+          <li><strong>M-αυξητικό μονοπάτι</strong>: ξεκινά και τελειώνει σε αταίριαστες κορυφές.
+              Ύπαρξή του ⟺ \(M\) δεν μέγιστο.</li>
+          <li><strong>Θεώρημα Hall</strong>: Σε διμερές \(G=(L\cup R, E)\): ∃ ταίριασμα του \(L\)
+              ⟺ \(\forall S \subseteq L: |N(S)| \ge |S|\).</li>
+          <li>Απόδειξη (⟸): επαγωγή στο \(|L|\) — δύο περιπτώσεις (χαλαρή / σφιχτή Hall).</li>
+          <li><strong>Defect version</strong>: Αν \(\max_{S\subseteq L}(|S|-|N(S)|) = d\), τότε
+              υπάρχει ταίριασμα μεγέθους \(|L|-d\).</li>
+          <li>Βλ. <a href="lecture8.html">Διάλεξη 8</a>: Dilworth ⟹ Hall.</li>
+        </ul>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- §1 -->
+    <section id="sec-defs">
+      <h2 id="h-defs">1. Ορισμοί Ταιριάσματος</h2>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμοί</div>
+        <ul>
+          <li><strong>Ταίριασμα</strong> (matching): \(M \subseteq E\) ώστε κάθε κορυφή να
+              προσπίπτει σε <em>το πολύ μία</em> ακμή του \(M\).</li>
+          <li><strong>Αταίριαστη κορυφή</strong> (free/exposed): κορυφή που δεν προσπίπτει
+              σε καμία ακμή του \(M\).</li>
+          <li><strong>Ταίρι</strong> κορυφής \(v\): \(M(v)\) — ο μοναδικός γείτονας μέσω \(M\).</li>
+          <li><strong>Ταίριασμα του \(U\)</strong>: κάθε κορυφή του \(U \subseteq V\) είναι ταιριαστή.</li>
+          <li><strong>Πλήρες ταίριασμα</strong>: ταίριασμα του \(V\) (απαιτεί \(|V|\) άρτιο).</li>
+          <li><strong>Τέλειο ταίριασμα</strong>: ταιριάζει <em>κάθε</em> κορυφή (≡ πλήρες).</li>
+          <li><strong>Μέγιστο</strong> (maximum): ταίριασμα μέγιστου πλήθους ακμών.</li>
+          <li><strong>Μεγιστικό</strong> (maximal): δεν μπορεί να επεκταθεί.</li>
+        </ul>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Μέγιστο vs Μεγιστικό</div>
+        <p>Κάθε μέγιστο είναι μεγιστικό αλλά όχι αντίστροφα. Μεγιστικό ταίριασμα μπορεί να
+           έχει μέγεθος πολύ μικρότερο από το βέλτιστο.</p>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- §2 -->
+    <section id="sec-bipartite">
+      <h2 id="h-bipartite">2. Διμερή Γραφήματα και Ταιριάσματα</h2>
+
+      <p>Τα διμερή γραφήματα είναι η πιο φυσική ρύθμιση για ταιριάσματα:
+         \(L\) = «αριστερά» κορυφές, \(R\) = «δεξιά», ακμές μόνο μεταξύ \(L\) και \(R\).</p>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Παράδειγμα — Ανάθεση Εργασιών</div>
+        <p>5 εργαζόμενοι (\(L = \{e_1,\ldots,e_5\}\)) και 5 εργασίες (\(R = \{j_1,\ldots,j_5\}\)).
+           Ακμή \(\{e_i, j_k\}\) αν ο \(e_i\) μπορεί να κάνει την \(j_k\).
+           Ζητούμε ταίριασμα του \(L\): κάθε εργαζόμενος σε διαφορετική εργασία.</p>
+      </div>
+
+      <div class="mermaid" aria-label="Διμερές γράφημα με ταίριασμα">
+graph LR
+    subgraph L["L"]
+      l1["l₁"]
+      l2["l₂"]
+      l3["l₃"]
+      l4["l₄"]
+    end
+    subgraph R["R"]
+      r1["r₁"]
+      r2["r₂"]
+      r3["r₃"]
+      r4["r₄"]
+    end
+    l1 ==> r1
+    l1 --- r2
+    l2 --- r1
+    l2 ==> r3
+    l3 --- r2
+    l3 ==> r4
+    l4 --- r3
+    l4 ==> r2
+      </div>
+      <p style="text-align:center;font-size:0.85rem;color:var(--color-text-muted)">
+        Παχιές ακμές (==&gt;): ταίριασμα \(M = \{l_1r_1, l_2r_3, l_3r_4, l_4r_2\}\). Πλήρες (\(|M|=4\)).</p>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Γειτονιά Συνόλου</div>
+        <p>Για \(S \subseteq L\): \(N(S) = \bigcup_{v \in S} N(v) \cap R\) — το σύνολο
+           <em>όλων</em> γειτόνων κορυφών του \(S\) στο \(R\).</p>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- §3 -->
+    <section id="sec-augmenting">
+      <h2 id="h-augmenting">3. M-εναλλασσόμενα και M-αυξητικά Μονοπάτια</h2>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμοί</div>
+        <ul>
+          <li><strong>M-εναλλασσόμενο μονοπάτι</strong> (alternating path): μονοπάτι που εναλλάσσει
+              ακμές εντός και εκτός \(M\).</li>
+          <li><strong>M-αυξητικό μονοπάτι</strong> (augmenting path):
+              M-εναλλασσόμενο μονοπάτι που ξεκινά <em>και</em> τελειώνει σε
+              αταίριαστες κορυφές.</li>
+          <li><strong>Συμμετρική διαφορά</strong>: \(M' = M \oplus E(P) = (M \setminus E(P)) \cup (E(P) \setminus M)\).</li>
+        </ul>
+      </div>
+
+      <div class="callout callout-theorem">
+        <div class="callout-title">Πρόταση — Αύξηση Ταιριάσματος</div>
+        <p>Αν \(P\) είναι M-αυξητικό μονοπάτι, τότε
+           \(M' = M \oplus E(P)\) είναι ταίριασμα με \(|M'| = |M| + 1\).</p>
+      </div>
+
+      <div class="callout callout-proof">
+        <div class="callout-title">Απόδειξη</div>
+        <details open>
+          <summary>Προβολή</summary>
+          <div class="proof-body">
+            <p>Το \(P\) έχει μήκος άρτιο+1 (ξεκινά από αταίριαστη → γειτονική ακμή ∉ \(M\) → ακμή ∈ \(M\) → ... → αταίριαστη).
+               Άρα \(|E(P)| = 2k+1\) για κάποιο \(k \ge 0\), με \(k\) ακμές ∈ \(M\) και \(k+1\) ∉ \(M\).</p>
+            <p>\(|M'| = |M| - k + (k+1) = |M|+1\). ✓</p>
+            <p>Το \(M'\) είναι ταίριασμα: κάθε κορυφή \(v\) — αν \(v\) εσωτερική του \(P\), η ακμή ∈ \(M\) αντικαθίσταται από ακμή ∉ \(M\) (εξακολουθεί μόνο μία ακμή).
+               Τα δύο άκρα του \(P\) ήταν αταίριαστα: γίνονται ταιριαστά. ✓ \(\square\)</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-theorem">
+        <div class="callout-title">Θεώρημα Berge (1957)</div>
+        <p>Ταίριασμα \(M\) είναι μέγιστο ⟺ δεν υπάρχει M-αυξητικό μονοπάτι.</p>
+      </div>
+
+      <div class="callout callout-proof">
+        <div class="callout-title">Απόδειξη</div>
+        <details>
+          <summary>Προβολή</summary>
+          <div class="proof-body">
+            <p>(⟸) Αν δεν υπάρχει αυξητικό μονοπάτι αλλά ∃ μεγαλύτερο \(M^*\): το \(M \oplus M^*\) περιέχει αυξητικό μονοπάτι για \(M\). Αντίφαση.</p>
+            <p>(⟹) Αν υπάρχει αυξητικό μονοπάτι → \(|M|+1 \le\) μέγεθος βέλτιστου → \(M\) δεν μέγιστο. Αντίφαση. \(\square\)</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Διαισθητική Εξήγηση</div>
+        <p>Φανταστείτε ότι οι ακμές ∈ \(M\) είναι «κόκκινες» και οι ∉ \(M\) «μπλε». Ένα αυξητικό μονοπάτι
+           ξεκινά από ελεύθερη κορυφή, εναλλάσσει μπλε-κόκκινη-μπλε-...-κόκκινη-μπλε, και τελειώνει
+           σε ελεύθερη. Αν αντιστρέψουμε τα χρώματα κατά μήκος του μονοπατιού, κερδίζουμε μία ακμή.</p>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- §4 -->
+    <section id="sec-hall">
+      <h2 id="h-hall">4. Θεώρημα Hall</h2>
+
+      <div class="callout callout-theorem">
+        <div class="callout-title">Θεώρημα Hall (1935)</div>
+        <p>Σε διμερές γράφημα \(G = (L \cup R, E)\): υπάρχει ταίριασμα του \(L\) (κάθε κορυφή
+           του \(L\) ταιριάζεται)
+           αν και μόνον αν για κάθε \(S \subseteq L\):</p>
+        \[ |N(S)| \ge |S|. \]
+        <p>Η συνθήκη αυτή ονομάζεται <strong>συνθήκη Hall</strong>.</p>
+      </div>
+
+      <section id="sec-hall-easy">
+        <h3 id="h-hall-easy">4.1 Απόδειξη (⟹) — Αναγκαία</h3>
+
+        <div class="callout callout-proof">
+          <div class="callout-title">Απόδειξη (⟹)</div>
+          <details open>
+            <summary>Προβολή</summary>
+            <div class="proof-body">
+              <p>Έστω \(M\) ταίριασμα του \(L\) και \(S \subseteq L\).</p>
+              <p>Το \(M\) ταιριάζει κάθε \(v \in S\) σε ένα διαφορετικό \(M(v) \in R\).
+                 Από ορισμό \(M(v) \in N(\{v\}) \subseteq N(S)\).
+                 Αφού οι \(M(v)\) διαφορετικοί (M ταίριασμα): \(|N(S)| \ge |S|\). \(\square\)</p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="sec-hall-hard">
+        <h3 id="h-hall-hard">4.2 Απόδειξη (⟸) — Ικανή με Επαγωγή</h3>
+
+        <div class="callout callout-proof">
+          <div class="callout-title">Απόδειξη (⟸) — Επαγωγή στο |L|</div>
+          <details open>
+            <summary>Προβολή πλήρους απόδειξης</summary>
+            <div class="proof-body">
+              <p>Υποθέτουμε συνθήκη Hall. Επαγωγή στο \(n = |L|\).</p>
+
+              <p><strong>Βάση</strong> \(n = 1\): \(L = \{u\}\). \(|N(\{u\})| \ge 1\), άρα ∃ \(r \in N(u)\).
+                 Ταιριάζουμε \(u \to r\). ✓</p>
+
+              <p><strong>Επαγωγικό Βήμα</strong> \(n > 1\). Δύο περιπτώσεις:</p>
+
+              <hr style="border-color:var(--color-border);margin:0.8rem 0">
+
+              <p><strong>Περίπτωση 1 — Χαλαρή Hall</strong> (για κάθε \(\emptyset \ne S \subsetneq L\): \(|N(S)| \ge |S|+1\)):</p>
+              <ul>
+                <li>Επιλέγουμε αυθαίρετο \(\ell \in L\) και οποιονδήποτε \(r \in N(\ell)\).</li>
+                <li>Ταιριάζουμε \(\ell \to r\).</li>
+                <li>Εφαρμόζουμε ΥΕ στο \(L' = L \setminus \{\ell\}\), \(R' = R \setminus \{r\}\), \(G' = G[L'\cup R']\).</li>
+                <li>Έλεγχος Hall για \(G'\): για \(S \subseteq L'\),
+                    \(|N_{G'}(S)| \ge |N_G(S)| - 1 \ge |S|+1-1 = |S|\). ✓</li>
+              </ul>
+
+              <hr style="border-color:var(--color-border);margin:0.8rem 0">
+
+              <p><strong>Περίπτωση 2 — Σφιχτή Hall</strong> (∃ \(T \subsetneq L\), \(T \ne \emptyset\), \(|N(T)| = |T|\)):</p>
+              <ul>
+                <li><strong>Βήμα Α</strong>: Εφαρμόζουμε ΥΕ στο \((T, N(T))\):
+                    Hall ισχύει (\(T\) υπο-σύνολο \(L\)), άρα ∃ ταίριασμα \(M_T\) του \(T\).</li>
+                <li><strong>Βήμα Β</strong>: Εφαρμόζουμε ΥΕ στο \((L\setminus T,\; R\setminus N(T))\),
+                    δηλ. γράφημα \(G'' = G[{(L\setminus T)} \cup {(R \setminus N(T))}]\).</li>
+                <li>Έλεγχος Hall για \(G''\): για \(S \subseteq L\setminus T\):
+                    \[|N_{G''}(S)| = |N_G(S) \setminus N(T)|.\]
+                    Από Hall στο \(G\) για \(S \cup T\):
+                    \[|N_G(S\cup T)| \ge |S|+|T|.\]
+                    Αλλά \(N_G(S \cup T) = N_G(S) \cup N(T)\), οπότε:
+                    \[|N_G(S)| + |N(T)| - |N_G(S)\cap N(T)| \ge |S|+|T|.\]
+                    Άρα \(|N_G(S)\setminus N(T)| = |N_G(S)| - |N_G(S)\cap N(T)| \ge |S| + |T| - |N(T)| = |S|\). ✓</li>
+                <li><strong>Συνδυασμός</strong>: \(M = M_T \cup M_{L\setminus T}\) ταίριασμα του \(L\). ✓</li>
+              </ul>
+
+              <p>Και οι δύο περιπτώσεις καλύπτουν κάθε ενδεχόμενο. \(\square\)</p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section id="sec-hall-algo">
+        <h3 id="h-hall-algo">4.3 Αλγόριθμος BFS για Αυξητικά Μονοπάτια</h3>
+
+        <p>Ο αλγόριθμος κατασκευάζει το ταίριασμα βήμα-βήμα χρησιμοποιώντας
+           επίπεδα BFS (alternating BFS).</p>
+
+        <div class="callout callout-definition">
+          <div class="callout-title">Ψευδοκώδικας — Augmenting BFS</div>
+          <pre><code>AUGMENT(u, M, G):
+  // Ψάχνει M-αυξητικό μονοπάτι από αταίριαστο u ∈ L
+  // Επιστρέφει true και ενημερώνει M, ή false
+  Visited ← ∅
+  return DFS_AUG(u, M, G, Visited)
+
+DFS_AUG(v, M, G, Visited):
+  for each r ∈ N(v) \ Visited:
+    Visited ← Visited ∪ {r}
+    if r αταίριαστο  OR  DFS_AUG(M⁻¹(r), M, G, Visited):
+      M ← M ∪ {(v,r)} \ {(M⁻¹(r), r)}   // ανανέωση M
+      return true
+  return false
+
+HALL_MATCHING(G = (L∪R, E)):
+  M ← ∅
+  for each u ∈ L:
+    AUGMENT(u, M, G)
+  return M</code></pre>
+        </div>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Πολυπλοκότητα</div>
+          <p>\(O(|L| \cdot (|L|+|E|))\) — κάθε AUGMENT τρέχει σε \(O(|L|+|E|)\).
+             Με Hopcroft-Karp: \(O(\sqrt{|L|} \cdot |E|)\).</p>
+        </div>
+
+        <div class="callout callout-theorem">
+          <div class="callout-title">Παρατήρηση — Αποτυχία ⟹ Παραβίαση Hall</div>
+          <p>Αν το AUGMENT αποτύχει για \(u\): τότε το σύνολο
+             \(S = \{v \in L : v\) επισκέφθηκε το DFS\(\} \cup \{u\}\)
+             παραβιάζει Hall: \(|N_G(S)| = |\text{Visited} \cap R| < |S|\).</p>
+        </div>
+
+        <div class="callout callout-proof">
+          <div class="callout-title">Απόδειξη</div>
+          <details>
+            <summary>Προβολή</summary>
+            <div class="proof-body">
+              <p>Έστω \(S\) = L-κορυφές που επισκέφτηκε το DFS, \(T\) = R-κορυφές που επισκέφτηκε.
+                 Αφού το DFS εξάντλησε όλους τους γείτονες, \(N(S) \subseteq T\).
+                 Αφού δεν βρέθηκε αταίριαστο \(r \in T\): κάθε \(r \in T\) ταιριαστό.
+                 Κάθε τέτοιο ταίρι ανήκει στο \(S \setminus \{u\}\) (αλλιώς θα επεκτεινόταν το DFS).
+                 Άρα \(|T| \le |S|-1 < |S|\).</p>
+              <p>Επομένως \(|N(S)| \le |T| < |S|\) — παραβίαση Hall. \(\square\)</p>
+            </div>
+          </details>
+        </div>
+      </section>
+    </section>
+
+    <hr>
+
+    <!-- §5 -->
+    <section id="sec-defect">
+      <h2 id="h-defect">5. Defect Version — Θεώρημα Hall με Έλλειψη</h2>
+
+      <div class="callout callout-definition">
+        <div class="callout-title">Ορισμός — Έλλειψη Hall (deficiency)</div>
+        <p>Η <strong>έλλειψη</strong> του γραφήματος:
+           \(\displaystyle\delta(G) = \max_{S \subseteq L} \bigl(|S| - |N(S)|\bigr) \ge 0.\)</p>
+      </div>
+
+      <div class="callout callout-theorem">
+        <div class="callout-title">Θεώρημα Hall — Defect Version</div>
+        <p>Σε διμερές \(G = (L \cup R, E)\): το μέγιστο ταίριασμα έχει μέγεθος
+           \(|L| - \delta(G)\).</p>
+      </div>
+
+      <div class="callout callout-proof">
+        <div class="callout-title">Απόδειξη — Προσθήκη Εικονικών Κορυφών</div>
+        <details open>
+          <summary>Προβολή</summary>
+          <div class="proof-body">
+            <p>Έστω \(\delta = \delta(G)\). Προσθέτουμε \(\delta\) εικονικές κορυφές
+               \(r_1',\ldots,r_\delta'\) στο \(R\) και τις συνδέουμε με <em>όλες</em>
+               τις κορυφές του \(L\): \(G^+ = G + \{(l, r_i') : l \in L, i=1,\ldots,\delta\}\).</p>
+
+            <p><strong>Ισχυρισμός</strong>: \(G^+\) ικανοποιεί Hall.</p>
+            <p>Για \(S \subseteq L\): \(N_{G^+}(S) = N_G(S) \cup \{r_1',\ldots,r_\delta'\}\),
+               άρα \(|N_{G^+}(S)| \ge |N_G(S)| + \delta \ge |S| - \delta + \delta = |S|\). ✓</p>
+
+            <p>Από Θεώρημα Hall, \(G^+\) έχει ταίριασμα \(M^+\) του \(L\).
+               Αφαιρούμε τις εικονικές ακμές: χάνουμε ακριβώς \(\delta\) ακμές
+               (μία για κάθε αταίριαστη θέση), παίρνουμε ταίριασμα μεγέθους \(|L|-\delta\). ✓</p>
+
+            <p><strong>Κάτω φράγμα</strong>: Αν \(S^*\) επιτυγχάνει το \(\delta\):
+               \(|S^*| - |N(S^*)| = \delta\). Αλλά \(|S^*|\) κορυφές σε \(|N(S^*)| = |S^*|-\delta\)
+               δεξιές θέσεις → το πολύ \(|S^*|-\delta\) ακμές του \(S^*\) στο \(M\) →
+               τουλάχιστον \(\delta\) κορυφές του \(L\) αταίριαστες. \(\square\)</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- §6 -->
+    <section id="sec-apps">
+      <h2 id="h-apps">6. Εφαρμογές</h2>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Εφαρμογή 1 — Συστήματα Διακριτών Αντιπροσώπων (SDR)</div>
+        <p>Δίνονται σύνολα \(A_1, \ldots, A_n\) (με πιθανές επικαλύψεις).
+           Θέλουμε διακριτούς αντιπροσώπους \(a_i \in A_i\) με \(a_i \ne a_j\) για \(i \ne j\).</p>
+        <p><strong>Hall</strong>: Ισοδύναμο με ταίριασμα σε διμερές με \(L = \{A_1,\ldots,A_n\}\),
+           \(R = \bigcup A_i\), ακμή \((A_i, x)\) αν \(x \in A_i\).
+           Ικανή και αναγκαία συνθήκη: \(\forall I \subseteq [n]: |A_{i_1} \cup \cdots \cup A_{i_k}| \ge k\).</p>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Εφαρμογή 2 — Γαμήλιο Πρόβλημα</div>
+        <p>\(n\) άντρες και \(n\) γυναίκες. Κάθε άντρας γνωρίζει μερικές γυναίκες.
+           Πότε μπορούμε να τους παντρέψουμε (bijection);
+           Απάντηση: Hall — για κάθε ομάδα \(k\) αντρών, γνωρίζουν μαζί \(\ge k\) γυναίκες.</p>
+      </div>
+
+      <div class="callout callout-example">
+        <div class="callout-title">Εφαρμογή 3 — Latin Squares</div>
+        <p>Κάθε μερικώς συμπληρωμένο \(n\times n\) Latin square (κάθε τιμή 1 έως \(n\) εμφανίζεται
+           το πολύ μία φορά σε κάθε γραμμή/στήλη) μπορεί να συμπληρωθεί σε πλήρες.
+           Απόδειξη μέσω Hall: για κάθε γραμμή, οι διαθέσιμες τιμές σχηματίζουν σύνολο
+           που ικανοποιεί Hall.</p>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Σύνδεση με Dilworth (Διάλεξη 8)</div>
+        <p>Το Θεώρημα Dilworth (<a href="lecture8.html">Διάλεξη 8</a>) γενικεύει το Hall:
+           οποιαδήποτε ελάχιστη αποσύνθεση σε αλυσίδες αντιστοιχεί σε ταίριασμα
+           σε διμερές γράφημα, και το Θεώρημα Hall ανακτάται ως πόρισμα.
+           Επίσης το Θεώρημα Erdős-Szekeres (<a href="lecture4.html">Διάλεξη 4</a>)
+           ανακτάται ως πόρισμα του Dilworth.</p>
+      </div>
+    </section>
+
+    <hr>
+
+    <section id="sec-exercises">
+      <h2 id="h-exercises">Ασκήσεις</h2>
+      <div class="callout callout-exam">
+        <div class="callout-title">Ασκήσεις Πρακτικής</div>
+        <ol>
+          <li>Σε \(K_{3,3}\) (πλήρες διμερές), βρείτε όλα τα τέλεια ταιριάσματα (πόσα υπάρχουν;).</li>
+          <li>Δείξτε ότι κάθε \(d\)-κανονικό διμερές γράφημα (\(d \ge 1\)) ικανοποιεί Hall και άρα έχει τέλειο ταίριασμα.</li>
+          <li>Αν \(|L| = |R| = n\) και \(G\) δεν έχει τέλειο ταίριασμα, βρείτε \(S \subseteq L\) που παραβιάζει Hall και κατασκευάστε ελάχιστο vertex cover (König).</li>
+          <li>Χρησιμοποιήστε Defect Hall για να δείξετε: αν κάθε άνδρας γνωρίζει τουλάχιστον \(k\) γυναίκες και κάθε γυναίκα γνωρίζει τουλάχιστον \(k\) άνδρες, τότε υπάρχει τέλειο ταίριασμα.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="sec-exam">
+      <h2 id="h-exam">Συχνές Ερωτήσεις Εξετάσεων</h2>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 1</div>
+        <p>Τι είναι M-αυξητικό μονοπάτι; Αποδείξτε ότι αύξηση κατά αυξητικό μονοπάτι δίνει μεγαλύτερο ταίριασμα.</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>M-αυξητικό: εναλλασσόμενο μονοπάτι από αταίριαστη σε αταίριαστη.
+               \(M' = M \oplus E(P)\): έχει \(k\) ακμές από \(M\) και \(k+1\) εκτός, άρα \(|M'|=|M|+1\).
+               Κάθε κορυφή έχει ≤1 ακμή από \(M'\) (οι εσωτερικές κορυφές έχουν ακριβώς 1). ✓</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 2</div>
+        <p>Αποδείξτε το Θεώρημα Hall — και τις δύο κατευθύνσεις.</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>(⟹) Αν \(M\) ταίριασμα \(L\): για \(S\subseteq L\), τα \(M(v)\in N(S)\) διακριτά → \(|N(S)|\ge|S|\). ✓</p>
+            <p>(⟸) Επαγωγή στο \(|L|\). Βάση: τετριμμένη. Βήμα: Περ. 1 (χαλαρή Hall): ταίριαξε τυχαία ακμή, ΥΕ στο υπόλοιπο. Περ. 2 (σφιχτό \(T\)): ΥΕ στο \(T\), μετά δείξε Hall για \(L\setminus T\) στο \(G[L\setminus T \cup R\setminus N(T)]\) χρησιμοποιώντας \(|N(T)|=|T|\). ✓</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 3</div>
+        <p>Αποδείξτε την Defect version: μέγιστο ταίριασμα = \(|L| - \delta(G)\).</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Προσθέτω \(\delta = \delta(G)\) εικονικές κορυφές σε \(R\) συνδεδεμένες με όλο το \(L\).
+               Για \(S \subseteq L\): \(|N^+(S)| \ge |N(S)|+\delta \ge |S|-\delta+\delta=|S|\) — Hall ✓.
+               Ταίριασμα \(M^+\) του \(L\) στο \(G^+\) → αφαίρεση εικονικών δίνει \(|L|-\delta\). ✓
+               Κάτω φράγμα: το σύνολο \(S^*\) που επιτυγχάνει \(\delta\) δεν μπορεί να ταιριάξει περισσότερο από \(|S^*|-\delta\) κορυφές.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 4</div>
+        <p>Αποδείξτε: κάθε \(d\)-κανονικό διμερές γράφημα (\(d \ge 1\)) έχει τέλειο ταίριασμα.</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Δείχνω Hall. Για \(S \subseteq L\): μετράω ακμές από \(S\) σε \(N(S)\).
+               Κάθε \(v\in S\): \(d\) ακμές → συνολικά \(d|S|\) ακμές.
+               Κάθε \(r \in N(S)\): το πολύ \(d\) ακμές → \(d|S| \le d|N(S)|\) → \(|N(S)| \ge |S|\). ✓</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 5</div>
+        <p>Πώς ο αλγόριθμος BFS εντοπίζει παραβίαση Hall αν δεν βρει αυξητικό μονοπάτι;</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>Έστω \(S\) = L-κορυφές, \(T\) = R-κορυφές που επισκέφτηκε το BFS από \(u\).
+               \(N(S) \subseteq T\), και κάθε \(r \in T\) ταιριαστό σε \(S\setminus\{u\}\).
+               Άρα \(|N(S)| \le |T| \le |S|-1 < |S|\) — παραβίαση Hall. ✓</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout callout-exam">
+        <div class="callout-title">Ερώτηση 6</div>
+        <p>Τι είναι SDR; Πότε υπάρχει SDR για συλλογή \(A_1,\ldots,A_n\);</p>
+        <details>
+          <summary>Προτεινόμενη απάντηση</summary>
+          <div class="proof-body">
+            <p>SDR = σύστημα διακριτών αντιπροσώπων: \(a_i \in A_i\) με \(a_i\ne a_j\) για \(i\ne j\).
+               Υπάρχει ⟺ Hall: \(\forall I \subseteq [n]: |\bigcup_{i\in I} A_i| \ge |I|\).</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <nav class="lecture-nav" aria-label="Πλοήγηση διαλέξεων">
+      <a href="lecture6.html" class="lecture-nav__btn">&#8592; Διάλεξη 6</a>
+      <span class="lecture-nav__current">Διάλεξη 7 / 8</span>
+      <a href="lecture8.html" class="lecture-nav__btn">Διάλεξη 8: Σχέσεις &amp; Dilworth &#8594;</a>
+    </nav>
+
   </main>
+</div>
 
-  <footer>
-    <p>Σημειώσεις Μαθηματικών Πληροφορικής — ΕΚΠΑ</p>
-  </footer>
+<footer class="site-footer" role="contentinfo">
+  <p>
+    Σημειώσεις Μαθηματικών Πληροφορικής &mdash; ΕΚΠΑ &nbsp;|&nbsp;
+    <a href="../index.html">Αρχική</a> &nbsp;|&nbsp;
+    Τελευταία ενημέρωση: <time datetime="2026-05-22">22 Μαΐου 2026</time>
+  </p>
+</footer>
 </body>
 </html>
